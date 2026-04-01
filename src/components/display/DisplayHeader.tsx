@@ -21,28 +21,28 @@ const DisplayHeader = () => {
   return (
     <header className="flex items-stretch bg-primary islamic-pattern">
       {/* Logo & Title */}
-      <div className="flex items-center gap-3 px-5 py-2 flex-1">
+      <div className="flex items-center gap-[1vw] px-[1.5vw] py-[0.5vh] flex-1">
         <img
           src={logoStqr}
           alt="Logo STQ Riyadhussholihiin"
-          className="w-14 h-14 flex-shrink-0 object-contain"
+          className="h-[7vh] w-[7vh] flex-shrink-0 object-contain"
         />
         <div>
-          <h1 className="text-primary-foreground font-barlow font-bold text-[14.5pt] tracking-wide leading-tight">
+          <h1 className="text-primary-foreground font-barlow font-bold text-[2vw] tracking-wide leading-tight">
             STQ Riyadhussholihiin
           </h1>
-          <p className="text-primary-foreground font-barlow font-bold text-[24pt] leading-none tracking-wide uppercase">
+          <p className="text-primary-foreground font-barlow font-bold text-[3.3vw] leading-[0.95] tracking-wide uppercase">
             School Digital Information Display
           </p>
         </div>
       </div>
 
       {/* Date & Clock */}
-      <div className="flex flex-col items-end justify-center bg-orange px-5 py-2 min-w-[220px]">
-        <p className="text-primary-foreground font-barlow font-bold text-[12pt]">
+      <div className="flex flex-col items-end justify-center bg-orange px-[1.5vw] py-[0.5vh] min-w-[16vw]">
+        <p className="text-primary-foreground font-barlow font-bold text-[1.6vw] leading-tight">
           {day}, {date} {month} {year}
         </p>
-        <p className="text-primary-foreground font-barlow font-bold text-[26pt] leading-none tracking-wider tabular-nums">
+        <p className="text-primary-foreground font-barlow font-bold text-[3.6vw] leading-none tracking-wider tabular-nums">
           {time}
         </p>
       </div>

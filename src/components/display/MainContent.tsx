@@ -15,8 +15,8 @@ const MainContent = () => {
   }, [config.contentType, config.sliderImages.length]);
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden m-2 mr-1">
-      <div className="flex-1 relative bg-foreground/5 rounded-sm overflow-hidden">
+    <div className="flex-1 flex flex-col overflow-hidden m-[0.5vw] mr-[0.5vw]">
+      <div className="flex-1 relative bg-foreground/5 overflow-hidden">
         {config.contentType === "video" ? (
           <iframe
             src={config.videoUrl}
@@ -37,15 +37,12 @@ const MainContent = () => {
                 }`}
               />
             ))}
-            {/* Slide indicators */}
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
               {config.sliderImages.map((_, i) => (
                 <div
                   key={i}
                   className={`w-2.5 h-2.5 rounded-full transition-all ${
-                    i === currentSlide
-                      ? "bg-gold scale-125"
-                      : "bg-primary-foreground/50"
+                    i === currentSlide ? "bg-gold scale-125" : "bg-primary-foreground/50"
                   }`}
                 />
               ))}
