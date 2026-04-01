@@ -155,6 +155,23 @@ const AdminPage = () => {
             onChange={(v) => updateConfig({ runningText: v })}
             multiline
           />
+          <div className="mb-3">
+            <label className="text-sm font-medium text-foreground block mb-1">
+              Kecepatan Running Text: {config.runningTextSpeed}s (semakin kecil = semakin cepat)
+            </label>
+            <input
+              type="range"
+              min="10"
+              max="120"
+              value={config.runningTextSpeed}
+              onChange={(e) => updateConfig({ runningTextSpeed: Number(e.target.value) })}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Cepat (10s)</span>
+              <span>Lambat (120s)</span>
+            </div>
+          </div>
         </Section>
       </div>
     </div>
