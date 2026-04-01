@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Amiri:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Amiri:wght@400;700&display=swap');
 
 @layer base {
   :root {
@@ -15,7 +15,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 160 30% 10%;
 
-    --primary: 160 84% 24%;
+    --primary: 180 100% 20%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 43 90% 52%;
@@ -32,27 +32,31 @@
 
     --border: 160 20% 85%;
     --input: 160 20% 85%;
-    --ring: 160 84% 24%;
+    --ring: 180 100% 20%;
 
     --radius: 0.5rem;
 
-    --emerald-dark: 160 84% 18%;
-    --emerald: 160 84% 24%;
-    --emerald-light: 160 60% 40%;
+    --emerald-dark: 180 100% 16%;
+    --emerald: 180 100% 20%;
+    --emerald-light: 180 60% 35%;
     --gold: 43 90% 52%;
     --gold-light: 43 80% 70%;
-    --cream: 45 30% 96%;
-    --teal: 180 50% 30%;
+    --cream: 45 50% 92%;
+    --teal: 180 100% 20%;
     --orange: 25 95% 55%;
+    --schedule-header: 25 95% 55%;
+    --footer-bg: 45 60% 90%;
 
-    --sidebar-background: 160 84% 18%;
+    --sidebar-background: 180 100% 16%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 43 90% 52%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 160 60% 30%;
+    --sidebar-accent: 180 60% 25%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 160 50% 25%;
+    --sidebar-border: 180 50% 25%;
     --sidebar-ring: 43 90% 52%;
+
+    --running-text-speed: 30s;
   }
 }
 
@@ -61,14 +65,14 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-poppins;
+    @apply bg-background text-foreground font-barlow;
     overflow: hidden;
   }
 }
 
 @layer utilities {
-  .font-poppins {
-    font-family: 'Poppins', sans-serif;
+  .font-barlow {
+    font-family: 'Barlow Condensed', sans-serif;
   }
   .font-amiri {
     font-family: 'Amiri', serif;
@@ -86,7 +90,7 @@
 }
 
 .animate-marquee {
-  animation: marquee 30s linear infinite;
+  animation: marquee var(--running-text-speed) linear infinite;
 }
 
 .islamic-pattern {

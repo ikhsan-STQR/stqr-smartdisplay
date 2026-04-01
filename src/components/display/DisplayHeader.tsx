@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import logoStqr from "@/assets/logo-stqr.png";
 
 const DAYS_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 const MONTHS_ID = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -18,17 +19,19 @@ const DisplayHeader = () => {
   const time = now.toLocaleTimeString("id-ID", { hour12: false });
 
   return (
-    <header className="flex items-stretch bg-emerald-dark islamic-pattern">
+    <header className="flex items-stretch bg-primary islamic-pattern">
       {/* Logo & Title */}
-      <div className="flex items-center gap-3 px-5 py-3 flex-1">
-        <div className="w-14 h-14 rounded-full bg-card flex items-center justify-center shadow-md border-2 border-gold flex-shrink-0">
-          <span className="text-primary font-bold text-xs text-center leading-tight">STQ</span>
-        </div>
+      <div className="flex items-center gap-3 px-5 py-2 flex-1">
+        <img
+          src={logoStqr}
+          alt="Logo STQ Riyadhussholihiin"
+          className="w-14 h-14 flex-shrink-0 object-contain"
+        />
         <div>
-          <h1 className="text-primary-foreground font-poppins font-bold text-xl tracking-wide leading-tight">
+          <h1 className="text-primary-foreground font-barlow font-bold text-[14.5pt] tracking-wide leading-tight">
             STQ Riyadhussholihiin
           </h1>
-          <p className="text-gold font-poppins font-semibold text-sm tracking-widest uppercase">
+          <p className="text-primary-foreground font-barlow font-bold text-[24pt] leading-none tracking-wide uppercase">
             School Digital Information Display
           </p>
         </div>
@@ -36,10 +39,10 @@ const DisplayHeader = () => {
 
       {/* Date & Clock */}
       <div className="flex flex-col items-end justify-center bg-orange px-5 py-2 min-w-[220px]">
-        <p className="text-primary-foreground font-poppins font-semibold text-sm">
+        <p className="text-primary-foreground font-barlow font-bold text-[12pt]">
           {day}, {date} {month} {year}
         </p>
-        <p className="text-primary-foreground font-poppins font-bold text-3xl tracking-wider tabular-nums">
+        <p className="text-primary-foreground font-barlow font-bold text-[26pt] leading-none tracking-wider tabular-nums">
           {time}
         </p>
       </div>

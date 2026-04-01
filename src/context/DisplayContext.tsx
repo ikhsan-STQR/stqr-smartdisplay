@@ -7,20 +7,14 @@ export interface ScheduleItem {
 }
 
 export interface DisplayConfig {
-  // Main content
   contentType: "video" | "slider";
   videoUrl: string;
   sliderImages: string[];
-
-  // Sidebar announcements
   announcementPosters: string[];
-
-  // Schedule
   jadwalPelajaran: ScheduleItem[];
-
-  // Footer
   dalilHariIni: string;
   runningText: string;
+  runningTextSpeed: number; // seconds for one full scroll
 }
 
 interface DisplayContextType {
@@ -44,7 +38,7 @@ const defaultConfig: DisplayConfig = {
     { kelas: "I-A", pelajaran: "TEMATIK", waktu: "07:30" },
     { kelas: "I-B", pelajaran: "CALISTUNG", waktu: "07:30" },
     { kelas: "I-C", pelajaran: "CALISTUNG", waktu: "07:30" },
-    { kelas: "II-A", pelajaran: "PAI", waktu: "08:00" },
+    { kelas: "II-A", pelajaran: "P A I", waktu: "08:00" },
     { kelas: "II-B", pelajaran: "CALISTUNG", waktu: "08:00" },
     { kelas: "II-C", pelajaran: "TEMATIK", waktu: "08:00" },
     { kelas: "III-A", pelajaran: "B. INGGRIS", waktu: "08:30" },
@@ -59,7 +53,8 @@ const defaultConfig: DisplayConfig = {
   dalilHariIni:
     '"Maukah aku tunjukkan sesuatu yang jika dilakukan akan membuat kalian saling mencintai? Sebarkan salam di antara kalian" (HR. Muslim)',
   runningText:
-    'Running Text: "Maukah aku tunjukkan sesuatu yang jika dilakukan akan membuat kalian saling mencintai? Sebarkan salam di antara kalian" (HR. Muslim) | Pendaftaran Santri Baru TA 2026/2027 dibuka! | Kegiatan Pesantren Kilat Ramadhan 1447H',
+    '"Maukah aku tunjukkan sesuatu yang jika dilakukan akan membuat kalian saling mencintai? Sebarkan salam di antara kalian" (HR. Muslim) | Pendaftaran Santri Baru TA 2026/2027 dibuka! | Kegiatan Pesantren Kilat Ramadhan 1447H',
+  runningTextSpeed: 30,
 };
 
 const DisplayContext = createContext<DisplayContextType | undefined>(undefined);
