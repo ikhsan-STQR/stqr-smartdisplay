@@ -15,16 +15,8 @@ const MainContent = () => {
   }, [config.contentType, config.sliderImages.length]);
 
   return (
-    <div className="flex-1 flex flex-col bg-card rounded-lg overflow-hidden shadow-md border border-border m-2 mr-1">
-      {/* Label */}
-      <div className="bg-primary px-4 py-1.5">
-        <span className="text-primary-foreground font-poppins font-semibold text-xs uppercase tracking-wider">
-          {config.contentType === "video" ? "Video Kajian" : "Galeri Kegiatan"}
-        </span>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 relative bg-foreground/5">
+    <div className="flex-1 flex flex-col overflow-hidden m-2 mr-1">
+      <div className="flex-1 relative bg-foreground/5 rounded-sm overflow-hidden">
         {config.contentType === "video" ? (
           <iframe
             src={config.videoUrl}

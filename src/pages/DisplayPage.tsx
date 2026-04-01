@@ -5,7 +5,7 @@ import DisplayFooter from "@/components/display/DisplayFooter";
 
 const DisplayPage = () => {
   return (
-    <div className="h-screen w-screen flex flex-col overflow-hidden bg-teal">
+    <div className="h-screen w-screen flex flex-col overflow-hidden bg-primary">
       <DisplayHeader />
       <div className="flex-1 flex min-h-0">
         <MainContent />
