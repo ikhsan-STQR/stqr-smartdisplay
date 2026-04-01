@@ -6,7 +6,6 @@ const DisplaySidebar = () => {
   const [showSchedule, setShowSchedule] = useState(true);
   const [currentPoster, setCurrentPoster] = useState(0);
 
-  // Alternate between schedule and posters every 10 seconds
   useEffect(() => {
     if (config.announcementPosters.length > 0) {
       const timer = setInterval(() => {
@@ -16,7 +15,6 @@ const DisplaySidebar = () => {
     }
   }, [config.announcementPosters.length]);
 
-  // Cycle posters
   useEffect(() => {
     if (!showSchedule && config.announcementPosters.length > 1) {
       const timer = setInterval(() => {
@@ -27,10 +25,10 @@ const DisplaySidebar = () => {
   }, [showSchedule, config.announcementPosters.length]);
 
   return (
-    <div className="w-[32%] flex flex-col m-2 ml-1">
+    <div className="w-[32%] flex flex-col m-[0.5vw] ml-0">
       {/* Header - JADWAL KELAS */}
-      <div className="bg-orange px-3 py-1.5">
-        <span className="text-primary-foreground font-barlow font-bold text-[12pt] uppercase tracking-wider">
+      <div className="bg-orange px-[1vw] py-[0.5vh]">
+        <span className="text-primary-foreground font-barlow font-bold text-[1.6vw] uppercase tracking-wider">
           {showSchedule ? "Jadwal Kelas" : "Pengumuman"}
         </span>
       </div>
@@ -44,13 +42,15 @@ const DisplaySidebar = () => {
                 <tr
                   key={i}
                   className={`${
-                    i % 2 === 0 ? "bg-card" : "bg-muted"
+                    i % 2 === 0
+                      ? "bg-[hsl(190,80%,85%)]"
+                      : "bg-card"
                   } border-b border-border`}
                 >
-                  <td className="px-3 py-[3px] font-bold text-primary font-barlow text-[9pt] text-center w-16">
+                  <td className="px-[1vw] py-[0.3vh] font-bold text-foreground font-barlow text-[1.2vw] text-center w-[30%]">
                     {item.kelas}
                   </td>
-                  <td className="px-3 py-[3px] font-barlow font-bold text-foreground text-[9pt] text-center">
+                  <td className="px-[1vw] py-[0.3vh] font-barlow font-bold text-foreground text-[1.2vw] text-center">
                     {item.pelajaran}
                   </td>
                 </tr>
