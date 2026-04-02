@@ -1,5 +1,17 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
+export interface ContentSchedule {
+  id: string;
+  name: string;
+  type: "main" | "announcement" | "runningText";
+  contentType?: "video" | "slider"; // only for "main"
+  content: string | string[]; // URL, Array of URLs, or Text
+  startTime: string; // HH:mm
+  endTime: string;   // HH:mm
+  days: number[];    // [0, 1, 2, 3, 4, 5, 6] (0 = Sunday)
+  isActive: boolean;
+}
+
 export interface ScheduleItem {
   kelas: string;
   pelajaran: string;
@@ -14,7 +26,8 @@ export interface DisplayConfig {
   jadwalPelajaran: ScheduleItem[];
   dalilHariIni: string;
   runningText: string;
-  runningTextSpeed: number; // seconds for one full scroll
+  runningTextSpeed: number;
+  schedules: ContentSchedule[];
 }
 
 interface DisplayContextType {
@@ -55,6 +68,7 @@ const defaultConfig: DisplayConfig = {
   runningText:
     '"Maukah aku tunjukkan sesuatu yang jika dilakukan akan membuat kalian saling mencintai? Sebarkan salam di antara kalian" (HR. Muslim) | Pendaftaran Santri Baru TA 2026/2027 dibuka! | Kegiatan Pesantren Kilat Ramadhan 1447H',
   runningTextSpeed: 30,
+  schedules: [],
 };
 
 const DisplayContext = createContext<DisplayContextType | undefined>(undefined);
