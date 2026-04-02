@@ -25,13 +25,13 @@ const DisplayHeader = () => {
         <img
           src={logoStqr}
           alt="Logo STQ Riyadhussholihiin"
-          className="h-[10vh] w-[10vh] flex-shrink-0 object-contain"
+          className="h-[8vh] max-h-20 w-auto flex-shrink-0 object-contain"
         />
         <div className="flex flex-col">
-          <h1 className="text-[var(--display-brown)] font-barlow font-bold text-[2.2vw] tracking-normal leading-[1.1]">
+          <h1 className="text-[var(--display-brown)] font-barlow font-bold text-[2vw] tracking-normal leading-[1.1]">
             STQ Riyadhussholihiin
           </h1>
-          <p className="text-[var(--display-olive)] font-barlow font-black text-[3.8vw] leading-[0.9] tracking-normal uppercase">
+          <p className="text-[var(--display-olive)] font-barlow font-black text-[3.2vw] leading-[0.9] tracking-normal uppercase">
             School Digital Information Display
           </p>
         </div>
@@ -42,7 +42,7 @@ const DisplayHeader = () => {
         <p className="font-barlow font-bold text-[1.4vw] leading-tight mb-[0.2vh] uppercase tracking-[0.1em] opacity-90">
           {day}, {date} {month} {year}
         </p>
-        <p className="font-barlow font-black text-[4.4vw] leading-none tracking-tighter tabular-nums drop-shadow-md">
+        <p className="font-barlow font-black text-[4vw] leading-none tracking-tighter tabular-nums drop-shadow-md">
           {time}
         </p>
       </div>

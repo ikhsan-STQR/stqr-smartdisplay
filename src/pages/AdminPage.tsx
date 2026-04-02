@@ -305,6 +305,11 @@ const AdminPage = () => {
                   onChange={(v) => updateConfig({ runningText: v })}
                   multiline
                 />
+                <InputField
+                  label="Lokasi Jadwal Shalat (Kecamatan/Kota)"
+                  value={config.prayerLocation}
+                  onChange={(v) => updateConfig({ prayerLocation: v })}
+                />
                 <div className="pt-2">
                   <label className="text-xs font-bold text-muted-foreground block mb-1 uppercase">
                     Kecepatan: {config.runningTextSpeed}s
