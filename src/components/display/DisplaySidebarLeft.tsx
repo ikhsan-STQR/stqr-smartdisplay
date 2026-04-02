@@ -11,11 +11,11 @@ const DisplaySidebarLeft = () => {
     const updateActiveSchedule = () => {
       const now = new Date();
       const currentTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
-      
-      const filtered = config.jadwalPelajaran.filter(item => 
+
+      const filtered = config.jadwalPelajaran.filter(item =>
         currentTime >= item.startTime && currentTime < item.endTime
       );
-      
+
       setActiveItems(filtered);
     };
 
@@ -52,7 +52,7 @@ const DisplaySidebarLeft = () => {
       {/* Sidebar Content Area */}
       <div className="flex-1 bg-gray-50/50 rounded-xl relative overflow-hidden flex flex-col items-center justify-center p-2">
         {activeItems.length > 0 ? (
-          <div 
+          <div
             className="w-full h-full flex flex-col gap-2 transition-opacity duration-500 ease-in-out"
             key={currentPage} // Forces re-mount for simple fade or use separate state for transition if needed
           >
@@ -75,8 +75,8 @@ const DisplaySidebarLeft = () => {
         {activeItems.length > ITEMS_PER_PAGE && (
           <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
             {Array.from({ length: Math.ceil(activeItems.length / ITEMS_PER_PAGE) }).map((_, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className={`h-1 rounded-full transition-all duration-300 ${i === currentPage ? "w-4 bg-[#1e5666]" : "w-1 bg-gray-300"}`}
               />
             ))}

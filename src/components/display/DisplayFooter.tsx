@@ -11,14 +11,14 @@ const DisplayFooter = () => {
       const currentTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
       const currentDay = now.getDay();
 
-      const active = config.schedules.find(s => 
-        s.isActive && 
-        s.type === "runningText" && 
+      const active = config.schedules.find(s =>
+        s.isActive &&
+        s.type === "runningText" &&
         s.days.includes(currentDay) &&
-        currentTime >= s.startTime && 
+        currentTime >= s.startTime &&
         currentTime < s.endTime
       );
-      
+
       setActiveSchedule(active || null);
     };
 
@@ -42,7 +42,7 @@ const DisplayFooter = () => {
       <div className="flex-1 h-full bg-[var(--greenscreen)] rounded-[1vw] overflow-hidden flex items-center shadow-inner">
         <div
           className="animate-marquee whitespace-nowrap font-montserrat font-medium text-primary text-[1.8vw] px-[2vw]"
-          style={{ 
+          style={{
             animationDuration: `${config.runningTextSpeed || 30}s`,
             animationPlayState: textToDisplay ? "running" : "paused"
           }}
