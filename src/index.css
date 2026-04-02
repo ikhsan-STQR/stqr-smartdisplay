@@ -6,56 +6,22 @@
 
 @layer base {
   :root {
-    --background: 150 20% 96%;
-    --foreground: 160 30% 10%;
+    --background: 40 30% 95%; /* #f7f4ed */
+    --foreground: 0 0% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 160 30% 10%;
+    --card-foreground: 0 0% 20%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 160 30% 10%;
-
-    --primary: 180 100% 20%;
+    --primary: 181 100% 15%; /* #004d4f */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 43 90% 52%;
-    --secondary-foreground: 160 30% 10%;
+    --display-brown: 28 26% 24%; /* #4D3D2D */
+    --display-olive: 42 42% 42%;  /* #977D3D (adjusted to HSL) */
+    --display-teal: 181 100% 15%; /* #004d4f */
+    --display-cream: 40 40% 97%; /* #fdfaf5 */
+    --greenscreen: 120 100% 50%;
 
-    --muted: 150 15% 92%;
-    --muted-foreground: 160 10% 40%;
-
-    --accent: 43 90% 52%;
-    --accent-foreground: 160 30% 10%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 160 20% 85%;
-    --input: 160 20% 85%;
-    --ring: 180 100% 20%;
-
-    --radius: 0.5rem;
-
-    --emerald-dark: 180 100% 16%;
-    --emerald: 180 100% 20%;
-    --emerald-light: 180 60% 35%;
-    --gold: 43 90% 52%;
-    --gold-light: 43 80% 70%;
-    --cream: 45 50% 92%;
-    --teal: 180 100% 20%;
-    --orange: 25 95% 55%;
-    --schedule-header: 25 95% 55%;
-    --footer-bg: 45 60% 90%;
-
-    --sidebar-background: 180 100% 16%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 43 90% 52%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 180 60% 25%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 180 50% 25%;
-    --sidebar-ring: 43 90% 52%;
-
+    --radius: 1.2vw;
     --running-text-speed: 30s;
   }
 }
@@ -94,5 +60,5 @@
 }
 
 .islamic-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a48b4e' fill-opacity='0.04'%3E%3Cpath d='M72 68v-8h-4v8h-8v4h8v8h4v-8h8v-4h-8zm0-60V0h-4v8h-8v4h8v8h4V12h8V8h-8zM12 68v-8H8v8H0v4h8v8h4v-8h8v-4h-8zM12 8V0H8v8H0v4h8v8h4V12h8V8h-12z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
