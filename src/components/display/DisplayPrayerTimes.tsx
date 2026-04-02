@@ -5,12 +5,12 @@ const DisplayPrayerTimes = () => {
   const { config } = useDisplay();
   const [timings, setTimings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [nextPrayer, setNextPrayer] = useState<{ name: string; time: string; diff: string } | null>(null);
 
   useEffect(() => {
     const fetchPrayerTimes = async () => {
       try {
         setLoading(true);
-        // Using Aladhan API
         const location = config.prayerLocation || "Pandeglang, Banten";
         const response = await fetch(
           `http://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(location)}&country=Indonesia&method=11`
@@ -27,10 +27,62 @@ const DisplayPrayerTimes = () => {
     };
 
     fetchPrayerTimes();
-    // Refresh every hour
     const interval = setInterval(fetchPrayerTimes, 3600000);
     return () => clearInterval(interval);
   }, [config.prayerLocation]);
+
+  useEffect(() => {
+    if (!timings) return;
+
+    const calculateCountdown = () => {
+      const now = new Date();
+      const prayerNames = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
+      const displayNames: { [key: string]: string } = {
+        Fajr: "SUBUH",
+        Dhuhr: "DZUHUR",
+        Asr: "ASHAR",
+        Maghrib: "MAGHRIB",
+        Isha: "ISYA"
+      };
+
+      let upcoming: { name: string; time: string; target: Date } | null = null;
+
+      for (const name of prayerNames) {
+        const [hours, minutes] = timings[name].split(":").map(Number);
+        const target = new Date(now);
+        target.setHours(hours, minutes, 0, 0);
+
+        if (target > now) {
+          upcoming = { name: displayNames[name], time: timings[name], target };
+          break;
+        }
+      }
+
+      // If all prayers today have passed, target tomorrow's Subuh
+      if (!upcoming) {
+        const [hours, minutes] = timings.Fajr.split(":").map(Number);
+        const target = new Date(now);
+        target.setDate(target.getDate() + 1);
+        target.setHours(hours, minutes, 0, 0);
+        upcoming = { name: "SUBUH", time: timings.Fajr, target };
+      }
+
+      const diffMs = upcoming.target.getTime() - now.getTime();
+      const h = Math.floor(diffMs / 3600000).toString().padStart(2, "0");
+      const m = Math.floor((diffMs % 3600000) / 60000).toString().padStart(2, "0");
+      const s = Math.floor((diffMs % 60000) / 1000).toString().padStart(2, "0");
+
+      setNextPrayer({
+        name: upcoming.name,
+        time: upcoming.time,
+        diff: `${h}:${m}:${s}`
+      });
+    };
+
+    calculateCountdown();
+    const timer = setInterval(calculateCountdown, 1000);
+    return () => clearInterval(timer);
+  }, [timings]);
 
   if (loading && !timings) {
     return (
@@ -43,7 +95,6 @@ const DisplayPrayerTimes = () => {
   if (!timings) return null;
 
   const prayerItems = [
-    { label: "IMSAK", time: timings.Imsak },
     { label: "SUBUH", time: timings.Fajr },
     { label: "TERBIT", time: timings.Sunrise },
     { label: "DZUHUR", time: timings.Dhuhr },
@@ -53,15 +104,27 @@ const DisplayPrayerTimes = () => {
   ];
 
   return (
-    <div className="w-full shrink-0 h-10 bg-[#1e5666] flex items-center justify-center border-t border-white/10">
-      <div className="flex items-center gap-[2.5vw]">
-        {prayerItems.map((item, index) => (
-          <div key={item.label} className="flex items-center gap-1.5">
-            <span className="text-white/60 font-montserrat font-black text-[0.85vw] tracking-wider">{item.label}</span>
-            <span className="text-white font-montserrat font-black text-[1.1vw]">{item.time}</span>
-            {index < prayerItems.length - 1 && (
-              <span className="text-white/20 ml-[2.5vw] font-light">|</span>
-            )}
+    <div className="w-full shrink-0 h-10 md:h-12 bg-[#1e5666] flex items-center justify-between px-6 border-t border-white/10 overflow-hidden">
+      {/* Left: Countdown */}
+      <div className="flex items-center gap-3">
+        {nextPrayer && (
+          <div className="flex items-center gap-3">
+            <span className="text-white/80 font-montserrat font-medium text-[0.85vw] uppercase tracking-wider">
+              MENUJU {nextPrayer.name}:
+            </span>
+            <span className="text-2xl font-black text-yellow-300 tracking-wider font-montserrat tabular-nums">
+              {nextPrayer.diff}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Right: Prayer List */}
+      <div className="flex items-center gap-6">
+        {prayerItems.map((item) => (
+          <div key={item.label} className="flex items-center gap-2">
+            <span className="text-white/60 font-montserrat font-black text-[0.8vw] tracking-wider">{item.label}</span>
+            <span className="text-white font-montserrat font-black text-[1vw]">{item.time}</span>
           </div>
         ))}
       </div>
