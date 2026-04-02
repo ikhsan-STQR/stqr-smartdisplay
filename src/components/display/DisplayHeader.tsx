@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import logoStqr from "@/assets/logo-stqr.png";
+import { useDisplay } from "@/context/DisplayContext";
 
 const DAYS_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
 const MONTHS_ID = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
 const DisplayHeader = () => {
+  const { config } = useDisplay();
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
@@ -31,8 +33,8 @@ const DisplayHeader = () => {
           <h1 className="text-[var(--display-brown)] font-barlow font-bold text-[2vw] tracking-normal leading-[1.1]">
             STQ Riyadhussholihiin
           </h1>
-          <p className="text-[var(--display-olive)] font-barlow font-black text-[3.2vw] leading-[0.9] tracking-normal uppercase">
-            School Digital Information Display
+          <p className="text-[#9e8549] font-montserrat font-black text-[3.2vw] leading-[0.9] tracking-normal uppercase">
+            {config.headerTitle || "SMART DIGITAL INFORMATION SYSTEM"}
           </p>
         </div>
       </div>

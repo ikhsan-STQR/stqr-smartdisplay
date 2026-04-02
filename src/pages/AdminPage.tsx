@@ -265,6 +265,13 @@ const AdminPage = () => {
                     onChange={(v) => updateConfig({ sliderImages: v })}
                   />
                 )}
+                <div className="pt-2">
+                  <InputField
+                    label="Judul Header Utama"
+                    value={config.headerTitle}
+                    onChange={(v) => updateConfig({ headerTitle: v })}
+                  />
+                </div>
               </div>
 
               <div className="bg-muted/20 p-4 rounded-xl space-y-4">

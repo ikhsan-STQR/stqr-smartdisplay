@@ -30,6 +30,7 @@ export interface DisplayConfig {
   runningTextSpeed: number;
   announcementInterval: number;
   prayerLocation: string;
+  headerTitle: string;
   schedules: ContentSchedule[];
 }
 
@@ -76,6 +77,7 @@ const defaultConfig: DisplayConfig = {
   runningTextSpeed: 30,
   announcementInterval: 5,
   prayerLocation: "Pandeglang, Banten",
+  headerTitle: "SMART DIGITAL INFORMATION SYSTEM",
   schedules: [],
 };
 

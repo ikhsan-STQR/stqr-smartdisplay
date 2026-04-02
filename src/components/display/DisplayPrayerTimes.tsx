@@ -104,27 +104,30 @@ const DisplayPrayerTimes = () => {
   ];
 
   return (
-    <div className="w-full shrink-0 h-10 md:h-12 bg-[#1e5666] flex items-center justify-between px-6 border-t border-white/10 overflow-hidden">
-      {/* Left: Countdown */}
-      <div className="flex items-center gap-3">
+    <div className="w-full shrink-0 h-10 md:h-12 bg-[#1e5666] flex items-center justify-between px-8 border-t border-white/10 overflow-hidden shadow-2xl relative z-10">
+      {/* Left: Countdown - High Visibility */}
+      <div className="flex items-center gap-4 py-1">
         {nextPrayer && (
-          <div className="flex items-center gap-3">
-            <span className="text-white/80 font-montserrat font-medium text-[0.85vw] uppercase tracking-wider">
+          <div className="flex items-center gap-4">
+            <span className="text-white font-montserrat font-bold text-[1.1vw] uppercase tracking-widest opacity-90">
               MENUJU {nextPrayer.name}:
             </span>
-            <span className="text-2xl font-black text-yellow-300 tracking-wider font-montserrat tabular-nums">
+            <span className="text-[2.2vw] font-black text-yellow-300 tracking-[0.05em] font-montserrat tabular-nums leading-none">
               {nextPrayer.diff}
             </span>
           </div>
         )}
       </div>
 
-      {/* Right: Prayer List */}
-      <div className="flex items-center gap-6">
+      {/* Right: Prayer List - Pill Styled Boxes */}
+      <div className="flex items-center gap-3">
         {prayerItems.map((item) => (
-          <div key={item.label} className="flex items-center gap-2">
-            <span className="text-white/60 font-montserrat font-black text-[0.8vw] tracking-wider">{item.label}</span>
-            <span className="text-white font-montserrat font-black text-[1vw]">{item.time}</span>
+          <div 
+            key={item.label} 
+            className="flex items-center gap-3 bg-[#133c47] px-[1vw] py-[0.5vh] rounded-xl border border-white/10 shadow-sm"
+          >
+            <span className="text-white/60 font-montserrat font-bold text-[0.85vw] tracking-wider uppercase">{item.label}</span>
+            <span className="text-white font-montserrat font-black text-[1.15vw] leading-none">{item.time}</span>
           </div>
         ))}
       </div>
