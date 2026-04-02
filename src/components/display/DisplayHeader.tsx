@@ -27,7 +27,7 @@ const DisplayHeader = () => {
         <img
           src={logoStqr}
           alt="Logo STQ Riyadhussholihiin"
-          className="h-[8vh] max-h-20 w-auto flex-shrink-0 object-contain"
+          className="h-[10.5vh] w-[10.5vh] flex-shrink-0 object-contain"
         />
         <div className="flex flex-col">
           <h1 className="text-[var(--display-brown)] font-barlow font-bold text-[2vw] tracking-normal leading-[1.1]">
@@ -39,8 +39,8 @@ const DisplayHeader = () => {
         </div>
       </div>
 
-      {/* Date & Clock */}
-      <div className="flex flex-col items-center justify-center bg-[#8b7336] px-[1vw] py-[1.2vh] w-[20%] rounded-xl text-white shadow-md shrink-0 border border-white/10">
+      {/* Date & Clock - Synchronized with Right Sidebar w-[22%] */}
+      <div className="flex flex-col items-center justify-center bg-[#8b7336] px-[1vw] py-[1.2vh] w-[22%] rounded-xl text-white shadow-md shrink-0 border border-white/10">
         <p className="font-barlow font-bold text-[1.4vw] leading-tight mb-[0.2vh] uppercase tracking-[0.1em] opacity-90">
           {day}, {date} {month} {year}
         </p>
