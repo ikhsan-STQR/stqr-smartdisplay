@@ -19,7 +19,7 @@ const DisplayHeader = () => {
   const time = now.toLocaleTimeString("id-ID", { hour12: false });
 
   return (
-    <header className="flex items-stretch bg-primary islamic-pattern">
+    <header className="flex items-stretch bg-background">
       {/* Logo & Title */}
       <div className="flex items-center gap-[1vw] px-[1.5vw] py-[0.5vh] flex-1">
         <img
@@ -28,17 +28,17 @@ const DisplayHeader = () => {
           className="h-[7vh] w-[7vh] flex-shrink-0 object-contain"
         />
         <div>
-          <h1 className="text-primary-foreground font-barlow font-bold text-[2vw] tracking-wide leading-tight">
+          <h1 className="text-primary font-barlow font-bold text-[2vw] tracking-wide leading-tight">
             STQ Riyadhussholihiin
           </h1>
-          <p className="text-primary-foreground font-barlow font-bold text-[3.3vw] leading-[0.95] tracking-wide uppercase">
+          <p className="text-gold font-barlow font-black text-[3.3vw] leading-[0.95] tracking-wide uppercase">
             School Digital Information Display
           </p>
         </div>
       </div>
 
       {/* Date & Clock */}
-      <div className="flex flex-col items-end justify-center bg-orange px-[1.5vw] py-[0.5vh] min-w-[16vw]">
+      <div className="flex flex-col items-end justify-center bg-gold px-[1.5vw] py-[0.5vh] min-w-[16vw] rounded-bl-[1vw]">
         <p className="text-primary-foreground font-barlow font-bold text-[1.6vw] leading-tight">
           {day}, {date} {month} {year}
         </p>
