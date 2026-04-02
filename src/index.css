@@ -18,7 +18,7 @@
     --display-brown: 28 26% 24%; /* #4D3D2D */
     --display-olive: 42 42% 42%;  /* #977D3D (adjusted to HSL) */
     --display-teal: 181 100% 15%; /* #004d4f */
-    --display-cream: 40 40% 97%; /* #fdfaf5 */
+    --display-cream: 60 80% 94%; /* #fefae0 (approx HSL) */
     --greenscreen: 120 100% 50%;
 
     --radius: 1.2vw;
@@ -45,6 +45,13 @@
   }
   .font-jakarta {
     font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 
