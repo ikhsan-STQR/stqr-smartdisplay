@@ -28,48 +28,45 @@ const MainContent = () => {
     return () => clearInterval(interval);
   }, [config.schedules]);
 
-  // Slider animation logic
+  // Slider animation for scheduled slider
   useEffect(() => {
-    const images = activeSchedule 
-      ? (activeSchedule.contentType === "slider" ? (Array.isArray(activeSchedule.content) ? activeSchedule.content : []) : [])
-      : (config.contentType === "slider" ? config.sliderImages : []);
+    const isSlider = activeSchedule?.contentType === "slider";
+    const images = Array.isArray(activeSchedule?.content) ? activeSchedule.content : [];
     
-    if (images.length > 1) {
+    if (isSlider && images.length > 1) {
       const timer = setInterval(() => {
         setCurrentSlide((prev) => (prev + 1) % images.length);
       }, 5000);
       return () => clearInterval(timer);
-    } else {
-      setCurrentSlide(0);
     }
-  }, [activeSchedule, config.contentType, config.sliderImages]);
+  }, [activeSchedule]);
 
-  const isVideo = activeSchedule ? activeSchedule.contentType === "video" : config.contentType === "video";
-  const contentItems = activeSchedule 
+  const currentType = activeSchedule ? activeSchedule.contentType : config.contentType;
+  const currentContent = activeSchedule 
     ? (Array.isArray(activeSchedule.content) ? activeSchedule.content : [activeSchedule.content as string])
     : (config.contentType === "video" ? [config.videoUrl] : config.sliderImages);
 
-  const videoUrl = isVideo ? contentItems[0] : "";
+  if (!currentContent || currentContent.length === 0 || !currentContent[0]) {
+    return (
+      <div className="w-full h-full bg-[var(--greenscreen)] rounded-[calc(var(--radius)-0.3vw)] shadow-inner flex items-center justify-center">
+        <p className="text-white/20 font-bold uppercase tracking-tighter text-4xl">Greenscreen Mode</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full h-full bg-white rounded-2xl overflow-hidden relative shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-black/5 font-barlow group">
-      {/* 1. Subtle Inner Frame Border (Layout 02 detail) */}
-      <div className="absolute inset-[1px] border border-white/20 rounded-[inherit] z-20 pointer-events-none" />
-
-      {isVideo ? (
-        <div className="absolute inset-0 w-full h-full bg-black">
-          <iframe
-            key={videoUrl}
-            src={videoUrl}
-            className="w-full h-full border-none object-cover scale-[1.01]"
-            allow="autoplay; encrypted-media; picture-in-picture"
-            allowFullScreen
-            title="Main Video Content"
-          />
-        </div>
+    <div className="w-full h-full bg-[var(--greenscreen)] rounded-[calc(var(--radius)-0.3vw)] overflow-hidden relative shadow-inner">
+      {currentType === "video" ? (
+        <iframe
+          src={currentContent[0]}
+          className="absolute inset-0 w-full h-full"
+          allow="autoplay; encrypted-media"
+          allowFullScreen
+          title="Video Content"
+        />
       ) : (
-        <div className="absolute inset-0 w-full h-full">
-          {contentItems.map((img, i) => (
+        <div className="absolute inset-0">
+          {currentContent.map((img, i) => (
             <img
               key={i}
               src={img}
@@ -79,13 +76,13 @@ const MainContent = () => {
               }`}
             />
           ))}
-          {contentItems.length > 1 && (
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2.5 z-30">
-              {contentItems.map((_, i) => (
+          {currentContent.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+              {currentContent.map((_, i) => (
                 <div
                   key={i}
-                  className={`h-1.5 rounded-full transition-all duration-500 shadow-sm ${
-                    i === currentSlide ? "w-8 bg-white" : "w-1.5 bg-white/40"
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    i === currentSlide ? "bg-white scale-125" : "bg-white/40"
                   }`}
                 />
               ))}

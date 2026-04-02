@@ -2,12 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Amiri:wght@400;700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Amiri:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 96%; /* #f5f5f5 */
-    --foreground: 0 0% 10%;
+    --background: 40 30% 95%; /* #f7f4ed */
+    --foreground: 0 0% 20%;
 
     --card: 0 0% 100%;
     --card-foreground: 0 0% 20%;
@@ -15,10 +15,15 @@
     --primary: 181 100% 15%; /* #004d4f */
     --primary-foreground: 0 0% 100%;
 
-    --gold: 42 37% 45%; /* #9e8549 */
-    --teal-dark: 194 54% 26%; /* #1e5666 */
-    
-    --radius: 1.5vw;
+    --display-brown: 28 26% 24%; /* #4D3D2D */
+    --display-olive: 42 42% 42%;  /* #977D3D (adjusted to HSL) */
+    --display-teal: 181 100% 15%; /* #004d4f */
+    --display-cream: 40 40% 97%; /* #fdfaf5 */
+    --display-gold: 42 50% 50%; /* #c5a044 equivalent */
+    --display-gold-dark: 42 50% 35%; /* #8a6d25 equivalent */
+    --greenscreen: 120 100% 50%;
+
+    --radius: 1.2vw;
     --running-text-speed: 30s;
   }
 }
@@ -28,10 +33,7 @@
     @apply border-border;
   }
   body {
-    background: #f5f5f5;
-    background-image: radial-gradient(circle at center, #ffffff 0%, #f1f1f1 100%);
-    @apply text-foreground font-barlow font-bold;
-    overflow: hidden;
+    @apply bg-background text-foreground font-barlow;
   }
 }
 
@@ -44,13 +46,6 @@
   }
   .font-jakarta {
     font-family: 'Plus Jakarta Sans', sans-serif;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
   }
 }
 

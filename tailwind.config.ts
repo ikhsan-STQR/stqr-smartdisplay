@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         barlow: ["'Barlow Condensed'", 'sans-serif'],
         amiri: ['Amiri', 'serif'],
+        jakarta: ["'Plus Jakarta Sans'", 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

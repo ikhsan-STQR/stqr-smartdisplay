@@ -28,30 +28,26 @@ const DisplayFooter = () => {
   }, [config.schedules]);
 
   const textToDisplay = activeSchedule ? (activeSchedule.content as string) : config.runningText;
-  const dalilText = config.dalilHariIni ? `${config.dalilHariIni.toUpperCase()} — ` : "";
 
   return (
-    <footer className="w-full relative h-full flex items-end font-barlow pb-[1vh]">
-      {/* 1. Iconic Left Tab (Dalil Hari Ini) - Overlaps Marquee */}
-      <div className="absolute left-[2vw] bottom-[4.5vh] z-20">
-        <div className="bg-white px-[4vw] py-[1.5vh] rounded-tr-[4.5vw] rounded-tl-2xl shadow-[-15px_-5px_30px_rgba(0,0,0,0.1)] border-t border-r border-black/5 flex items-center justify-center">
-          <span className="text-[#1a1a1a] font-black text-[1.8vw] uppercase tracking-tighter">
-            Dalil Hari Ini
-          </span>
-        </div>
+    <footer className="flex items-center gap-[0.75vw] bg-transparent h-[8vh]">
+      {/* Dalil Hari Ini Label */}
+      <div className="flex-shrink-0">
+        <span className="text-[var(--display-olive)] font-barlow font-black text-[2.2vw] uppercase tracking-tight">
+          Dalil Hari Ini
+        </span>
       </div>
 
-      {/* 2. Running Text Marquee Hub (Stretches Behind Tab) */}
-      <div className="w-full h-[8vh] bg-white rounded-2xl overflow-hidden flex items-center shadow-[0_15px_40px_rgba(0,0,0,0.12)] border border-black/5 relative z-10 mx-auto">
+      {/* Running Text Bar (Greenscreen) */}
+      <div className="flex-1 h-full bg-[var(--greenscreen)] rounded-[1vw] overflow-hidden flex items-center shadow-inner">
         <div
-          className="animate-marquee whitespace-nowrap text-[#1e5666] text-[2.8vw] font-black px-[8vw] uppercase flex items-center"
+          className="animate-marquee whitespace-nowrap font-barlow text-primary text-[2vw] font-bold px-[2vw]"
           style={{ 
             animationDuration: `${config.runningTextSpeed || 30}s`,
             animationPlayState: textToDisplay ? "running" : "paused"
           }}
         >
-          <span className="text-[#9e8549] mr-4">{dalilText}</span>
-          <span>{textToDisplay}</span>
+          {textToDisplay || "STQ Riyadhussholihiin - Digital Information Display"}
         </div>
       </div>
     </footer>
