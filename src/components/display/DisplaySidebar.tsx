@@ -46,17 +46,17 @@ const DisplaySidebar = () => {
   }, [currentPosters.length, config.announcementInterval]);
 
   return (
-    <div className="w-full h-full flex flex-col gap-[0.75vw]">
+    <div className="w-full h-full flex flex-col">
       {/* INFO STQR Banner */}
-      <div className="bg-transparent border-b border-gray-100 pb-[0.8vh] text-center overflow-hidden shrink-0">
+      <div className="bg-transparent border-b border-gray-100 py-[1vh] px-4 text-center overflow-hidden shrink-0">
         <span className="text-[#1e5666] font-montserrat font-black text-[1.15vw] uppercase tracking-normal whitespace-nowrap inline-block w-full">
           Info STQR
         </span>
       </div>
 
       {/* Sidebar Green Area - Maximized specifically for 3:4 */}
-      <div className="flex-1 min-h-0 bg-transparent flex items-center justify-center pt-1">
-        <div className="h-full aspect-[3/4] max-w-full bg-gray-50 rounded-xl shadow-inner border border-gray-100 relative overflow-hidden group">
+      <div className="flex-1 min-h-0 bg-transparent flex items-center justify-center">
+        <div className="h-full aspect-[3/4] w-full bg-gray-50 shadow-inner relative overflow-hidden group">
           {(!currentPosters || currentPosters.length === 0 || !currentPosters[0]) ? (
             <div className="absolute inset-0 flex items-center justify-center p-4 text-center">
               <p className="text-gray-300 font-montserrat font-medium uppercase tracking-tighter text-sm">Belum Ada Poster</p>

@@ -104,30 +104,30 @@ const DisplayPrayerTimes = () => {
   ];
 
   return (
-    <div className="w-full shrink-0 h-10 md:h-12 bg-[#1e5666] flex items-center justify-between px-8 border-t border-white/10 overflow-hidden shadow-2xl relative z-10">
-      {/* Left: Countdown - High Visibility */}
-      <div className="flex items-center gap-4 py-1">
+    <div className="w-full shrink-0 h-24 md:h-[110px] bg-[#1e5666] flex items-center justify-between px-10 border-t border-white/10 overflow-hidden shadow-2xl relative z-10">
+      {/* Left: Countdown - High Visibility Vertical Layout */}
+      <div className="flex flex-col items-start justify-center py-2 h-full">
         {nextPrayer && (
-          <div className="flex items-center gap-4">
-            <span className="text-white font-montserrat font-bold text-[1.1vw] uppercase tracking-widest opacity-90">
+          <div className="flex flex-col items-start justify-center leading-tight">
+            <span className="text-white font-montserrat font-bold text-[1vw] uppercase tracking-widest opacity-80 mb-0.5">
               MENUJU {nextPrayer.name}:
             </span>
-            <span className="text-[2.2vw] font-black text-yellow-300 tracking-[0.05em] font-montserrat tabular-nums leading-none">
+            <span className="text-[2.8vw] font-black text-yellow-300 tracking-[0.05em] font-montserrat tabular-nums leading-[0.9]">
               {nextPrayer.diff}
             </span>
           </div>
         )}
       </div>
 
-      {/* Right: Prayer List - Pill Styled Boxes */}
-      <div className="flex items-center gap-3">
+      {/* Right: Prayer List - Vertical Pill Styled Boxes */}
+      <div className="flex items-center gap-4 h-full py-2">
         {prayerItems.map((item) => (
           <div 
             key={item.label} 
-            className="flex items-center gap-3 bg-[#133c47] px-[1vw] py-[0.5vh] rounded-xl border border-white/10 shadow-sm"
+            className="flex flex-col items-center justify-center bg-[#133c47] px-[1.2vw] py-[0.8vh] h-[85%] min-w-[9vw] rounded-2xl border border-white/10 shadow-sm transition-all hover:bg-[#1a4a58]"
           >
-            <span className="text-white/60 font-montserrat font-bold text-[0.85vw] tracking-wider uppercase">{item.label}</span>
-            <span className="text-white font-montserrat font-black text-[1.15vw] leading-none">{item.time}</span>
+            <span className="text-white/60 font-montserrat font-bold text-[0.8vw] tracking-wider uppercase mb-1">{item.label}</span>
+            <span className="text-white font-montserrat font-black text-[1.8vw] leading-none">{item.time}</span>
           </div>
         ))}
       </div>

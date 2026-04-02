@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import logoStqr from "@/assets/logo-stqr.png";
 import { useDisplay } from "@/context/DisplayContext";
 
-const DAYS_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+const DAYS_ID = ["AHAD", "SENIN", "SELASA", "RABU", "KAMIS", "JUMAT", "SABTU"];
 const MONTHS_ID = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
 const DisplayHeader = () => {
@@ -18,7 +18,7 @@ const DisplayHeader = () => {
   const date = now.getDate();
   const month = MONTHS_ID[now.getMonth()];
   const year = now.getFullYear();
-  const time = now.toLocaleTimeString("id-ID", { hour12: false });
+  const time = now.toLocaleTimeString("id-ID", { hour12: false }).replace(/\./g, ":");
 
   return (
     <header className="w-full flex justify-between items-start bg-transparent">
