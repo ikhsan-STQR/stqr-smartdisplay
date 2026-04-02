@@ -61,7 +61,7 @@ const AdminPage = () => {
 
   const handleAddSchedule = () => {
     updateConfig({
-      jadwalPelajaran: [...config.jadwalPelajaran, { kelas: "", pelajaran: "", waktu: "" }],
+      jadwalPelajaran: [...config.jadwalPelajaran, { kelas: "", pelajaran: "", startTime: "07:30", endTime: "08:30" }],
     });
   };
 
@@ -324,12 +324,21 @@ const AdminPage = () => {
                         placeholder="Pelajaran"
                         className="border border-input rounded px-2 py-1 text-xs flex-1"
                       />
-                      <input
-                        value={item.waktu}
-                        onChange={(e) => updateSchedule(i, "waktu", e.target.value)}
-                        placeholder="Jam"
-                        className="border border-input rounded px-2 py-1 text-xs w-14"
-                      />
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="time"
+                          value={item.startTime}
+                          onChange={(e) => updateSchedule(i, "startTime", e.target.value)}
+                          className="border border-input rounded px-1 py-1 text-[10px] w-16"
+                        />
+                        <span className="text-muted-foreground text-[10px]">-</span>
+                        <input
+                          type="time"
+                          value={item.endTime}
+                          onChange={(e) => updateSchedule(i, "endTime", e.target.value)}
+                          className="border border-input rounded px-1 py-1 text-[10px] w-16"
+                        />
+                      </div>
                       <button onClick={() => removeSchedule(i)} className="text-destructive font-bold px-1">✕</button>
                     </div>
                   ))}

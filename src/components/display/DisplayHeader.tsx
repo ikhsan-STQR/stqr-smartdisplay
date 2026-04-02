@@ -38,11 +38,11 @@ const DisplayHeader = () => {
       </div>
 
       {/* Date & Clock */}
-      <div className="flex flex-col items-center justify-center bg-[var(--display-gold-dark)] px-[0.5vw] py-[1vh] w-[22.5vw] rounded-[1vw] text-white shadow-xl border border-white/10 shrink-0">
-        <p className="font-barlow font-bold text-[1.3vw] leading-tight mb-[0.2vh] opacity-95 uppercase tracking-widest text-center">
+      <div className="flex flex-col items-center justify-center bg-[#8b7336] px-[1vw] py-[1.2vh] w-[22%] rounded-xl text-white shadow-md shrink-0 border border-white/10">
+        <p className="font-barlow font-bold text-[1.4vw] leading-tight mb-[0.2vh] uppercase tracking-[0.1em] opacity-90">
           {day}, {date} {month} {year}
         </p>
-        <p className="font-barlow font-black text-[4.2vw] leading-none tracking-tighter tabular-nums drop-shadow-lg text-white">
+        <p className="font-barlow font-black text-[4.4vw] leading-none tracking-tighter tabular-nums drop-shadow-md">
           {time}
         </p>
       </div>

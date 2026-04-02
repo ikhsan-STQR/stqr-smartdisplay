@@ -32,8 +32,8 @@ const DisplayFooter = () => {
   return (
     <footer className="flex items-center gap-[0.75vw] bg-transparent h-[8vh]">
       {/* Dalil Hari Ini Label */}
-      <div className="flex-shrink-0">
-        <span className="text-[var(--display-olive)] font-barlow font-black text-[2.2vw] uppercase tracking-tight">
+      <div className="flex-shrink-0 bg-white px-[1vw] py-[0.5vh] rounded-xl shadow-md border border-gray-100 flex items-center justify-center min-w-[15vw] overflow-hidden">
+        <span className="text-[#1e5666] font-montserrat font-black text-[1.45vw] uppercase tracking-tighter whitespace-nowrap">
           Dalil Hari Ini
         </span>
       </div>
@@ -41,7 +41,7 @@ const DisplayFooter = () => {
       {/* Running Text Bar (Greenscreen) */}
       <div className="flex-1 h-full bg-[var(--greenscreen)] rounded-[1vw] overflow-hidden flex items-center shadow-inner">
         <div
-          className="animate-marquee whitespace-nowrap font-barlow text-primary text-[2vw] font-bold px-[2vw]"
+          className="animate-marquee whitespace-nowrap font-montserrat font-medium text-primary text-[1.8vw] px-[2vw]"
           style={{ 
             animationDuration: `${config.runningTextSpeed || 30}s`,
             animationPlayState: textToDisplay ? "running" : "paused"

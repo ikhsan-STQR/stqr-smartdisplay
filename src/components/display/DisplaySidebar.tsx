@@ -43,17 +43,17 @@ const DisplaySidebar = () => {
     : config.announcementPosters;
 
   return (
-    <div className="w-full h-full flex flex-col gap-[0.5vw]">
+    <div className="w-full h-full flex flex-col gap-[0.75vw]">
       {/* INFO STQR Banner */}
-      <div className="bg-[var(--display-teal)] px-[1vw] py-[0.6vh] rounded-[0.6vw] text-center shadow-sm">
-        <span className="text-white font-barlow font-bold text-[1.4vw] uppercase tracking-wider">
+      <div className="bg-transparent border-b border-gray-100 pb-[1vh] text-center overflow-hidden">
+        <span className="text-[#1e5666] font-montserrat font-black text-[1.45vw] uppercase tracking-tighter whitespace-nowrap inline-block w-full">
           Info STQR
         </span>
       </div>
 
-      {/* Sidebar Green Area - Maximized */}
-      <div className="flex-1 min-h-0 bg-transparent flex items-center justify-center">
-        <div className="h-full w-auto aspect-[3/4] max-w-full bg-[var(--greenscreen)] rounded-[var(--radius)] shadow-xl border border-white/20 relative overflow-hidden">
+      {/* Sidebar Green Area - Maximized specifically for 3:4 */}
+      <div className="flex-1 min-h-0 bg-transparent flex items-center justify-center pt-2">
+        <div className="h-full aspect-[3/4] max-w-full bg-gray-50 rounded-xl shadow-inner border border-gray-100 relative overflow-hidden">
           {(!currentPosters || currentPosters.length === 0 || !currentPosters[0]) ? (
             <div className="absolute inset-0 flex items-center justify-center p-4 text-center">
               <p className="text-white/20 font-bold uppercase tracking-tighter text-xl">Display Area</p>

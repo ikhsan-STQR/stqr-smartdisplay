@@ -15,7 +15,8 @@ export interface ContentSchedule {
 export interface ScheduleItem {
   kelas: string;
   pelajaran: string;
-  waktu: string;
+  startTime: string; // HH:mm
+  endTime: string;   // HH:mm
 }
 
 export interface DisplayConfig {
@@ -48,20 +49,23 @@ const defaultConfig: DisplayConfig = {
     "https://images.unsplash.com/photo-1564769625905-50e93615e769?w=400&q=80",
   ],
   jadwalPelajaran: [
-    { kelas: "I-A", pelajaran: "TEMATIK", waktu: "07:30" },
-    { kelas: "I-B", pelajaran: "CALISTUNG", waktu: "07:30" },
-    { kelas: "I-C", pelajaran: "CALISTUNG", waktu: "07:30" },
-    { kelas: "II-A", pelajaran: "P A I", waktu: "08:00" },
-    { kelas: "II-B", pelajaran: "CALISTUNG", waktu: "08:00" },
-    { kelas: "II-C", pelajaran: "TEMATIK", waktu: "08:00" },
-    { kelas: "III-A", pelajaran: "B. INGGRIS", waktu: "08:30" },
-    { kelas: "III-B", pelajaran: "PAI", waktu: "08:30" },
-    { kelas: "IV-A", pelajaran: "TEMATIK", waktu: "09:00" },
-    { kelas: "IV-B", pelajaran: "PAI", waktu: "09:00" },
-    { kelas: "V-A", pelajaran: "ADAB & AKHLAK", waktu: "09:30" },
-    { kelas: "V-B", pelajaran: "ADAB & AKHLAK", waktu: "09:30" },
-    { kelas: "VI-A", pelajaran: "B. INGGRIS", waktu: "10:00" },
-    { kelas: "VI-B", pelajaran: "PAI", waktu: "10:00" },
+    { kelas: "I-A", pelajaran: "TEMATIK", startTime: "07:00", endTime: "08:00" },
+    { kelas: "I-B", pelajaran: "CALISTUNG", startTime: "07:00", endTime: "08:00" },
+    { kelas: "I-C", pelajaran: "CALISTUNG", startTime: "07:00", endTime: "08:00" },
+    { kelas: "II-A", pelajaran: "P A I", startTime: "08:00", endTime: "09:00" },
+    { kelas: "II-B", pelajaran: "CALISTUNG", startTime: "08:00", endTime: "09:00" },
+    { kelas: "II-C", pelajaran: "TEMATIK", startTime: "08:00", endTime: "09:00" },
+    { kelas: "III-A", pelajaran: "B. INGGRIS", startTime: "09:00", endTime: "10:00" },
+    { kelas: "III-B", pelajaran: "PAI", startTime: "09:00", endTime: "10:00" },
+    { kelas: "IV-A", pelajaran: "TEMATIK", startTime: "10:00", endTime: "11:00" },
+    { kelas: "IV-B", pelajaran: "PAI", startTime: "10:00", endTime: "11:00" },
+    { kelas: "V-A", pelajaran: "ADAB & AKHLAK", startTime: "13:00", endTime: "14:00" },
+    { kelas: "V-B", pelajaran: "ADAB & AKHLAK", startTime: "13:00", endTime: "14:00" },
+    { kelas: "VI-A", pelajaran: "B. INGGRIS", startTime: "14:00", endTime: "15:00" },
+    { kelas: "VI-B", pelajaran: "PAI", startTime: "14:00", endTime: "15:00" },
+    { kelas: "VII-A", pelajaran: "TAHFIDZ", startTime: "15:00", endTime: "17:00" }, // Active now (16:00)
+    { kelas: "VII-B", pelajaran: "TAHFIDZ", startTime: "15:00", endTime: "17:00" }, // Active now
+    { kelas: "VIII-A", pelajaran: "FIQIH", startTime: "16:00", endTime: "17:30" }, // Active now
   ],
   dalilHariIni:
     '"Maukah aku tunjukkan sesuatu yang jika dilakukan akan membuat kalian saling mencintai? Sebarkan salam di antara kalian" (HR. Muslim)',
