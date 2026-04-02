@@ -38,7 +38,7 @@ const DisplayHeader = () => {
       </div>
 
       {/* Date & Clock */}
-      <div className="flex flex-col items-center justify-center bg-[#8b7336] px-[1vw] py-[1.2vh] w-[22%] rounded-xl text-white shadow-md shrink-0 border border-white/10">
+      <div className="flex flex-col items-center justify-center bg-[#8b7336] px-[1vw] py-[1.2vh] w-[20%] rounded-xl text-white shadow-md shrink-0 border border-white/10">
         <p className="font-barlow font-bold text-[1.4vw] leading-tight mb-[0.2vh] uppercase tracking-[0.1em] opacity-90">
           {day}, {date} {month} {year}
         </p>

@@ -274,6 +274,19 @@ const AdminPage = () => {
                   values={config.announcementPosters}
                   onChange={(v) => updateConfig({ announcementPosters: v })}
                 />
+                <div className="pt-2">
+                  <label className="text-xs font-bold text-muted-foreground block mb-1 uppercase">
+                    Durasi Slide Pengumuman: {config.announcementInterval}s
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="60"
+                    value={config.announcementInterval}
+                    onChange={(e) => updateConfig({ announcementInterval: Number(e.target.value) })}
+                    className="w-full accent-primary"
+                  />
+                </div>
               </div>
             </div>
 

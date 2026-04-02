@@ -28,44 +28,47 @@ const DisplaySidebar = () => {
     return () => clearInterval(interval);
   }, [config.schedules]);
 
-  useEffect(() => {
-    const posters = Array.isArray(activeSchedule?.content) ? activeSchedule.content : [];
-    if (posters.length > 1) {
-      const timer = setInterval(() => {
-        setCurrentPoster((prev) => (prev + 1) % posters.length);
-      }, 5000);
-      return () => clearInterval(timer);
-    }
-  }, [activeSchedule]);
-
   const currentPosters = activeSchedule 
     ? (Array.isArray(activeSchedule.content) ? activeSchedule.content : [activeSchedule.content as string])
     : config.announcementPosters;
 
+  useEffect(() => {
+    const posters = Array.isArray(currentPosters) ? currentPosters : [];
+    if (posters.length > 1) {
+      const intervalDuration = (config.announcementInterval || 5) * 1000;
+      const timer = setInterval(() => {
+        setCurrentPoster((prev) => (prev + 1) % posters.length);
+      }, intervalDuration);
+      return () => clearInterval(timer);
+    } else {
+      setCurrentPoster(0);
+    }
+  }, [currentPosters.length, config.announcementInterval]);
+
   return (
     <div className="w-full h-full flex flex-col gap-[0.75vw]">
       {/* INFO STQR Banner */}
-      <div className="bg-transparent border-b border-gray-100 pb-[1vh] text-center overflow-hidden">
-        <span className="text-[#1e5666] font-montserrat font-black text-[1.45vw] uppercase tracking-tighter whitespace-nowrap inline-block w-full">
+      <div className="bg-transparent border-b border-gray-100 pb-[0.8vh] text-center overflow-hidden shrink-0">
+        <span className="text-[#1e5666] font-montserrat font-black text-[1.15vw] uppercase tracking-normal whitespace-nowrap inline-block w-full">
           Info STQR
         </span>
       </div>
 
       {/* Sidebar Green Area - Maximized specifically for 3:4 */}
-      <div className="flex-1 min-h-0 bg-transparent flex items-center justify-center pt-2">
-        <div className="h-full aspect-[3/4] max-w-full bg-gray-50 rounded-xl shadow-inner border border-gray-100 relative overflow-hidden">
+      <div className="flex-1 min-h-0 bg-transparent flex items-center justify-center pt-1">
+        <div className="h-full aspect-[3/4] max-w-full bg-gray-50 rounded-xl shadow-inner border border-gray-100 relative overflow-hidden group">
           {(!currentPosters || currentPosters.length === 0 || !currentPosters[0]) ? (
             <div className="absolute inset-0 flex items-center justify-center p-4 text-center">
-              <p className="text-white/20 font-bold uppercase tracking-tighter text-xl">Display Area</p>
+              <p className="text-gray-300 font-montserrat font-medium uppercase tracking-tighter text-sm">Belum Ada Poster</p>
             </div>
           ) : (
-            <div className="absolute inset-0">
+            <div className="absolute inset-0 w-full h-full">
               {currentPosters.map((poster, i) => (
                 <img
                   key={i}
                   src={poster as string}
                   alt={`Pengumuman ${i + 1}`}
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
                     i === currentPoster ? "opacity-100" : "opacity-0"
                   }`}
                 />

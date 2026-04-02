@@ -13,14 +13,14 @@ const DisplayPage = () => {
       </div>
 
       {/* Content Row: Sidebar Left (Remainder) | Main Content (16:9) | Sidebar Right (3:4) */}
-      <div className="flex-1 flex gap-[0.75vw] min-h-0">
-        <div className="flex-1 bg-white rounded-xl shadow-md p-[0.5vw] flex flex-col relative overflow-hidden">
+      <div className="flex-1 flex gap-[0.5vw] min-h-0 px-[0.5vw]">
+        <div className="flex-1 min-w-[15%] bg-white rounded-xl shadow-md p-[0.5vw] flex flex-col relative overflow-hidden">
           <DisplaySidebarLeft />
         </div>
         <div className="h-full aspect-video shrink-0 overflow-hidden flex items-center justify-center">
           <MainContent />
         </div>
-        <div className="w-[22%] bg-white rounded-xl shadow-md p-[0.5vw] flex flex-col relative overflow-hidden shrink-0">
+        <div className="w-[20%] bg-white rounded-xl shadow-md p-[0.5vw] flex flex-col relative overflow-hidden shrink-0">
            <DisplaySidebar />
         </div>
       </div>

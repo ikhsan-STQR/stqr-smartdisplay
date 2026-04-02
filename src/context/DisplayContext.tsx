@@ -28,6 +28,7 @@ export interface DisplayConfig {
   dalilHariIni: string;
   runningText: string;
   runningTextSpeed: number;
+  announcementInterval: number;
   schedules: ContentSchedule[];
 }
 
@@ -72,6 +73,7 @@ const defaultConfig: DisplayConfig = {
   runningText:
     '"Maukah aku tunjukkan sesuatu yang jika dilakukan akan membuat kalian saling mencintai? Sebarkan salam di antara kalian" (HR. Muslim) | Pendaftaran Santri Baru TA 2026/2027 dibuka! | Kegiatan Pesantren Kilat Ramadhan 1447H',
   runningTextSpeed: 30,
+  announcementInterval: 5,
   schedules: [],
 };
 

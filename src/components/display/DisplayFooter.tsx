@@ -32,8 +32,8 @@ const DisplayFooter = () => {
   return (
     <footer className="flex items-center gap-[0.75vw] bg-transparent h-[8vh]">
       {/* Dalil Hari Ini Label */}
-      <div className="flex-shrink-0 bg-white px-[1vw] py-[0.5vh] rounded-xl shadow-md border border-gray-100 flex items-center justify-center min-w-[15vw] overflow-hidden">
-        <span className="text-[#1e5666] font-montserrat font-black text-[1.45vw] uppercase tracking-tighter whitespace-nowrap">
+      <div className="flex-shrink-0 bg-white px-[1vw] py-[0.5vh] rounded-xl shadow-md border border-gray-100 flex items-center justify-center min-w-[12vw] overflow-hidden">
+        <span className="text-[#1e5666] font-montserrat font-black text-[1.15vw] uppercase tracking-normal whitespace-nowrap">
           Dalil Hari Ini
         </span>
       </div>

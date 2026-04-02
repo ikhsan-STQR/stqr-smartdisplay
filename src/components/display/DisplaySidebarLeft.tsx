@@ -43,8 +43,8 @@ const DisplaySidebarLeft = () => {
   return (
     <div className="w-full h-full flex flex-col gap-[1vw]">
       {/* Title Banner */}
-      <div className="bg-transparent border-b border-gray-100 pb-[1vh] text-center overflow-hidden">
-        <span className="text-[#1e5666] font-montserrat font-black text-[1.45vw] uppercase tracking-tighter whitespace-nowrap inline-block w-full">
+      <div className="bg-transparent border-b border-gray-100 pb-[0.8vh] text-center overflow-hidden shrink-0">
+        <span className="text-[#1e5666] font-montserrat font-black text-[1.15vw] uppercase tracking-normal whitespace-nowrap inline-block w-full">
           Jadwal Pelajaran
         </span>
       </div>
