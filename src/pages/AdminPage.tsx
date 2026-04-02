@@ -2,6 +2,14 @@ import { useState } from "react";
 import { useDisplay, ScheduleItem } from "@/context/DisplayContext";
 import { useNavigate } from "react-router-dom";
 
+const parseGDriveUrl = (url: string): string => {
+  const fileIdMatch = url.match(/\/file\/d\/([^\/]+)/) || url.match(/[?&]id=([^&]+)/);
+  if (fileIdMatch && fileIdMatch[1]) {
+    return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+  }
+  return url;
+};
+
 const AdminPage = () => {
   const { config, updateConfig } = useDisplay();
   const navigate = useNavigate();
@@ -373,7 +381,7 @@ const InputField = ({
     ) : (
       <input
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(parseGDriveUrl(e.target.value))}
         className="w-full border border-input rounded-md px-3 py-2 text-sm"
       />
     )}
@@ -391,7 +399,7 @@ const ArrayField = ({
           value={v}
           onChange={(e) => {
             const updated = [...values];
-            updated[i] = e.target.value;
+            updated[i] = parseGDriveUrl(e.target.value);
             onChange(updated);
           }}
           className="flex-1 border border-input rounded-md px-3 py-1.5 text-sm"
