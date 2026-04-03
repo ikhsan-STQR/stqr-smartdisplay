@@ -49,10 +49,10 @@ const DisplayFooter = () => {
         )}
       </div>
 
-      {/* Col 2: Running Text Bar (flex-1) - Expanding to the right */}
-      <div className="flex-1 h-full bg-[var(--greenscreen)] rounded-[1vw] overflow-hidden flex items-center shadow-inner">
+      {/* Col 2: Running Text Bar (flex-1) - Expanding to the right with Light Tosca background */}
+      <div className="flex-1 h-full bg-[#A8E6CF] rounded-[1vw] overflow-hidden flex items-center shadow-inner">
         <div
-          className="animate-marquee whitespace-nowrap font-montserrat font-medium text-primary text-[1.8vw] px-[2vw]"
+          className="animate-marquee whitespace-nowrap font-montserrat font-medium text-[#133c47] text-[1.5vw] px-[2vw]"
           style={{
             animationDuration: `${config.runningTextSpeed || 30}s`,
             animationPlayState: textToDisplay ? "running" : "paused"
