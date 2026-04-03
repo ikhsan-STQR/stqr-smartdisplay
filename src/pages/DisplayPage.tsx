@@ -15,12 +15,13 @@ const DisplayPage = () => {
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
+      const height = window.innerHeight;
       const isMob = width < 1024;
       setIsMobile(isMob);
       
       if (isMob) {
-        // Target a stable internal width of 1280px for perfect desktop-like interpolation
-        setScale(width / 1280);
+        // Target a stable internal height of 720px for perfect vertical fitting (no scroll)
+        setScale(height / 720);
       } else {
         setScale(1);
       }
@@ -80,16 +81,13 @@ const DisplayPage = () => {
     return renderLayout(false);
   }
 
-  // Mobile (< 1024px): Wrap in a fixed 1280x720 Virtual Canvas scaled to fit device width
+  // Mobile (< 1024px): Wrap in a fixed 1280x720 Virtual Canvas scaled to fit device HEIGHT (non-scrollable)
   return (
-    <div 
-      className="w-screen bg-gray-900 flex flex-col items-center justify-start overflow-hidden relative"
-      style={{ minHeight: `${720 * scale}px` }}
-    >
+    <div className="h-screen w-screen bg-gray-900 flex items-center justify-center overflow-hidden relative">
       <div 
         style={{ 
           transform: `scale(${scale})`, 
-          transformOrigin: 'top center',
+          transformOrigin: 'center center',
           width: '1280px',
           height: '720px',
           flexShrink: 0
