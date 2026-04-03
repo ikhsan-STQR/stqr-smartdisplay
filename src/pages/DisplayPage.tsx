@@ -51,9 +51,9 @@ const DisplayPage = () => {
         <DisplayHeader isMobile={isScaled} />
       </div>
 
-      {/* Content Row: Sidebar Left (22%) | Main Content (58%) | Sidebar Right (20%) */}
+      {/* Content Row: Sidebar Left (17.5% Mobile / 22% Desktop) | Main Content (58%) | Sidebar Right (24.5% Mobile / 20% Desktop) */}
       <div className={`shrink-0 flex gap-[0.5vw] px-[0.5vw] items-stretch justify-center ${isScaled ? 'h-auto' : 'flex-1 min-h-0'}`}>
-        <div className="w-[22%] bg-white rounded-xl shadow-md p-[0.5vw] flex flex-col relative overflow-hidden shrink-0">
+        <div className={`${isScaled ? 'w-[17.5%]' : 'w-[22%]'} bg-white rounded-xl shadow-md p-[0.5vw] flex flex-col relative overflow-hidden shrink-0`}>
           <DisplaySidebarLeft isMobile={isScaled} />
         </div>
         <div className={`flex-1 min-w-0 flex items-center justify-center overflow-hidden ${isScaled ? 'max-w-[58%] aspect-video' : ''}`}>
@@ -61,7 +61,7 @@ const DisplayPage = () => {
             <MainContent />
           </div>
         </div>
-        <div className="w-[20%] bg-white rounded-xl shadow-md p-0 flex flex-col relative overflow-hidden shrink-0">
+        <div className={`${isScaled ? 'w-[24.5%]' : 'w-[20%]'} bg-white rounded-xl shadow-md p-0 flex flex-col relative overflow-hidden shrink-0`}>
           <DisplaySidebar isMobile={isScaled} />
         </div>
       </div>

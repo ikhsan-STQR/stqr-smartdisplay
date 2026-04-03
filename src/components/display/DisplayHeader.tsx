@@ -27,33 +27,33 @@ const DisplayHeader = ({ isMobile }: { isMobile?: boolean }) => {
         <img
           src={logoStqr}
           alt="Logo STQ Riyadhussholihiin"
-          className={`${isMobile ? 'h-[14.5vh] w-[14.5vh]' : 'h-[14vh] w-[14vh]'} flex-shrink-0 object-contain mr-[0.8vw]`}
+          className={`${isMobile ? 'h-[16vh] w-[16vh]' : 'h-[14vh] w-[14vh]'} flex-shrink-0 object-contain mr-[0.8vw]`}
         />
       </div>
 
       {/* Col 2: Titles Stacked (flex-1) */}
       <div className={`flex-1 flex flex-col justify-center ${isMobile ? 'h-full' : 'h-[14vh]'}`}>
         <div className="flex flex-col">
-          <span className={`${isMobile ? 'text-[2.1vw]' : 'text-[2.5vw]'} text-[var(--display-brown)] font-montserrat font-black leading-none mb-1 opacity-80 uppercase tracking-tight`}>
+          <span className={`${isMobile ? 'text-[2.5vw]' : 'text-[2.5vw]'} text-[var(--display-brown)] font-montserrat font-black leading-none mb-1 opacity-80 uppercase tracking-tight`}>
             STQ Riyadhussholihiin
           </span>
-          <h1 className={`${isMobile ? 'text-[2.8vw]' : 'text-[3.1vw]'} text-[#9e8549] font-montserrat font-black leading-none uppercase tracking-tighter whitespace-nowrap`}>
+          <h1 className={`${isMobile ? 'text-[3.5vw]' : 'text-[3.1vw]'} text-[#9e8549] font-montserrat font-black leading-none uppercase tracking-tighter whitespace-nowrap`}>
             {config.headerTitle || "SMART DIGITAL INFORMATION SYSTEM"}
           </h1>
         </div>
       </div>
 
-      {/* Col 3: Date & Clock (w-[20%]) - Sync with narrowed Right Sidebar */}
-      <div className={`${isMobile ? 'w-[18%] py-[0.8vh] min-h-[14.5vh]' : 'w-[20%] py-[1vh]'} shrink-0 flex flex-col items-center justify-center bg-[#8b7336] px-[1vw] rounded-xl text-white shadow-md border border-white/10 relative overflow-hidden`}>
+      {/* Col 3: Date & Clock (w-[24.5% Mobile / 20% Desktop]) - Sync with narrowed Right Sidebar */}
+      <div className={`${isMobile ? 'w-[24.5%] py-[0.8vh] min-h-[16vh]' : 'w-[20%] py-[1vh]'} shrink-0 flex flex-col items-center justify-center bg-[#8b7336] px-[1vw] rounded-xl text-white shadow-md border border-white/10 relative overflow-hidden`}>
         {/* Mode Indicator Overlay */}
-        <div className={`absolute top-0 right-0 px-[0.8vw] py-[0.3vh] bg-yellow-400 text-[#1a3a3a] font-montserrat font-black ${isMobile ? 'text-[0.6vw]' : 'text-[0.65vw]'} rounded-bl-lg tracking-widest shadow-sm`}>
+        <div className={`absolute top-0 right-0 px-[0.8vw] py-[0.3vh] bg-yellow-400 text-[#1a3a3a] font-montserrat font-black ${isMobile ? 'text-[0.65vw]' : 'text-[0.65vw]'} rounded-bl-lg tracking-widest shadow-sm`}>
           MODA {settings.active_mode}
         </div>
         
-        <p className={`font-montserrat font-bold ${isMobile ? 'text-[1.2vw] mt-[1.2vh]' : 'text-[1.3vw] mt-[1.8vh]'} leading-tight mb-0 uppercase tracking-tight opacity-90`}>
+        <p className={`font-montserrat font-bold ${isMobile ? 'text-[1.3vw] mt-[1.2vh]' : 'text-[1.3vw] mt-[1.8vh]'} leading-tight mb-0 uppercase tracking-tight opacity-90`}>
           {day}, {date} {month} {year}
         </p>
-        <p className={`font-montserrat font-bold ${isMobile ? 'text-[3.2vw]' : 'text-[3.8vw]'} leading-none tracking-tighter tabular-nums drop-shadow-md`}>
+        <p className={`font-montserrat font-bold ${isMobile ? 'text-[3.8vw]' : 'text-[3.8vw]'} leading-none tracking-tighter tabular-nums drop-shadow-md`}>
           {time}
         </p>
       </div>
