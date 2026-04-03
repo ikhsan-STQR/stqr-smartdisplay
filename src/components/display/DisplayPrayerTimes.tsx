@@ -108,11 +108,11 @@ const DisplayPrayerTimes = () => {
       {/* Left Section: Header + Centered Next Prayer */}
       <div className="flex items-center h-full flex-1">
         {/* PRAYER TIME Header Block */}
-        <div className="flex flex-col items-center justify-center leading-[0.8] mr-10 select-none">
-          <span className="text-yellow-300 font-montserrat font-bold text-[1vw] uppercase tracking-[0.2em] opacity-90 mb-1">
+        <div className="flex flex-col items-center justify-center leading-[0.9] mr-10 select-none">
+          <span className="text-yellow-300 font-montserrat font-bold text-[0.9vw] uppercase tracking-[0.2em] opacity-90 mb-0">
             PRAYER
           </span>
-          <span className="text-yellow-300 font-montserrat font-black text-[2.5vw] uppercase tracking-tighter">
+          <span className="text-yellow-300 font-montserrat font-black text-[2.6vw] uppercase tracking-tighter">
             TIME
           </span>
         </div>
@@ -121,10 +121,10 @@ const DisplayPrayerTimes = () => {
         <div className="flex-1 flex justify-center">
           {nextPrayer && (
             <div className="flex flex-col items-center justify-center leading-tight">
-              <span className="text-white font-montserrat font-bold text-[0.9vw] uppercase tracking-widest opacity-80 mb-0.5 whitespace-nowrap">
+              <span className="text-white font-montserrat font-bold text-[1vw] uppercase tracking-widest opacity-80 mb-0.5 whitespace-nowrap">
                 MENUJU {nextPrayer.name}:
               </span>
-              <span className="text-[2.52vw] font-black text-yellow-300 tracking-[0.05em] font-montserrat tabular-nums leading-[0.9]">
+              <span className="text-[2.6vw] font-black text-yellow-300 tracking-[0.05em] font-montserrat tabular-nums leading-[0.9]">
                 {nextPrayer.diff}
               </span>
             </div>
@@ -137,10 +137,10 @@ const DisplayPrayerTimes = () => {
         {prayerItems.map((item) => (
           <div 
             key={item.label} 
-            className="flex flex-col items-center justify-center bg-[#133c47] px-[1.2vw] py-[0.8vh] h-[85%] min-w-[9vw] rounded-2xl border border-white/10 shadow-sm transition-all hover:bg-[#1a4a58]"
+            className="flex flex-col items-center justify-center bg-[#133c47] px-[1.2vw] py-[0.8vh] h-[85%] min-w-[9.5vw] rounded-2xl border border-white/10 shadow-sm transition-all hover:bg-[#1a4a58]"
           >
-            <span className="text-yellow-300 font-montserrat font-bold text-[0.8vw] tracking-wider uppercase mb-1">{item.label}</span>
-            <span className="text-white font-montserrat font-black text-[1.8vw] leading-none">{item.time}</span>
+            <span className="text-[#A8E6CF] font-montserrat font-bold text-[0.85vw] tracking-wider uppercase mb-1">{item.label}</span>
+            <span className="text-white font-montserrat font-black text-[1.9vw] leading-none text-center w-full">{item.time}</span>
           </div>
         ))}
       </div>

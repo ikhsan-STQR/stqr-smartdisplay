@@ -6,7 +6,7 @@ const DAYS_ID = ["AHAD", "SENIN", "SELASA", "RABU", "KAMIS", "JUMAT", "SABTU"];
 const MONTHS_ID = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
 const DisplayHeader = () => {
-  const { config } = useDisplay();
+  const { config, settings } = useDisplay();
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
@@ -44,8 +44,13 @@ const DisplayHeader = () => {
       </div>
 
       {/* Col 3: Date & Clock (w-[20%]) - Sync with narrowed Right Sidebar */}
-      <div className="w-[20%] shrink-0 flex flex-col items-center justify-center bg-[#8b7336] px-[1vw] py-[1.2vh] rounded-xl text-white shadow-md border border-white/10">
-        <p className="font-barlow font-bold text-[1.4vw] leading-tight mb-[0.2vh] uppercase tracking-[0.1em] opacity-90">
+      <div className="w-[20%] shrink-0 flex flex-col items-center justify-center bg-[#8b7336] px-[1vw] py-[1vh] rounded-xl text-white shadow-md border border-white/10 relative overflow-hidden">
+        {/* Mode Indicator Overlay */}
+        <div className="absolute top-0 right-0 px-[0.8vw] py-[0.3vh] bg-yellow-400 text-[#1a3a3a] font-montserrat font-black text-[0.65vw] rounded-bl-lg tracking-widest shadow-sm">
+          MODA {settings.active_mode}
+        </div>
+        
+        <p className="font-barlow font-bold text-[1.4vw] leading-tight mb-[0.2vh] uppercase tracking-[0.1em] opacity-90 mt-[0.5vh]">
           {day}, {date} {month} {year}
         </p>
         <p className="font-barlow font-black text-[4vw] leading-none tracking-tighter tabular-nums drop-shadow-md">

@@ -20,28 +20,30 @@ export interface ScheduleItem {
   endTime: string;
 }
 
-export interface TimeBlock {
+export interface TimetableEntry {
   id: string;
-  name: string;
+  day: string;
+  rombel: string | null;
+  start_time: string;
+  end_time: string;
+  period: string | null;
+  subject_name: string | null;
+  description: string | null;
   mode: 'KBM' | 'RAMADHAN' | 'PAS_PAT';
-  dayOfWeek: number; // 0-6
-  startTime: string;
-  endTime: string;
-  type: 'class' | 'break' | 'end';
 }
 
-export interface CustomTexts {
-  noActivityText: string;
-  breakTitle: string;
-  breakNotes: string;
-  apelBersamaNotes: string;
-  apelPagiNotes: string;
-  pulangNotes: string;
+export interface DisplaySettings {
+  id: string;
+  active_mode: 'KBM' | 'RAMADHAN' | 'PAS_PAT';
+  note_apel_pagi: string;
+  note_apel_bersama: string;
+  note_istirahat: string;
+  note_pulang: string;
 }
 
 export interface TimeStatus {
-  activePeriod: TimeBlock | null;
-  nextPeriod: TimeBlock | null;
+  activePeriod: TimetableEntry | null;
+  nextPeriod: TimetableEntry | null;
   countdown: string;
 }
 
@@ -50,7 +52,7 @@ export interface DisplayConfig {
   videoUrl: string;
   sliderImages: string[];
   announcementPosters: string[];
-  jadwalPelajaran: ScheduleItem[];
+  jadwalPelajaran: ScheduleItem[]; // Legacy
   dalilHariIni: string;
   runningText: string;
   runningTextSpeed: number;
@@ -58,10 +60,6 @@ export interface DisplayConfig {
   prayerLocation: string;
   headerTitle: string;
   schedules: ContentSchedule[];
-  timetable: TimeBlock[]; // Legacy - keeping for compat or migrating
-  activeScheduleMode: 'KBM' | 'RAMADHAN' | 'PAS_PAT';
-  masterTimetable: TimeBlock[];
-  customTexts: CustomTexts;
 }
 
 interface DisplayContextType {
@@ -71,7 +69,21 @@ interface DisplayContextType {
   saveToCloud: () => Promise<void>;
   isSaving: boolean;
   status: TimeStatus;
+  // New Master Timetable System
+  timetable: TimetableEntry[];
+  settings: DisplaySettings;
+  updateSettings: (updates: Partial<DisplaySettings>) => void;
+  saveSettings: () => Promise<void>;
 }
+
+const defaultSettings: DisplaySettings = {
+  id: "",
+  active_mode: 'KBM',
+  note_apel_pagi: 'Berbaris Di Depan Kelas Masing-Masing',
+  note_apel_bersama: 'Seragam Lengkap, Berbaris Rapi',
+  note_istirahat: 'Shalat Dhuha, Tetap Tertib, Jaga Kebersihan',
+  note_pulang: 'Shalat Dzuhur Berjamaah, Tetap Jaga Ketertiban'
+};
 
 const defaultConfig: DisplayConfig = {
   contentType: "slider",
@@ -85,25 +97,7 @@ const defaultConfig: DisplayConfig = {
     "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=400&q=80",
     "https://images.unsplash.com/photo-1564769625905-50e93615e769?w=400&q=80",
   ],
-  jadwalPelajaran: [
-    { kelas: "I-A", pelajaran: "TEMATIK", startTime: "07:00", endTime: "08:00" },
-    { kelas: "I-B", pelajaran: "CALISTUNG", startTime: "07:00", endTime: "08:00" },
-    { kelas: "I-C", pelajaran: "CALISTUNG", startTime: "07:00", endTime: "08:00" },
-    { kelas: "II-A", pelajaran: "P A I", startTime: "08:00", endTime: "09:00" },
-    { kelas: "II-B", pelajaran: "CALISTUNG", startTime: "08:00", endTime: "09:00" },
-    { kelas: "II-C", pelajaran: "TEMATIK", startTime: "08:00", endTime: "09:00" },
-    { kelas: "III-A", pelajaran: "B. INGGRIS", startTime: "09:00", endTime: "10:00" },
-    { kelas: "III-B", pelajaran: "PAI", startTime: "09:00", endTime: "10:00" },
-    { kelas: "IV-A", pelajaran: "TEMATIK", startTime: "10:00", endTime: "11:00" },
-    { kelas: "IV-B", pelajaran: "PAI", startTime: "10:00", endTime: "11:00" },
-    { kelas: "V-A", pelajaran: "ADAB & AKHLAK", startTime: "13:00", endTime: "14:00" },
-    { kelas: "V-B", pelajaran: "ADAB & AKHLAK", startTime: "13:00", endTime: "14:00" },
-    { kelas: "VI-A", pelajaran: "B. INGGRIS", startTime: "14:00", endTime: "15:00" },
-    { kelas: "VI-B", pelajaran: "PAI", startTime: "14:00", endTime: "15:00" },
-    { kelas: "VII-A", pelajaran: "TAHFIDZ", startTime: "15:00", endTime: "17:00" },
-    { kelas: "VII-B", pelajaran: "TAHFIDZ", startTime: "15:00", endTime: "17:00" },
-    { kelas: "VIII-A", pelajaran: "FIQIH", startTime: "16:00", endTime: "17:30" },
-  ],
+  jadwalPelajaran: [],
   dalilHariIni:
     '"Maukah aku tunjukkan sesuatu yang jika dilakukan akan membuat kalian saling mencintai? Sebarkan salam di antara kalian" (HR. Muslim)',
   runningText:
@@ -113,32 +107,14 @@ const defaultConfig: DisplayConfig = {
   prayerLocation: "Pandeglang, Banten",
   headerTitle: "SMART DIGITAL INFORMATION SYSTEM",
   schedules: [],
-  timetable: [
-    { id: "1", name: "JP 1", mode: 'KBM', dayOfWeek: 1, startTime: "07:30", endTime: "08:10", type: 'class' },
-    { id: "2", name: "JP 2", mode: 'KBM', dayOfWeek: 1, startTime: "08:10", endTime: "08:50", type: 'class' },
-    { id: "3", name: "ISTIRAHAT", mode: 'KBM', dayOfWeek: 1, startTime: "08:50", endTime: "09:10", type: 'break' },
-    { id: "4", name: "JP 3", mode: 'KBM', dayOfWeek: 1, startTime: "09:10", endTime: "09:50", type: 'class' },
-    { id: "5", name: "JP 4", mode: 'KBM', dayOfWeek: 1, startTime: "09:50", endTime: "10:30", type: 'class' },
-    { id: "6", name: "ISTIRAHAT", mode: 'KBM', dayOfWeek: 1, startTime: "10:30", endTime: "10:50", type: 'break' },
-    { id: "7", name: "JP 5", mode: 'KBM', dayOfWeek: 1, startTime: "10:50", endTime: "11:30", type: 'class' },
-    { id: "8", name: "JP 6", mode: 'KBM', dayOfWeek: 1, startTime: "11:30", endTime: "12:10", type: 'class' },
-  ],
-  activeScheduleMode: 'KBM',
-  masterTimetable: [],
-  customTexts: {
-    noActivityText: "TIDAK ADA KEGIATAN",
-    breakTitle: "Jam Istirahat",
-    breakNotes: "Shalat Dhuha\nTetap Tertib\nJaga Kebersihan",
-    apelBersamaNotes: "Seragam Lengkap\nBerbaris Rapi\nTidak Berisik",
-    apelPagiNotes: "Berbaris Di Depan Kelas\nMasing-Masing\nBaca Doa & Hadits",
-    pulangNotes: "Shalat DzhuHUR Berjamaah\nTetap Jaga Ketertiban\nJaga Kebersihan"
-  }
 };
 
 const DisplayContext = createContext<DisplayContextType | undefined>(undefined);
 
 export const DisplayProvider = ({ children }: { children: ReactNode }) => {
   const [config, setConfig] = useState<DisplayConfig>(defaultConfig);
+  const [timetable, setTimetable] = useState<TimetableEntry[]>([]);
+  const [settings, setSettings] = useState<DisplaySettings>(defaultSettings);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [status, setStatus] = useState<TimeStatus>({
@@ -147,99 +123,130 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
     countdown: "00:00:00",
   });
 
-  // Load config from database on mount
-  useEffect(() => {
-    const loadConfig = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("display_config")
-          .select("config_data")
-          .eq("config_key", "default")
-          .maybeSingle();
+  const loadData = async () => {
+    try {
+      // 1. Fetch Config
+      const { data: configData } = await (supabase as any)
+        .from("display_config")
+        .select("config_data")
+        .eq("config_key", "default")
+        .maybeSingle();
 
-        if (error) {
-          console.error("Failed to load config from database:", error);
-        } else if (data?.config_data) {
-          setConfig({ 
-            ...defaultConfig, 
-            ...(data.config_data as unknown as Partial<DisplayConfig>) 
-          });
-        }
-      } catch (e) {
-        console.error("Error loading config:", e);
-      } finally {
-        setIsLoading(false);
+      if (configData?.config_data) {
+        setConfig({
+          ...defaultConfig,
+          ...(configData.config_data as unknown as Partial<DisplayConfig>),
+        });
       }
-    };
-    
-    loadConfig();
 
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('schema-db-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'display_config', filter: 'config_key=eq.default' },
-        (payload) => {
-          if (payload.new && (payload.new as any).config_data) {
-            setConfig((prev) => ({
-              ...prev,
-              ...((payload.new as any).config_data as unknown as Partial<DisplayConfig>)
-            }));
-          }
+      // 2. Fetch Display Settings (Global Mode & Notes)
+      const { data: settingsData } = await (supabase as any)
+        .from("display_settings")
+        .select("*")
+        .limit(1)
+        .maybeSingle();
+
+      if (settingsData) {
+        setSettings(settingsData as DisplaySettings);
+      }
+
+      // 3. Fetch Timetable
+      const { data: timetableData } = await (supabase as any)
+        .from("timetables")
+        .select("*");
+
+      if (timetableData) {
+        setTimetable(timetableData as TimetableEntry[]);
+      }
+    } catch (e) {
+      console.error("Error loading display data:", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load data on mount
+  useEffect(() => {
+    loadData();
+
+    // Real-time Subscriptions
+    const configChannel = supabase
+      .channel('display-config-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'display_config', filter: 'config_key=eq.default' }, (payload) => {
+        if (payload.new && (payload.new as any).config_data) {
+          setConfig(prev => ({ ...prev, ...((payload.new as any).config_data as any) }));
         }
-      )
-      .subscribe();
+      }).subscribe();
+
+    const settingsChannel = supabase
+      .channel('display-settings-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'display_settings' }, (payload) => {
+        if (payload.new) setSettings(payload.new as DisplaySettings);
+      }).subscribe();
+
+    const timetableChannel = supabase
+      .channel('timetable-sync')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'timetables' }, () => {
+        // Refresh full timetable on any major change
+        (supabase as any).from("timetables").select("*").then(({ data }: any) => {
+          if (data) setTimetable(data as TimetableEntry[]);
+        });
+      }).subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(configChannel);
+      supabase.removeChannel(settingsChannel);
+      supabase.removeChannel(timetableChannel);
     };
   }, []);
 
-  // Update status every second
+  // Update status based on current time
   useEffect(() => {
     const updateTimeStatus = () => {
       const now = new Date();
-      const currentDay = now.getDay();
+      const idDays = ["Ahad", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+      const currentDay = idDays[now.getDay()];
       const currentTimeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-      const currentTimeShort = currentTimeStr.substring(0, 5);
-
-      // Filter timetable by current mode
-      const relevantBlocks = config.masterTimetable.length > 0 
-        ? config.masterTimetable.filter(b => b.mode === config.activeScheduleMode)
-        : config.timetable.map(b => ({ ...b, mode: 'KBM' as const, dayOfWeek: currentDay, type: 'class' as const }));
-
-      // 1. Find active block for today
-      const todayBlocks = relevantBlocks.filter(b => b.dayOfWeek === currentDay);
-      const active = todayBlocks.find(b => currentTimeShort >= b.startTime && currentTimeShort < b.endTime) || null;
-
-      // 2. Find next block (can be tomorrow or beyond)
-      let next: TimeBlock | null = null;
-      let nextDate = new Date();
       
-      // Search through next 7 days
-      for (let d = 0; d < 8; d++) {
-        const searchDay = (currentDay + d) % 7;
-        const searchBlocks = relevantBlocks
-          .filter(b => b.dayOfWeek === searchDay)
-          .sort((a, b) => a.startTime.localeCompare(b.startTime));
+      // Filter by active mode and current day
+      const modeTimetable = timetable.filter(entry => entry.mode === settings.active_mode);
+      const todayEntries = modeTimetable.filter(entry => entry.day === currentDay);
 
-        for (const b of searchBlocks) {
-          if (d === 0) {
-            // If today, must be after current time
-            if (b.startTime > currentTimeShort) {
-              next = b;
-              nextDate.setDate(now.getDate() + d);
-              const [h, m] = b.startTime.split(':').map(Number);
-              nextDate.setHours(h, m, 0, 0);
+      // Find active period
+      const active = todayEntries.find(entry => 
+        currentTimeStr >= entry.start_time && currentTimeStr < entry.end_time
+      ) || null;
+
+      // Find next period (can be today or next day)
+      let next: TimetableEntry | null = null;
+      let nextDate = new Date();
+
+      // Look through next 7 days
+      for (let i = 0; i < 8; i++) {
+        const checkDate = new Date();
+        checkDate.setDate(now.getDate() + i);
+        const checkDay = idDays[checkDate.getDay()];
+        
+        const dayEntries = modeTimetable
+          .filter(entry => entry.day === checkDay)
+          .sort((a, b) => a.start_time.localeCompare(b.start_time));
+
+        for (const entry of dayEntries) {
+          if (i === 0) {
+            // If today, must be in the future
+            if (entry.start_time > currentTimeStr) {
+              next = entry;
+              const [h, m, s] = entry.start_time.split(':').map(Number);
+              nextDate = checkDate;
+              nextDate.setHours(h, m, s || 0, 0);
               break;
             }
           } else {
-            // First block of any future day
-            next = b;
-            nextDate.setDate(now.getDate() + d);
-            const [h, m] = b.startTime.split(':').map(Number);
-            nextDate.setHours(h, m, 0, 0);
+            // First entry of the next available day
+            next = entry;
+            const [h, m, s] = entry.start_time.split(':').map(Number);
+            nextDate = checkDate;
+            nextDate.setHours(h, m, s || 0, 0);
             break;
           }
         }
@@ -259,8 +266,8 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
       }
 
       setStatus({
-        activePeriod: active ? ({ ...active } as any) : null,
-        nextPeriod: next ? ({ ...next } as any) : null,
+        activePeriod: active ? { ...active } : null,
+        nextPeriod: next ? { ...next } : null,
         countdown: countdownStr,
       });
     };
@@ -268,36 +275,25 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
     const timer = setInterval(updateTimeStatus, 1000);
     updateTimeStatus();
     return () => clearInterval(timer);
-  }, [config.masterTimetable, config.timetable, config.activeScheduleMode]);
+  }, [timetable, settings.active_mode]);
 
   const updateConfig = useCallback((updates: Partial<DisplayConfig>) => {
     setConfig((prev) => ({ ...prev, ...updates }));
   }, []);
 
+  const updateSettings = useCallback((updates: Partial<DisplaySettings>) => {
+    setSettings((prev) => ({ ...prev, ...updates }));
+  }, []);
+
   const saveToCloud = useCallback(async () => {
     setIsSaving(true);
     try {
-      // Ensure we have a valid object to JSON.stringify
       const configToSave = JSON.parse(JSON.stringify(config));
-      
-      const { data: existing } = await supabase
-        .from("display_config")
-        .select("id")
-        .eq("config_key", "default")
-        .maybeSingle();
-
-      if (existing) {
-        const { error } = await supabase
-          .from("display_config")
-          .update({ config_data: configToSave, updated_at: new Date().toISOString() })
-          .eq("config_key", "default");
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from("display_config")
-          .insert([{ config_key: "default", config_data: configToSave }]);
-        if (error) throw error;
-      }
+      await (supabase as any).from("display_config").upsert({ 
+        config_key: "default", 
+        config_data: configToSave,
+        updated_at: new Date().toISOString()
+      });
     } catch (e) {
       console.error("Failed to save config:", e);
       throw e;
@@ -306,8 +302,26 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [config]);
 
+  const saveSettings = useCallback(async () => {
+    setIsSaving(true);
+    try {
+      await (supabase as any).from("display_settings").upsert({
+        ...settings,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'id' });
+    } catch (e) {
+      console.error("Failed to save settings:", e);
+      throw e;
+    } finally {
+      setIsSaving(false);
+    }
+  }, [settings]);
+
   return (
-    <DisplayContext.Provider value={{ config, updateConfig, isLoading, saveToCloud, isSaving, status }}>
+    <DisplayContext.Provider value={{ 
+      config, updateConfig, isLoading, saveToCloud, isSaving, status,
+      timetable, settings, updateSettings, saveSettings 
+    }}>
       {children}
     </DisplayContext.Provider>
   );
