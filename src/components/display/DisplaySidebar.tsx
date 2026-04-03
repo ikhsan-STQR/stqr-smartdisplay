@@ -54,9 +54,9 @@ const DisplaySidebar = () => {
         </span>
       </div>
 
-      {/* Sidebar Green Area - Maximized specifically for 3:4 */}
-      <div className="flex-1 min-h-0 bg-transparent flex items-center justify-center">
-        <div className="h-full aspect-[3/4] w-full bg-gray-50 shadow-inner relative overflow-hidden group">
+      {/* Sidebar Content Area - Maximized specifically for 3:4 */}
+      <div className="flex-1 min-h-0 bg-transparent flex items-center justify-center overflow-hidden">
+        <div className="h-full aspect-[3/4] max-w-full bg-gray-50 shadow-inner relative overflow-hidden group">
           {(!currentPosters || currentPosters.length === 0 || !currentPosters[0]) ? (
             <div className="absolute inset-0 flex items-center justify-center p-4 text-center">
               <p className="text-gray-300 font-montserrat font-medium uppercase tracking-tighter text-sm">Belum Ada Poster</p>

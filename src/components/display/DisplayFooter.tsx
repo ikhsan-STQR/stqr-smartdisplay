@@ -31,8 +31,8 @@ const DisplayFooter = () => {
 
   return (
     <footer className="w-full flex items-center gap-[0.5vw] bg-transparent h-[10vh]">
-      {/* Col 1: Next Period Countdown (w-[24%]) - Matching Sidebar Left */}
-      <div className="w-[24%] bg-white px-[1vw] py-[0.5vh] rounded-xl shadow-md border border-gray-100 flex flex-col items-center justify-center overflow-hidden shrink-0 h-full">
+      {/* Col 1: Next Period Countdown (w-[22%]) - Matching Sidebar Left */}
+      <div className="w-[22%] bg-white px-[1vw] py-[0.5vh] rounded-xl shadow-md border border-gray-100 flex flex-col items-center justify-center overflow-hidden shrink-0 h-full">
         {status.nextPeriod ? (
           <>
             <span className="text-[#1e5666] font-montserrat font-black text-[2vw] leading-none uppercase tracking-tighter">
@@ -49,7 +49,7 @@ const DisplayFooter = () => {
         )}
       </div>
 
-      {/* Col 2: Running Text Bar (flex-1) - Matching Main Content */}
+      {/* Col 2: Running Text Bar (flex-1) - Expanding to the right */}
       <div className="flex-1 h-full bg-[var(--greenscreen)] rounded-[1vw] overflow-hidden flex items-center shadow-inner">
         <div
           className="animate-marquee whitespace-nowrap font-montserrat font-medium text-primary text-[1.8vw] px-[2vw]"
@@ -61,9 +61,6 @@ const DisplayFooter = () => {
           {textToDisplay || "STQ Riyadhussholihiin - Digital Information Display"}
         </div>
       </div>
-
-      {/* Col 3: Spacer (w-[22%]) - Matching Sidebar Right */}
-      <div className="w-[22%] shrink-0 h-full"></div>
     </footer>
   );
 };

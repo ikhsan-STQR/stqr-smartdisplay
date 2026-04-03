@@ -41,16 +41,16 @@ const DisplaySidebarLeft = () => {
   );
 
   return (
-    <div className="flex-1 flex flex-col gap-[0.5vw] h-full overflow-hidden">
+    <div className="flex-1 flex flex-col gap-[0.5vw] h-full overflow-hidden w-full">
       {/* Status Box - Simplified Single Line */}
-      <div className="Islamic-card bg-[#133c47] rounded-xl p-[1.5vw] shadow-lg border border-white/10 flex items-center justify-center min-h-[8vh]">
+      <div className="w-full bg-[#133c47] rounded-xl p-[1.5vw] shadow-lg border border-white/10 flex items-center justify-center min-h-[8vh] shrink-0">
         <h2 className="text-white font-montserrat font-black text-[2.2vw] uppercase tracking-tighter text-center leading-none">
           {status.activePeriod ? status.activePeriod.name : "TIDAK ADA KEGIATAN"}
         </h2>
       </div>
 
       {/* Sidebar Content Area */}
-      <div className="flex-1 bg-gray-50/50 rounded-xl relative overflow-hidden flex flex-col p-2">
+      <div className="flex-1 w-full bg-gray-50/50 rounded-xl relative overflow-hidden flex flex-col p-2">
         {(() => {
           const active = status.activePeriod;
           const name = active?.name.toUpperCase() || "";

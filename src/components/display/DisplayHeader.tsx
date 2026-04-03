@@ -22,23 +22,25 @@ const DisplayHeader = () => {
 
   return (
     <header className="w-full flex items-start gap-[0.5vw] bg-transparent">
-      {/* Col 1: Logo & Left Alignment (w-[24%]) */}
-      <div className="w-[24%] shrink-0 flex items-start">
+      {/* Col 1: Logo (Fixed size) */}
+      <div className="shrink-0 flex items-start">
         <img
           src={logoStqr}
           alt="Logo STQ Riyadhussholihiin"
-          className="h-[10.5vh] w-[10.5vh] flex-shrink-0 object-contain mr-[0.5vw]"
+          className="h-[10.5vh] w-[10.5vh] flex-shrink-0 object-contain mr-[0.8vw]"
         />
-        <h1 className="text-[var(--display-brown)] font-barlow font-bold text-[1.8vw] tracking-normal leading-[1.1] pt-1">
-          STQ Riyadhussholihiin
-        </h1>
       </div>
 
-      {/* Col 2: Main Title (flex-1) */}
-      <div className="flex-1 flex flex-col justify-end h-[10.5vh] pb-1">
-        <p className="text-[#9e8549] font-montserrat font-black text-[3vw] leading-none tracking-normal uppercase text-left">
-          {config.headerTitle || "SMART DIGITAL INFORMATION SYSTEM"}
-        </p>
+      {/* Col 2: Titles Stacked (flex-1) */}
+      <div className="flex-1 flex flex-col justify-center h-[10.5vh]">
+        <div className="flex flex-col">
+          <span className="text-[var(--display-brown)] font-barlow font-bold text-[1.4vw] leading-none mb-1 opacity-80">
+            STQ Riyadhussholihiin
+          </span>
+          <h1 className="text-[#9e8549] font-montserrat font-black text-[2.8vw] leading-none uppercase tracking-tighter whitespace-nowrap">
+            {config.headerTitle || "SMART DIGITAL INFORMATION SYSTEM"}
+          </h1>
+        </div>
       </div>
 
       {/* Col 3: Date & Clock (w-[22%]) - Exact Match with Right Sidebar */}
