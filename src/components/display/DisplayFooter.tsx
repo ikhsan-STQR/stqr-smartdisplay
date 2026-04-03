@@ -42,15 +42,16 @@ const DisplayFooter = () => {
       </div>
 
       {/* Col 2: Running Text Bar (flex-1) - Expanding to the right with Light Tosca background */}
-      <div className="flex-1 h-full bg-[#A8E6CF] rounded-[1vw] overflow-hidden flex items-center shadow-inner">
+      <div className="flex-1 h-full bg-[#A8E6CF] rounded-[1vw] overflow-hidden flex items-center shadow-inner relative">
         <div
-          className="animate-marquee whitespace-nowrap font-montserrat font-medium text-[#133c47] text-[1.5vw] px-[2vw]"
+          className="flex animate-marquee-seamless whitespace-nowrap font-montserrat font-medium text-[#133c47] text-[1.5vw]"
           style={{
             animationDuration: `${config.runningTextSpeed || 30}s`,
             animationPlayState: textToDisplay ? "running" : "paused"
           }}
         >
-          {textToDisplay || "STQ Riyadhussholihiin - Digital Information Display"}
+          <span className="px-[4vw]">{textToDisplay || "STQ Riyadhussholihiin - Digital Information Display"}</span>
+          <span className="px-[4vw]">{textToDisplay || "STQ Riyadhussholihiin - Digital Information Display"}</span>
         </div>
       </div>
     </footer>

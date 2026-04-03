@@ -137,12 +137,19 @@ const DisplayPrayerTimes = () => {
         {prayerItems.map((item) => (
           <div 
             key={item.label} 
-            className="flex flex-col items-center justify-center bg-[#133c47] px-[1.2vw] py-[0.8vh] h-[85%] min-w-[9.5vw] rounded-2xl border border-white/10 shadow-sm transition-all hover:bg-[#1a4a58]"
+            className="flex flex-col items-center justify-center bg-[#133c47] px-[1.2vw] py-[0.8vh] h-[82%] min-w-[9.5vw] rounded-2xl border border-white/10 shadow-sm transition-all hover:bg-[#1a4a58]"
           >
             <span className="text-yellow-400 font-montserrat font-bold text-[0.85vw] tracking-wider uppercase mb-1">{item.label}</span>
             <span className="text-white font-montserrat font-black text-[1.9vw] leading-none text-center w-full">{item.time}</span>
           </div>
         ))}
+      </div>
+
+      {/* Footnote Credit Watermark - Final Styling: Subtler 10px / 30% opacity */}
+      <div className="absolute bottom-0 right-4 z-20 select-none pointer-events-none opacity-30">
+        <span className="text-[10px] text-white font-montserrat tracking-tight leading-none">
+          Developed by Ikhsan Abu Ahsan © 2026
+        </span>
       </div>
     </div>
   );

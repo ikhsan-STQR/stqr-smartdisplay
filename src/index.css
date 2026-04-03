@@ -57,6 +57,11 @@
   100% { transform: translateX(-100%); }
 }
 
+@keyframes marquee-seamless {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 @keyframes fade-slide {
   0%, 100% { opacity: 0; transform: translateY(8px); }
   10%, 90% { opacity: 1; transform: translateY(0); }
@@ -64,6 +69,10 @@
 
 .animate-marquee {
   animation: marquee var(--running-text-speed) linear infinite;
+}
+
+.animate-marquee-seamless {
+  animation: marquee-seamless var(--running-text-speed) linear infinite;
 }
 
 .islamic-pattern {
