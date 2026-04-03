@@ -15,12 +15,16 @@ const DisplayPage = () => {
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
+      const height = window.innerHeight;
       const isMob = width < 1024;
       setIsMobile(isMob);
       
       if (isMob) {
-        // Force a stable 1280px internal width for the mobile scale-down
-        setScale(width / 1280);
+        // Force a strict 16:9 aspect ratio box based on height (100vh)
+        // targetWidth is what a 16:9 box would be at current viewport height
+        const targetWidth = height * (16 / 9);
+        // If the screen width is narrower than the 16:9 target, scale it down to fit
+        setScale(Math.min(1, width / targetWidth));
       } else {
         setScale(1);
       }
@@ -42,7 +46,7 @@ const DisplayPage = () => {
   // The Original Comprehensive Layout Logic
   const renderLayout = (isScaled: boolean) => (
     <div className={`
-      ${isScaled ? 'w-[1280px] h-[720px]' : 'h-screen w-screen'} 
+      ${isScaled ? 'w-full h-full' : 'h-screen w-screen'} 
       flex flex-col overflow-hidden bg-background islamic-pattern p-[0.75vw] gap-[0.75vw]
     `}>
       {/* Top Header Row - Fixed Columns aligned with content below */}
@@ -80,17 +84,18 @@ const DisplayPage = () => {
     return renderLayout(false);
   }
 
-  // Mobile (< 1024px): Wrap in a scaling-optimized container
+  // Mobile (< 1024px): Wrap in a STRICT 16:9 container anchored to viewport height
   return (
-    <div className="h-screen w-screen bg-gray-900 overflow-hidden relative">
+    <div className="h-screen w-screen bg-gray-900 flex items-center justify-center overflow-hidden relative">
       <div 
         style={{ 
           transform: `scale(${scale})`, 
-          transformOrigin: 'top left',
-          width: '1280px',
-          height: `${window.innerHeight / scale}px` // Ensure full height coverage
+          transformOrigin: 'center center',
+          width: 'calc(100vh * 16 / 9)',
+          height: '100vh',
+          flexShrink: 0
         }}
-        className="absolute top-0 left-0"
+        className="relative shadow-2xl"
       >
         {renderLayout(true)}
       </div>

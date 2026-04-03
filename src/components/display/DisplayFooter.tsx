@@ -34,7 +34,7 @@ const DisplayFooter = () => {
       {/* Col 1: Next Period Countdown (w-[22%]) - Matching Sidebar Left */}
       <div className="w-[22%] bg-white px-[1vw] py-[0.5vh] rounded-xl shadow-md border border-gray-100 flex flex-col items-center justify-center overflow-hidden shrink-0 h-full">
         <div className="flex flex-col items-center justify-center p-[0.5vw]">
-          <p className="text-[2.7vw] font-montserrat font-black text-[#133c47] leading-none mb-1 tabular-nums">
+          <p className="text-[2.7vw] font-montserrat font-black text-[#9e8549] leading-none mb-1 tabular-nums drop-shadow-sm">
             {status.countdown || "00:00:00"}
           </p>
           <p className="text-[0.9vw] font-jakarta font-bold text-gray-500/80 uppercase tracking-[0.1em] whitespace-nowrap overflow-hidden text-ellipsis max-w-full text-center">
