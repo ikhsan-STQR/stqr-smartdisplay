@@ -44,7 +44,7 @@ const DisplaySidebarLeft = () => {
     <div className="flex-1 flex flex-col gap-[0.5vw] h-full overflow-hidden w-full">
       {/* Status Box - Simplified Single Line */}
       <div className="w-full bg-[#133c47] rounded-xl p-[1.5vw] shadow-lg border border-white/10 flex items-center justify-center min-h-[8vh] shrink-0">
-        <h2 className="text-white font-montserrat font-black text-[2.2vw] uppercase tracking-tighter text-center leading-none">
+        <h2 className="text-white font-montserrat font-black text-[1.7vw] uppercase tracking-tighter text-center leading-none whitespace-nowrap">
           {status.activePeriod ? status.activePeriod.name : "TIDAK ADA KEGIATAN"}
         </h2>
       </div>

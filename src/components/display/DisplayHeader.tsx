@@ -27,17 +27,17 @@ const DisplayHeader = () => {
         <img
           src={logoStqr}
           alt="Logo STQ Riyadhussholihiin"
-          className="h-[10.5vh] w-[10.5vh] flex-shrink-0 object-contain mr-[0.8vw]"
+          className="h-[14vh] w-[14vh] flex-shrink-0 object-contain mr-[0.8vw]"
         />
       </div>
 
       {/* Col 2: Titles Stacked (flex-1) */}
-      <div className="flex-1 flex flex-col justify-center h-[10.5vh]">
+      <div className="flex-1 flex flex-col justify-center h-[14vh]">
         <div className="flex flex-col">
-          <span className="text-[var(--display-brown)] font-barlow font-bold text-[1.4vw] leading-none mb-1 opacity-80">
+          <span className="text-[var(--display-brown)] font-montserrat font-black text-[3.1vw] leading-none mb-1 opacity-80">
             STQ Riyadhussholihiin
           </span>
-          <h1 className="text-[#9e8549] font-montserrat font-black text-[2.8vw] leading-none uppercase tracking-tighter whitespace-nowrap">
+          <h1 className="text-[#9e8549] font-montserrat font-black text-[3.1vw] leading-none uppercase tracking-tighter whitespace-nowrap">
             {config.headerTitle || "SMART DIGITAL INFORMATION SYSTEM"}
           </h1>
         </div>
