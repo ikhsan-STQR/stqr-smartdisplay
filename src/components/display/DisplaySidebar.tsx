@@ -12,14 +12,14 @@ const DisplaySidebar = () => {
       const currentTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
       const currentDay = now.getDay();
 
-      const active = config.schedules.find(s => 
-        s.isActive && 
-        s.type === "announcement" && 
+      const active = config.schedules.find(s =>
+        s.isActive &&
+        s.type === "announcement" &&
         s.days.includes(currentDay) &&
-        currentTime >= s.startTime && 
+        currentTime >= s.startTime &&
         currentTime < s.endTime
       );
-      
+
       setActiveSchedule(active || null);
     };
 
@@ -28,7 +28,7 @@ const DisplaySidebar = () => {
     return () => clearInterval(interval);
   }, [config.schedules]);
 
-  const currentPosters = activeSchedule 
+  const currentPosters = activeSchedule
     ? (Array.isArray(activeSchedule.content) ? activeSchedule.content : [activeSchedule.content as string])
     : config.announcementPosters;
 
@@ -68,9 +68,8 @@ const DisplaySidebar = () => {
                   key={i}
                   src={poster as string}
                   alt={`Pengumuman ${i + 1}`}
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
-                    i === currentPoster ? "opacity-100" : "opacity-0"
-                  }`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${i === currentPoster ? "opacity-100" : "opacity-0"
+                    }`}
                 />
               ))}
             </div>

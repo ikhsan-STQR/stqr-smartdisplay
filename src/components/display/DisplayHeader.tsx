@@ -43,8 +43,8 @@ const DisplayHeader = () => {
         </div>
       </div>
 
-      {/* Col 3: Date & Clock (w-[22%]) - Exact Match with Right Sidebar */}
-      <div className="w-[22%] shrink-0 flex flex-col items-center justify-center bg-[#8b7336] px-[1vw] py-[1.2vh] rounded-xl text-white shadow-md border border-white/10">
+      {/* Col 3: Date & Clock (w-[20%]) - Sync with narrowed Right Sidebar */}
+      <div className="w-[20%] shrink-0 flex flex-col items-center justify-center bg-[#8b7336] px-[1vw] py-[1.2vh] rounded-xl text-white shadow-md border border-white/10">
         <p className="font-barlow font-bold text-[1.4vw] leading-tight mb-[0.2vh] uppercase tracking-[0.1em] opacity-90">
           {day}, {date} {month} {year}
         </p>

@@ -34,7 +34,7 @@ const DisplayPage = () => {
             <MainContent />
           </div>
         </div>
-        <div className="w-[22%] bg-white rounded-xl shadow-md p-0 flex flex-col relative overflow-hidden shrink-0">
+        <div className="w-[20%] bg-white rounded-xl shadow-md p-0 flex flex-col relative overflow-hidden shrink-0">
            <DisplaySidebar />
         </div>
       </div>
