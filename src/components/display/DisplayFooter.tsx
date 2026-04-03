@@ -33,11 +33,11 @@ const DisplayFooter = () => {
     <footer className="w-full flex items-center gap-[0.5vw] bg-transparent h-[10vh]">
       {/* Col 1: Next Period Countdown (w-[22%]) - Matching Sidebar Left */}
       <div className="w-[22%] bg-white px-[1vw] py-[0.5vh] rounded-xl shadow-md border border-gray-100 flex flex-col items-center justify-center overflow-hidden shrink-0 h-full">
-        <span className="text-yellow-400 font-montserrat font-black text-[2.7vw] leading-none uppercase tracking-tighter tabular-nums drop-shadow-sm">
+        <span className="text-[#133c47] font-montserrat font-black text-[2.7vw] leading-none uppercase tracking-tighter tabular-nums drop-shadow-sm">
           {status.countdown || "00:00:00"}
         </span>
         <span className="text-gray-500 font-jakarta font-bold text-[1.08vw] uppercase tracking-widest mt-1">
-          {status.nextPeriod ? `menuju ${status.nextPeriod.subject_name || status.nextPeriod.period}` : "MENUNGGU JADWAL"}
+          MENUJU {status.targetLabel}
         </span>
       </div>
 

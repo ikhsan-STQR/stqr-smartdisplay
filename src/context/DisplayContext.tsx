@@ -45,6 +45,7 @@ export interface TimeStatus {
   activePeriod: TimetableEntry | null;
   nextPeriod: TimetableEntry | null;
   countdown: string;
+  targetLabel: string;
 }
 
 export interface DisplayConfig {
@@ -121,7 +122,9 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
     activePeriod: null,
     nextPeriod: null,
     countdown: "00:00:00",
+    targetLabel: "MENUNGGU JADWAL",
   });
+  const [prayerTimes, setPrayerTimes] = useState<any>(null);
 
   const loadData = async () => {
     try {
@@ -158,6 +161,9 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
       if (timetableData) {
         setTimetable(timetableData as TimetableEntry[]);
       }
+
+      // 4. Fetch Prayer Times (Local helper)
+      fetchPrayerTimes();
     } catch (e) {
       console.error("Error loading display data:", e);
     } finally {
@@ -165,10 +171,25 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const fetchPrayerTimes = async () => {
+    try {
+      const response = await fetch(
+        `http://api.aladhan.com/v1/timingsByCity?city=Pandeglang&country=Indonesia&method=11`
+      );
+      const data = await response.json();
+      if (data.code === 200) {
+        setPrayerTimes(data.data.timings);
+      }
+    } catch (e) {
+      console.error("Failed to fetch prayer times in context:", e);
+    }
+  };
+
   // Load data on mount
   useEffect(() => {
     loadData();
-
+    const prayerInterval = setInterval(fetchPrayerTimes, 3600000); // Update once an hour
+    
     // Real-time Subscriptions
     const configChannel = supabase
       .channel('display-config-sync')
@@ -197,6 +218,7 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
       supabase.removeChannel(configChannel);
       supabase.removeChannel(settingsChannel);
       supabase.removeChannel(timetableChannel);
+      clearInterval(prayerInterval);
     };
   }, []);
 
@@ -207,6 +229,7 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
       const now = new Date();
       const jakartaDateStr = now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" });
       const jakartaDate = new Date(jakartaDateStr);
+      const dayNum = now.getDay(); // 0: Sunday, 5: Friday, 6: Saturday
       
       // 2. Day Mapping (Sunday -> Ahad, dsb)
       const enDay = new Intl.DateTimeFormat("en-US", { weekday: 'long', timeZone: "Asia/Jakarta" }).format(now);
@@ -228,78 +251,84 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
       
       // Filter by active mode and current day
       const modeTimetable = timetable.filter(entry => entry.mode === settings.active_mode);
-      const todayEntries = modeTimetable.filter(entry => entry.day === currentDayID);
+      const todaySorted = modeTimetable
+        .filter(entry => entry.day === currentDayID)
+        .sort((a, b) => a.start_time.localeCompare(b.start_time));
 
-      // --- DEBUG MODE LOGS ---
-      if (now.getSeconds() % 30 === 0) { // Log every 30s to avoid spam
-        console.log('--- DEBUG SCHEDULE ---');
-        console.log('Hari terdeteksi:', currentDayID, `(${enDay})`);
-        console.log('Mode aktif:', settings.active_mode);
-        console.log('Waktu (WIB):', currentTimeHM);
-        console.log('Jumlah data ditemukan (Filter Mode+Hari):', todayEntries.length);
-      }
-
-      // 4. Find Active Period
-      // DB might store HH:mm:ss or HH:mm, so we normalize for comparison
-      const active = todayEntries.find(entry => {
+      // Find active period
+      const active = todaySorted.find(entry => {
         const start = entry.start_time.substring(0, 5);
         const end = entry.end_time.substring(0, 5);
         return currentTimeHM >= start && currentTimeHM < end;
       }) || null;
 
-      // 5. Find next period
+      // --- LOGIC: TARGET NEXT ---
       let next: TimetableEntry | null = null;
       let nextDate = new Date(jakartaDateStr);
+      let label = "-";
 
-      for (let i = 0; i < 8; i++) {
-        const checkDate = new Date(jakartaDateStr);
-        checkDate.setDate(jakartaDate.getDate() + i);
+      // CASE: WEEKEND (Friday/Saturday)
+      if (dayNum === 5 || dayNum === 6) {
+        label = "JAM MASUK SEKOLAH";
+        const daysToSun = (7 - dayNum) % 7;
+        nextDate.setDate(jakartaDate.getDate() + daysToSun);
+        nextDate.setHours(7, 30, 0, 0);
+      } 
+      else {
+        // Find next activity today
+        const futureToday = todaySorted.filter(e => e.start_time.substring(0, 5) > currentTimeHM);
         
-        const checkEnDay = new Intl.DateTimeFormat("en-US", { weekday: 'long', timeZone: "Asia/Jakarta" }).format(checkDate);
-        const checkDayID = dayMap[checkEnDay];
-        
-        const dayEntries = modeTimetable
-          .filter(entry => entry.day === checkDayID)
-          .sort((a, b) => a.start_time.localeCompare(b.start_time));
+        if (futureToday.length > 0) {
+          next = futureToday[0];
+          const [h, m] = next.start_time.split(':').map(Number);
+          nextDate.setHours(h, m, 0, 0);
 
-        for (const entry of dayEntries) {
-          const entryStartHM = entry.start_time.substring(0, 5);
-          if (i === 0) {
-            if (entryStartHM > currentTimeHM) {
-              next = entry;
-              const [h, m] = entryStartHM.split(':').map(Number);
-              nextDate = new Date(jakartaDateStr);
-              nextDate.setHours(h, m, 0, 0);
-              break;
+          // Labels
+          const isFirst = next.id === todaySorted[0].id;
+          const isLast = next.id === todaySorted[todaySorted.length-1].id;
+          const sub = (next.subject_name || "").toUpperCase();
+          const per = (next.period || "").toUpperCase();
+
+          if (isFirst) label = "JAM MASUK SEKOLAH";
+          else if (sub.includes("ISTIRAHAT")) label = "JAM ISTIRAHAT";
+          else if (isLast) label = "JAM PULANG SEKOLAH";
+          else if (per.includes("JP")) label = per;
+          else label = sub || "KEGIATAN BERIKUTNYA";
+        } 
+        else {
+          // School is over for today
+          label = "SHALAT DZUHUR";
+          if (prayerTimes?.Dhuhr) {
+            const [h, m] = prayerTimes.Dhuhr.split(':').map(Number);
+            nextDate.setHours(h, m, 0, 0);
+            
+            // If Dzuhur already passed today, target tomorrow's Dzuhur
+            if (nextDate < jakartaDate) {
+               nextDate.setDate(jakartaDate.getDate() + 1);
             }
           } else {
-            next = entry;
-            const [h, m] = entryStartHM.split(':').map(Number);
-            nextDate = new Date(jakartaDateStr);
-            nextDate.setDate(jakartaDate.getDate() + i);
-            nextDate.setHours(h, m, 0, 0);
-            break;
+            // Default fallback if API fails
+            nextDate.setHours(12, 0, 0, 0);
+            if (nextDate < jakartaDate) nextDate.setDate(jakartaDate.getDate() + 1);
           }
         }
-        if (next) break;
       }
 
       let countdownStr = "00:00:00";
-      if (next) {
-        const diffMs = nextDate.getTime() - jakartaDate.getTime();
-        if (diffMs > 0) {
-          const totalSeconds = Math.floor(diffMs / 1000);
-          const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
-          const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
-          const s = (totalSeconds % 60).toString().padStart(2, '0');
-          countdownStr = `${h}:${m}:${s}`;
-        }
+      const diffMs = nextDate.getTime() - jakartaDate.getTime();
+      if (diffMs > 0) {
+        const totalSeconds = Math.floor(diffMs / 1000);
+        const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+        const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+        const s = (totalSeconds % 60).toString().padStart(2, '0');
+        countdownStr = `${h}:${m}:${s}`;
       }
 
       setStatus({
         activePeriod: active ? { ...active } : null,
         nextPeriod: next ? { ...next } : null,
         countdown: countdownStr,
+        targetLabel: label,
       });
     };
 
