@@ -47,9 +47,9 @@ const DisplaySidebar = () => {
 
   return (
     <div className="w-full h-full flex flex-col">
-      {/* INFO STQR Banner */}
-      <div className="bg-transparent border-b border-gray-100 py-[1vh] px-4 text-center overflow-hidden shrink-0">
-        <span className="text-[#1e5666] font-montserrat font-black text-[1.15vw] uppercase tracking-normal whitespace-nowrap inline-block w-full">
+      {/* INFO STQR Banner - Light Tosca Background */}
+      <div className="bg-[#A8E6CF] py-[1.2vh] px-4 text-center overflow-hidden shrink-0 shadow-sm border-b border-[#96d1bc]">
+        <span className="text-[#133c47] font-montserrat font-black text-[1.15vw] uppercase tracking-wider whitespace-nowrap inline-block w-full">
           Info STQR
         </span>
       </div>
