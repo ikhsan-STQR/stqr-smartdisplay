@@ -47,7 +47,7 @@ const DisplayPage = () => {
     `}>
       {/* Top Header Row - Fixed Columns aligned with content below */}
       <div className="shrink-0 px-[0.5vw]">
-        <DisplayHeader />
+        <DisplayHeader isMobile={isScaled} />
       </div>
 
       {/* Content Row: Sidebar Left (Remainder) | Main Content (16:9) | Sidebar Right (3:4) */}
@@ -71,7 +71,7 @@ const DisplayPage = () => {
       </div>
 
       {/* New Prayer Row */}
-      <DisplayPrayerTimes />
+      <DisplayPrayerTimes isMobile={isScaled} />
     </div>
   );
 
