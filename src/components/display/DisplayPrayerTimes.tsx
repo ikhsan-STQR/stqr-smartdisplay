@@ -75,7 +75,7 @@ const DisplayPrayerTimes = () => {
       setNextPrayer({
         name: upcoming.name,
         time: upcoming.time,
-        diff: `${h} : ${m} : ${s}`
+        diff: `${h}:${m}:${s}`
       });
     };
 
@@ -109,10 +109,10 @@ const DisplayPrayerTimes = () => {
       <div className="flex flex-col items-start justify-center py-2 h-full">
         {nextPrayer && (
           <div className="flex flex-col items-start justify-center leading-tight">
-            <span className="text-white font-montserrat font-bold text-[1vw] uppercase tracking-widest opacity-80 mb-0.5">
+            <span className="text-white font-montserrat font-bold text-[0.9vw] uppercase tracking-widest opacity-80 mb-0.5">
               MENUJU {nextPrayer.name}:
             </span>
-            <span className="text-[2.8vw] font-black text-yellow-300 tracking-[0.15em] font-montserrat tabular-nums leading-[0.9]">
+            <span className="text-[2.52vw] font-black text-yellow-300 tracking-[0.05em] font-montserrat tabular-nums leading-[0.9]">
               {nextPrayer.diff}
             </span>
           </div>

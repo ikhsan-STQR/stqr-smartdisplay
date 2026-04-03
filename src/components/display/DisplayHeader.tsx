@@ -34,7 +34,7 @@ const DisplayHeader = () => {
       {/* Col 2: Titles Stacked (flex-1) */}
       <div className="flex-1 flex flex-col justify-center h-[14vh]">
         <div className="flex flex-col">
-          <span className="text-[var(--display-brown)] font-montserrat font-black text-[3.1vw] leading-none mb-1 opacity-80">
+          <span className="text-[var(--display-brown)] font-montserrat font-black text-[2.5vw] leading-none mb-1 opacity-80 uppercase">
             STQ Riyadhussholihiin
           </span>
           <h1 className="text-[#9e8549] font-montserrat font-black text-[3.1vw] leading-none uppercase tracking-tighter whitespace-nowrap">

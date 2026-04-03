@@ -35,10 +35,10 @@ const DisplayFooter = () => {
       <div className="w-[22%] bg-white px-[1vw] py-[0.5vh] rounded-xl shadow-md border border-gray-100 flex flex-col items-center justify-center overflow-hidden shrink-0 h-full">
         {status.nextPeriod ? (
           <>
-            <span className="text-[#1e5666] font-montserrat font-black text-[3vw] leading-none uppercase tracking-[0.1em] tabular-nums">
+            <span className="text-[#1e5666] font-montserrat font-black text-[2.7vw] leading-none uppercase tracking-tighter tabular-nums">
               {status.countdown}
             </span>
-            <span className="text-gray-500 font-jakarta font-bold text-[1.2vw] uppercase tracking-widest mt-1">
+            <span className="text-gray-500 font-jakarta font-bold text-[1.08vw] uppercase tracking-widest mt-1">
               menuju {status.nextPeriod.name}
             </span>
           </>
