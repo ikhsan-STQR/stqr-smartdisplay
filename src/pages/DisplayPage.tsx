@@ -19,7 +19,7 @@ const DisplayPage = () => {
       setIsMobile(isMob);
       
       if (isMob) {
-        // Target a stable internal width of 1280px for mobile zoom
+        // Force a stable 1280px internal width for the mobile scale-down
         setScale(width / 1280);
       } else {
         setScale(1);
@@ -39,48 +39,62 @@ const DisplayPage = () => {
     );
   }
 
+  // The Original Comprehensive Layout Logic
+  const renderLayout = (isScaled: boolean) => (
+    <div className={`
+      ${isScaled ? 'w-[1280px] h-[720px]' : 'h-screen w-screen'} 
+      flex flex-col overflow-hidden bg-background islamic-pattern p-[0.75vw] gap-[0.75vw]
+    `}>
+      {/* Top Header Row - Fixed Columns aligned with content below */}
+      <div className="shrink-0 px-[0.5vw]">
+        <DisplayHeader />
+      </div>
+
+      {/* Content Row: Sidebar Left (Remainder) | Main Content (16:9) | Sidebar Right (3:4) */}
+      <div className="flex-1 flex gap-[0.5vw] min-h-0 px-[0.5vw]">
+        <div className="w-[22%] bg-white rounded-xl shadow-md p-[0.5vw] flex flex-col relative overflow-hidden shrink-0">
+          <DisplaySidebarLeft />
+        </div>
+        <div className="flex-1 min-w-0 flex items-center justify-center overflow-hidden">
+          <div className="w-full aspect-video shadow-2xl rounded-xl overflow-hidden bg-black">
+            <MainContent />
+          </div>
+        </div>
+        <div className="w-[20%] bg-white rounded-xl shadow-md p-0 flex flex-col relative overflow-hidden shrink-0">
+          <DisplaySidebar />
+        </div>
+      </div>
+
+      {/* Footer Row - Synced padding with content row */}
+      <div className="shrink-0 drop-shadow-sm px-[0.5vw]">
+        <DisplayFooter />
+      </div>
+
+      {/* New Prayer Row */}
+      <DisplayPrayerTimes />
+    </div>
+  );
+
+  // Desktop (>= 1024px): Return the normal fullscreen layout
+  if (!isMobile) {
+    return renderLayout(false);
+  }
+
+  // Mobile (< 1024px): Wrap in a scaling-optimized container
   return (
-    <div className="h-screen w-screen flex items-center justify-center bg-gray-900 overflow-hidden relative">
+    <div className="h-screen w-screen bg-gray-900 overflow-hidden relative">
       <div 
-        className={`${isMobile ? "absolute top-0 left-0" : "w-full h-full flex items-center justify-center"}`}
-        style={isMobile ? { 
+        style={{ 
           transform: `scale(${scale})`, 
           transformOrigin: 'top left',
           width: '1280px',
-        } : {}}
+          height: `${window.innerHeight / scale}px` // Ensure full height coverage
+        }}
+        className="absolute top-0 left-0"
       >
-        {/* Strict 16:9 Display Wrapper (Desktop: Flexible | Mobile: Scaled) */}
-        <div className="w-full max-w-[calc(100vh*(16/9))] max-h-[calc(100vw*(9/16))] aspect-video relative bg-background islamic-pattern overflow-hidden flex flex-col p-[0.75vw] gap-[0.75vw] shadow-2xl">
-        {/* Top Header Row - Fixed Columns aligned with content below */}
-        <div className="shrink-0 px-[0.5vw]">
-          <DisplayHeader />
-        </div>
-
-        {/* Content Row: Sidebar Left (Remainder) | Main Content (16:9) | Sidebar Right (3:4) */}
-        <div className="flex-1 flex gap-[0.5vw] min-h-0 px-[0.5vw]">
-          <div className="w-[22%] bg-white rounded-xl shadow-md p-[0.5vw] flex flex-col relative overflow-hidden shrink-0">
-            <DisplaySidebarLeft />
-          </div>
-          <div className="flex-1 min-w-0 flex items-center justify-center overflow-hidden">
-            <div className="w-full aspect-video shadow-2xl rounded-xl overflow-hidden bg-black">
-              <MainContent />
-            </div>
-          </div>
-          <div className="w-[20%] bg-white rounded-xl shadow-md p-0 flex flex-col relative overflow-hidden shrink-0">
-            <DisplaySidebar />
-          </div>
-        </div>
-
-        {/* Footer Row - Synced padding with content row */}
-        <div className="shrink-0 drop-shadow-sm px-[0.5vw]">
-          <DisplayFooter />
-        </div>
-
-        {/* New Prayer Row */}
-        <DisplayPrayerTimes />
+        {renderLayout(true)}
       </div>
     </div>
-  </div>
   );
 };
 

@@ -120,8 +120,8 @@ const DisplayPrayerTimes = () => {
       {/* Middle Section: Countdown */}
       {nextPrayer && (
         <div className="flex flex-col items-center justify-center leading-tight shrink-0">
-          <span className="text-white font-montserrat font-black text-[1.3vw] uppercase tracking-[0.25em] opacity-90 mb-1 whitespace-nowrap">
-            MENUJU {nextPrayer.name}:
+          <span className="text-white font-montserrat font-black text-[1.15vw] uppercase tracking-[0.15em] opacity-90 mb-1 whitespace-nowrap">
+            MENUJU WAKTU {nextPrayer.name}:
           </span>
           <span className="text-[2.6vw] font-black text-yellow-300 tracking-[0.05em] font-montserrat tabular-nums leading-[0.9]">
             {nextPrayer.diff}
