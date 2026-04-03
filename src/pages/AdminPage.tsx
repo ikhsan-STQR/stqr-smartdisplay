@@ -1,43 +1,23 @@
 import { useState } from "react";
 import { useDisplay, ScheduleItem } from "@/context/DisplayContext";
-import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 
 const AdminPage = () => {
-  const { config, updateConfig, saveToCloud, isSaving } = useDisplay();
-  const { user, isAdmin, isLoading: authLoading, signIn, signOut } = useAuth();
+  const { config, updateConfig } = useDisplay();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loginError, setLoginError] = useState("");
 
-  const handleLogin = async () => {
-    setLoginError("");
-    const { error } = await signIn(email, password);
-    if (error) {
-      setLoginError(error.message);
+  const handleLogin = () => {
+    if (username === "adminmedia" && password === "admin@123") {
+      setIsAuthenticated(true);
+    } else {
+      alert("Username atau Password salah!");
     }
   };
 
-  const handleSave = async () => {
-    try {
-      await saveToCloud();
-      toast.success("Konfigurasi berhasil disimpan!");
-    } catch {
-      toast.error("Gagal menyimpan konfigurasi. Pastikan Anda memiliki hak akses admin.");
-    }
-  };
-
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Memuat...</p>
-      </div>
-    );
-  }
-
-  if (!user) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 font-jakarta">
         <div className="bg-card p-8 rounded-xl shadow-xl border border-border max-w-sm w-full">
@@ -46,12 +26,12 @@ const AdminPage = () => {
           
           <div className="space-y-4">
             <div>
-              <label className="text-xs font-bold uppercase text-muted-foreground block mb-1 ml-1">Email</label>
+              <label className="text-xs font-bold uppercase text-muted-foreground block mb-1 ml-1">Username</label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@example.com"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username"
                 className="w-full px-4 py-2 border border-input rounded-lg text-sm bg-muted/30 focus:outline-none focus:ring-2 focus:ring-primary/20"
                 onKeyDown={(e) => e.key === "Enter" && handleLogin()}
               />
@@ -67,7 +47,6 @@ const AdminPage = () => {
                 onKeyDown={(e) => e.key === "Enter" && handleLogin()}
               />
             </div>
-            {loginError && <p className="text-destructive text-xs">{loginError}</p>}
             <button
               onClick={handleLogin}
               className="w-full bg-primary text-primary-foreground py-2.5 rounded-lg font-poppins font-semibold text-sm hover:opacity-90 transition shadow-md mt-2"
@@ -75,23 +54,6 @@ const AdminPage = () => {
               Masuk
             </button>
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6 font-jakarta">
-        <div className="bg-card p-8 rounded-xl shadow-xl border border-border max-w-sm w-full text-center">
-          <h2 className="text-xl font-bold text-destructive mb-2">Akses Ditolak</h2>
-          <p className="text-muted-foreground text-sm mb-4">Akun Anda tidak memiliki hak akses admin.</p>
-          <button
-            onClick={signOut}
-            className="bg-destructive text-destructive-foreground px-4 py-2 rounded-lg font-bold text-sm hover:opacity-90 transition"
-          >
-            Keluar
-          </button>
         </div>
       </div>
     );
@@ -157,20 +119,13 @@ const AdminPage = () => {
         </div>
         <div className="flex gap-3">
           <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-green-700 transition shadow-md disabled:opacity-50"
-          >
-            {isSaving ? "Menyimpan..." : "💾 Simpan ke Cloud"}
-          </button>
-          <button
             onClick={() => navigate("/")}
             className="bg-white/10 text-white border border-white/20 px-4 py-2 rounded-lg font-bold text-sm hover:bg-white/20 transition"
           >
             Lihat Display
           </button>
           <button
-            onClick={signOut}
+            onClick={() => setIsAuthenticated(false)}
             className="bg-destructive text-destructive-foreground px-4 py-2 rounded-lg font-bold text-sm hover:opacity-90 transition"
           >
             Keluar

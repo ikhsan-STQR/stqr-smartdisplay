@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 export interface ContentSchedule {
   id: string;
@@ -38,9 +37,6 @@ export interface DisplayConfig {
 interface DisplayContextType {
   config: DisplayConfig;
   updateConfig: (updates: Partial<DisplayConfig>) => void;
-  isLoading: boolean;
-  saveToCloud: () => Promise<void>;
-  isSaving: boolean;
 }
 
 const defaultConfig: DisplayConfig = {
@@ -87,70 +83,31 @@ const defaultConfig: DisplayConfig = {
 
 const DisplayContext = createContext<DisplayContextType | undefined>(undefined);
 
+const STORAGE_KEY = "stqr_display_config";
+
 export const DisplayProvider = ({ children }: { children: ReactNode }) => {
-  const [config, setConfig] = useState<DisplayConfig>(defaultConfig);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-
-  // Load config from database on mount
-  useEffect(() => {
-    const loadConfig = async () => {
+  const [config, setConfig] = useState<DisplayConfig>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
       try {
-        const { data, error } = await supabase
-          .from("display_config")
-          .select("config_data")
-          .eq("config_key", "default")
-          .maybeSingle();
-
-        if (error) {
-          console.error("Failed to load config from database:", error);
-        } else if (data?.config_data) {
-          setConfig({ ...defaultConfig, ...(data.config_data as unknown as Partial<DisplayConfig>) });
-        }
+        return JSON.parse(saved);
       } catch (e) {
-        console.error("Error loading config:", e);
-      } finally {
-        setIsLoading(false);
+        console.error("Failed to load config from localStorage", e);
       }
-    };
-    loadConfig();
-  }, []);
-
-  const updateConfig = useCallback((updates: Partial<DisplayConfig>) => {
-    setConfig((prev) => ({ ...prev, ...updates }));
-  }, []);
-
-  const saveToCloud = useCallback(async () => {
-    setIsSaving(true);
-    try {
-      const { data: existing } = await supabase
-        .from("display_config")
-        .select("id")
-        .eq("config_key", "default")
-        .maybeSingle();
-
-      if (existing) {
-        const { error } = await supabase
-          .from("display_config")
-          .update({ config_data: JSON.parse(JSON.stringify(config)) })
-          .eq("config_key", "default");
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from("display_config")
-          .insert([{ config_key: "default", config_data: JSON.parse(JSON.stringify(config)) }]);
-        if (error) throw error;
-      }
-    } catch (e) {
-      console.error("Failed to save config:", e);
-      throw e;
-    } finally {
-      setIsSaving(false);
     }
-  }, [config]);
+    return defaultConfig;
+  });
+
+  const updateConfig = (updates: Partial<DisplayConfig>) => {
+    setConfig((prev) => {
+      const newConfig = { ...prev, ...updates };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newConfig));
+      return newConfig;
+    });
+  };
 
   return (
-    <DisplayContext.Provider value={{ config, updateConfig, isLoading, saveToCloud, isSaving }}>
+    <DisplayContext.Provider value={{ config, updateConfig }}>
       {children}
     </DisplayContext.Provider>
   );
