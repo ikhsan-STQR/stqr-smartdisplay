@@ -132,13 +132,13 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
       if (existing) {
         const { error } = await supabase
           .from("display_config")
-          .update({ config_data: config as unknown as Record<string, unknown> })
+          .update({ config_data: JSON.parse(JSON.stringify(config)) })
           .eq("config_key", "default");
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from("display_config")
-          .insert({ config_key: "default", config_data: config as unknown as Record<string, unknown> });
+          .insert([{ config_key: "default", config_data: JSON.parse(JSON.stringify(config)) }]);
         if (error) throw error;
       }
     } catch (e) {
