@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useDisplay } from "@/context/DisplayContext";
 import DisplayHeader from "@/components/display/DisplayHeader";
 import MainContent from "@/components/display/MainContent";
@@ -8,6 +9,27 @@ import DisplayPrayerTimes from "@/components/display/DisplayPrayerTimes";
 
 const DisplayPage = () => {
   const { isLoading } = useDisplay();
+  const [isMobile, setIsMobile] = useState(false);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      const isMob = width < 1024;
+      setIsMobile(isMob);
+      
+      if (isMob) {
+        // Target a stable internal width of 1280px for mobile zoom
+        setScale(width / 1280);
+      } else {
+        setScale(1);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   if (isLoading) {
     return (
@@ -18,9 +40,17 @@ const DisplayPage = () => {
   }
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center bg-gray-900 overflow-hidden">
-      {/* Strict 16:9 Display Wrapper */}
-      <div className="w-full max-w-[calc(100vh*(16/9))] max-h-[calc(100vw*(9/16))] aspect-video relative bg-background islamic-pattern overflow-hidden flex flex-col p-[0.75vw] gap-[0.75vw] shadow-2xl">
+    <div className="h-screen w-screen flex items-center justify-center bg-gray-900 overflow-hidden relative">
+      <div 
+        className={`${isMobile ? "absolute top-0 left-0" : "w-full h-full flex items-center justify-center"}`}
+        style={isMobile ? { 
+          transform: `scale(${scale})`, 
+          transformOrigin: 'top left',
+          width: '1280px',
+        } : {}}
+      >
+        {/* Strict 16:9 Display Wrapper (Desktop: Flexible | Mobile: Scaled) */}
+        <div className="w-full max-w-[calc(100vh*(16/9))] max-h-[calc(100vw*(9/16))] aspect-video relative bg-background islamic-pattern overflow-hidden flex flex-col p-[0.75vw] gap-[0.75vw] shadow-2xl">
         {/* Top Header Row - Fixed Columns aligned with content below */}
         <div className="shrink-0 px-[0.5vw]">
           <DisplayHeader />
@@ -50,6 +80,7 @@ const DisplayPage = () => {
         <DisplayPrayerTimes />
       </div>
     </div>
+  </div>
   );
 };
 

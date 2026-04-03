@@ -43,8 +43,8 @@ const DisplaySidebarLeft = () => {
   return (
     <div className="flex-1 flex flex-col gap-[0.5vw] h-full overflow-hidden w-full">
       {/* Status Box - Simplified Single Line */}
-      <div className="w-full bg-[#133c47] rounded-xl p-[1.5vw] shadow-lg border border-white/10 flex items-center justify-center min-h-[8vh] shrink-0">
-        <h2 className="text-yellow-400 font-montserrat font-black text-[1.75vw] uppercase tracking-tighter text-center leading-none whitespace-nowrap">
+      <div className="w-full bg-[#133c47] rounded-xl px-[2vw] py-[1.2vw] shadow-lg border border-white/10 flex items-center justify-center min-h-[8vh] shrink-0">
+        <h2 className="text-yellow-400 font-montserrat font-black text-[1.5vw] uppercase tracking-tight text-center leading-none whitespace-nowrap">
           {status.activePeriod 
             ? (status.activePeriod.subject_name !== "-" ? status.activePeriod.subject_name : (status.activePeriod.description || status.activePeriod.period)) 
             : "TIDAK ADA KEGIATAN"}

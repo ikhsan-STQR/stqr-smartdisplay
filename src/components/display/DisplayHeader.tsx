@@ -50,10 +50,10 @@ const DisplayHeader = () => {
           MODA {settings.active_mode}
         </div>
         
-        <p className="font-barlow font-bold text-[1.4vw] leading-tight mb-0 uppercase tracking-[0.1em] opacity-90 mt-[1.8vh]">
+        <p className="font-montserrat font-bold text-[1.3vw] leading-tight mb-0 uppercase tracking-tight opacity-90 mt-[1.8vh]">
           {day}, {date} {month} {year}
         </p>
-        <p className="font-barlow font-black text-[4vw] leading-none tracking-tighter tabular-nums drop-shadow-md">
+        <p className="font-montserrat font-bold text-[3.8vw] leading-none tracking-tighter tabular-nums drop-shadow-md">
           {time}
         </p>
       </div>
