@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDisplay, ContentSchedule } from "@/context/DisplayContext";
 
-const DisplaySidebar = () => {
+const DisplaySidebar = ({ isMobile }: { isMobile?: boolean }) => {
   const { config } = useDisplay();
   const [activeSchedule, setActiveSchedule] = useState<ContentSchedule | null>(null);
   const [currentPoster, setCurrentPoster] = useState(0);
@@ -48,15 +48,15 @@ const DisplaySidebar = () => {
   return (
     <div className="w-full h-full flex flex-col">
       {/* INFO STQR Banner - Light Tosca Background */}
-      <div className="bg-[#A8E6CF] py-[1.2vh] px-4 text-center overflow-hidden shrink-0 shadow-sm border-b border-[#96d1bc]">
-        <span className="text-[#133c47] font-montserrat font-black text-[1.15vw] uppercase tracking-wider whitespace-nowrap inline-block w-full">
+      <div className={`bg-[#A8E6CF] ${isMobile ? 'py-[0.8vh]' : 'py-[1.2vh]'} px-4 text-center overflow-hidden shrink-0 shadow-sm border-b border-[#96d1bc]`}>
+        <span className={`text-[#133c47] font-montserrat font-black ${isMobile ? 'text-[1vw]' : 'text-[1.15vw]'} uppercase tracking-wider whitespace-nowrap inline-block w-full`}>
           Info STQR
         </span>
       </div>
 
       {/* Sidebar Content Area - Maximized specifically for 3:4 */}
       <div className="flex-1 min-h-0 bg-transparent flex items-center justify-center overflow-hidden">
-        <div className="h-full aspect-[3/4] max-w-full bg-gray-50 shadow-inner relative overflow-hidden group">
+        <div className={`h-full ${isMobile ? 'w-full' : 'aspect-[3/4] max-w-full'} bg-gray-50 shadow-inner relative overflow-hidden group`}>
           {(!currentPosters || currentPosters.length === 0 || !currentPosters[0]) ? (
             <div className="absolute inset-0 flex items-center justify-center p-4 text-center">
               <p className="text-gray-300 font-montserrat font-medium uppercase tracking-tighter text-sm">Belum Ada Poster</p>
@@ -68,8 +68,9 @@ const DisplaySidebar = () => {
                   key={i}
                   src={poster as string}
                   alt={`Pengumuman ${i + 1}`}
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${i === currentPoster ? "opacity-100" : "opacity-0"
-                    }`}
+                  className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${
+                    isMobile ? 'object-contain' : 'object-cover'
+                  } ${i === currentPoster ? "opacity-100" : "opacity-0"}`}
                 />
               ))}
             </div>

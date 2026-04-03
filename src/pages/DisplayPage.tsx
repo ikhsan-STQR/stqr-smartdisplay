@@ -54,7 +54,7 @@ const DisplayPage = () => {
       {/* Content Row: Sidebar Left (Remainder) | Main Content (16:9) | Sidebar Right (3:4) */}
       <div className="flex-1 flex gap-[0.5vw] min-h-0 px-[0.5vw]">
         <div className="w-[22%] bg-white rounded-xl shadow-md p-[0.5vw] flex flex-col relative overflow-hidden shrink-0">
-          <DisplaySidebarLeft />
+          <DisplaySidebarLeft isMobile={isScaled} />
         </div>
         <div className="flex-1 min-w-0 flex items-center justify-center overflow-hidden">
           <div className="w-full aspect-video shadow-2xl rounded-xl overflow-hidden bg-black">
@@ -62,7 +62,7 @@ const DisplayPage = () => {
           </div>
         </div>
         <div className="w-[20%] bg-white rounded-xl shadow-md p-0 flex flex-col relative overflow-hidden shrink-0">
-          <DisplaySidebar />
+          <DisplaySidebar isMobile={isScaled} />
         </div>
       </div>
 
