@@ -1,23 +1,45 @@
 import { useState } from "react";
 import { useDisplay, ScheduleItem } from "@/context/DisplayContext";
+import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import * as XLSX from "xlsx";
 
 const AdminPage = () => {
-  const { config, updateConfig } = useDisplay();
+  const { config, updateConfig, saveToCloud, isSaving } = useDisplay();
+  const { user, isAdmin, isLoading: authLoading, signIn, signOut } = useAuth();
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
 
-  const handleLogin = () => {
-    if (username === "adminmedia" && password === "admin@123") {
-      setIsAuthenticated(true);
-    } else {
-      alert("Username atau Password salah!");
+  const handleLogin = async () => {
+    setLoginError("");
+    const { error } = await signIn(email, password);
+    if (error) {
+      setLoginError(error.message);
     }
   };
 
-  if (!isAuthenticated) {
+  const handleSave = async () => {
+    try {
+      await saveToCloud();
+      toast.success("Konfigurasi berhasil disimpan ke Cloud!");
+    } catch (e: any) {
+      toast.error("Gagal menyimpan: " + e.message);
+    }
+  };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 font-jakarta">
         <div className="bg-card p-8 rounded-xl shadow-xl border border-border max-w-sm w-full">
@@ -26,12 +48,12 @@ const AdminPage = () => {
           
           <div className="space-y-4">
             <div>
-              <label className="text-xs font-bold uppercase text-muted-foreground block mb-1 ml-1">Username</label>
+              <label className="text-xs font-bold uppercase text-muted-foreground block mb-1 ml-1">Email</label>
               <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@stqr.com"
                 className="w-full px-4 py-2 border border-input rounded-lg text-sm bg-muted/30 focus:outline-none focus:ring-2 focus:ring-primary/20"
                 onKeyDown={(e) => e.key === "Enter" && handleLogin()}
               />
@@ -47,6 +69,7 @@ const AdminPage = () => {
                 onKeyDown={(e) => e.key === "Enter" && handleLogin()}
               />
             </div>
+            {loginError && <p className="text-destructive text-xs text-center">{loginError}</p>}
             <button
               onClick={handleLogin}
               className="w-full bg-primary text-primary-foreground py-2.5 rounded-lg font-poppins font-semibold text-sm hover:opacity-90 transition shadow-md mt-2"
@@ -75,6 +98,68 @@ const AdminPage = () => {
     updateConfig({
       jadwalPelajaran: config.jadwalPelajaran.filter((_, i) => i !== index),
     });
+  };
+
+  const handleAddTimeBlock = () => {
+    updateConfig({
+      timetable: [
+        ...config.timetable,
+        { id: Math.random().toString(36).substr(2, 9), name: "", startTime: "07:30", endTime: "08:10", mode: 'KBM', dayOfWeek: 1, type: 'class' },
+      ],
+    });
+  };
+
+  const updateTimeBlock = (index: number, field: string, value: any) => {
+    const updated = [...config.timetable];
+    updated[index] = { ...updated[index], [field]: value };
+    updateConfig({ timetable: updated });
+  };
+
+  const removeTimeBlock = (index: number) => {
+    updateConfig({
+      timetable: config.timetable.filter((_, i) => i !== index),
+    });
+  };
+
+  const handleExcelImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const bstr = evt.target?.result;
+        const wb = XLSX.read(bstr, { type: "binary" });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const data = XLSX.utils.sheet_to_json(ws);
+
+        const mapped = data.map((row: any) => {
+          const hariRaw = String(row.Hari || row.hari || "1").toLowerCase();
+          let dayNum = parseInt(hariRaw);
+          if (isNaN(dayNum)) {
+            const map: any = { senin: 1, selasa: 2, rabu: 3, kamis: 4, jumat: 5, sabtu: 6, minggu: 0, ahad: 0 };
+            dayNum = map[hariRaw] ?? 1;
+          }
+
+          return {
+            id: Math.random().toString(36).substr(2, 9),
+            mode: (row.Mode || row.mode || "KBM").toUpperCase(),
+            dayOfWeek: dayNum,
+            name: row.Kegiatan || row.kegiatan || "Tanpa Nama",
+            startTime: row.Mulai || row.mulai || "07:00",
+            endTime: row.Selesai || row.selesai || "08:00",
+            type: (row.Tipe || row.tipe || "class").toLowerCase(),
+          };
+        });
+
+        updateConfig({ masterTimetable: mapped as any });
+        toast.success(`Berhasil mengimpor ${mapped.length} data jadwal!`);
+      } catch (err) {
+        toast.error("Gagal membaca file Excel. Pastikan format kolom sesuai.");
+      }
+    };
+    reader.readAsBinaryString(file);
   };
 
   const handleAddContentSchedule = () => {
@@ -119,13 +204,20 @@ const AdminPage = () => {
         </div>
         <div className="flex gap-3">
           <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-green-700 transition shadow-md disabled:opacity-50"
+          >
+            {isSaving ? "Menyimpan..." : "💾 Simpan ke Cloud"}
+          </button>
+          <button
             onClick={() => navigate("/")}
             className="bg-white/10 text-white border border-white/20 px-4 py-2 rounded-lg font-bold text-sm hover:bg-white/20 transition"
           >
             Lihat Display
           </button>
           <button
-            onClick={() => setIsAuthenticated(false)}
+            onClick={() => signOut()}
             className="bg-destructive text-destructive-foreground px-4 py-2 rounded-lg font-bold text-sm hover:opacity-90 transition"
           >
             Keluar
@@ -369,10 +461,89 @@ const AdminPage = () => {
                 </div>
                 <button
                   onClick={handleAddSchedule}
-                  className="w-full py-1.5 border border-primary/50 text-primary text-xs rounded-lg font-bold hover:bg-primary/5"
+                  className="w-full py-1.5 border border-primary/50 text-primary text-xs rounded-lg font-bold hover:bg-primary/5 mb-4"
                 >
                   + Tambah Baris Jadwal
                 </button>
+
+                <h3 className="font-bold text-sm border-b pb-2 pt-4">Advanced Master Timetable</h3>
+                <div className="mt-4 space-y-4">
+                  <div className="flex items-center justify-between bg-zinc-50 p-3 rounded-lg border border-border/50">
+                    <div>
+                      <label className="text-[10px] font-bold uppercase text-muted-foreground block">Mode Jadwal Aktif</label>
+                      <div className="flex gap-2 mt-1">
+                        {['KBM', 'RAMADHAN', 'PAS_PAT'].map(m => (
+                          <button
+                            key={m}
+                            onClick={() => updateConfig({ activeScheduleMode: m as any })}
+                            className={`px-3 py-1 rounded-md text-[10px] font-bold transition-all ${
+                              config.activeScheduleMode === m 
+                                ? "bg-primary text-primary-foreground shadow-sm" 
+                                : "bg-white border border-border text-muted-foreground hover:bg-muted"
+                            }`}
+                          >
+                            {m}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <label className="cursor-pointer bg-primary/10 text-primary hover:bg-primary/20 px-3 py-2 rounded-lg text-[10px] font-bold uppercase flex items-center gap-2 transition-colors">
+                      📁 Import Excel
+                      <input type="file" className="hidden" accept=".xlsx,.xls" onChange={handleExcelImport} />
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 border-t pt-4">
+                    <InputField 
+                      label="Text Saat Tidak Ada Kegiatan" 
+                      value={config.customTexts.noActivityText} 
+                      onChange={(v) => updateConfig({ customTexts: { ...config.customTexts, noActivityText: v } })} 
+                    />
+                    <InputField 
+                      label="Judul Saat Istirahat" 
+                      value={config.customTexts.breakTitle} 
+                      onChange={(v) => updateConfig({ customTexts: { ...config.customTexts, breakTitle: v } })} 
+                    />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium text-foreground block">Catatan Istirahat</label>
+                        <textarea
+                          value={config.customTexts.breakNotes}
+                          onChange={(e) => updateConfig({ customTexts: { ...config.customTexts, breakNotes: e.target.value } })}
+                          className="w-full border border-input rounded-md px-3 py-2 text-xs min-h-[80px]"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium text-foreground block">Catatan Apel Bersama</label>
+                        <textarea
+                          value={config.customTexts.apelBersamaNotes}
+                          onChange={(e) => updateConfig({ customTexts: { ...config.customTexts, apelBersamaNotes: e.target.value } })}
+                          className="w-full border border-input rounded-md px-3 py-2 text-xs min-h-[80px]"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium text-foreground block">Catatan Apel Pagi</label>
+                        <textarea
+                          value={config.customTexts.apelPagiNotes}
+                          onChange={(e) => updateConfig({ customTexts: { ...config.customTexts, apelPagiNotes: e.target.value } })}
+                          className="w-full border border-input rounded-md px-3 py-2 text-xs min-h-[80px]"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium text-foreground block">Catatan Pulang</label>
+                        <textarea
+                          value={config.customTexts.pulangNotes}
+                          onChange={(e) => updateConfig({ customTexts: { ...config.customTexts, pulangNotes: e.target.value } })}
+                          className="w-full border border-input rounded-md px-3 py-2 text-xs min-h-[80px]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="text-[10px] text-muted-foreground italic bg-muted/30 p-2 rounded">
+                    <strong>Format Excel:</strong> Mode, Hari (0-6), Kegiatan, Mulai (HH:mm), Selesai (HH:mm), Tipe (class/break/end)
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -426,21 +597,41 @@ const formatYoutubeUrl = (url: string) => {
 const ArrayField = ({
   label, values, onChange,
 }: { label: string; values: string[]; onChange: (v: string[]) => void }) => {
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+  const [uploading, setUploading] = useState<number | null>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert("File terlalu besar! Maksimal 2MB untuk performa terbaik.");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const base64 = event.target?.result as string;
-        const updated = [...values];
-        updated[index] = base64;
-        onChange(updated);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File terlalu besar! Maksimal 5MB.");
+      return;
+    }
+
+    setUploading(index);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { data, error: uploadError } = await supabase.storage
+        .from('posters')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('posters')
+        .getPublicUrl(filePath);
+
+      const updated = [...values];
+      updated[index] = publicUrl;
+      onChange(updated);
+      toast.success("Gambar berhasil diunggah!");
+    } catch (error: any) {
+      toast.error("Gagal mengunggah: " + error.message);
+    } finally {
+      setUploading(null);
     }
   };
 
@@ -462,11 +653,14 @@ const ArrayField = ({
             />
             <div className="flex gap-1 items-center">
               <label className="cursor-pointer hover:bg-primary/10 p-1.5 rounded transition-colors" title="Upload Gambar">
-                <span className="text-xs font-bold text-primary">Upload</span>
+                <span className="text-xs font-bold text-primary">
+                  {uploading === i ? "..." : "Upload"}
+                </span>
                 <input
                   type="file"
                   className="hidden"
                   accept="image/*"
+                  disabled={uploading !== null}
                   onChange={(e) => handleFileUpload(e, i)}
                 />
               </label>
