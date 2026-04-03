@@ -13,7 +13,7 @@ const DisplayPrayerTimes = () => {
         setLoading(true);
         const location = config.prayerLocation || "Pandeglang, Banten";
         const response = await fetch(
-          `http://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(location)}&country=Indonesia&method=11`
+          `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(location)}&country=Indonesia&method=11`
         );
         const data = await response.json();
         if (data.code === 200) {

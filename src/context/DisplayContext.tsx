@@ -174,7 +174,7 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
   const fetchPrayerTimes = async () => {
     try {
       const response = await fetch(
-        `http://api.aladhan.com/v1/timingsByCity?city=Pandeglang&country=Indonesia&method=11`
+        `https://api.aladhan.com/v1/timingsByCity?city=Pandeglang&country=Indonesia&method=11`
       );
       const data = await response.json();
       if (data.code === 200) {
