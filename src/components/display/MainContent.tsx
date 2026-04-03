@@ -100,7 +100,7 @@ const MainContent = () => {
   if (!currentContent || currentContent.length === 0 || !currentContent[0]) {
     return (
       <div className="w-full h-full bg-[#1a4a58] rounded-[calc(var(--radius)-0.3vw)] shadow-inner flex items-center justify-center">
-        <p className="text-white/20 font-bold uppercase tracking-tighter text-4xl">Greenscreen Mode</p>
+        <p className="text-white/20 font-bold uppercase tracking-tighter text-[2vw]">Greenscreen Mode</p>
       </div>
     );
   }

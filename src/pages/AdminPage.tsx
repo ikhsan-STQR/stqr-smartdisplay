@@ -99,11 +99,30 @@ const AdminPage = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const cleanTime = (val: any) => {
+      if (!val) return "00:00:00";
+      
+      // If it's a JS Date (from XLSX)
+      if (val instanceof Date) {
+        return val.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/\./g, ':') + ":00";
+      }
+
+      let str = String(val).trim().replace(/\./g, ':');
+      // Handle HH:mm format to HH:mm:ss
+      const parts = str.split(':');
+      if (parts.length === 2) {
+        const h = parts[0].padStart(2, '0');
+        const m = parts[1].padStart(2, '0');
+        return `${h}:${m}:00`;
+      }
+      return str;
+    };
+
     const reader = new FileReader();
     reader.onload = async (evt) => {
       try {
         const bstr = evt.target?.result;
-        const wb = XLSX.read(bstr, { type: "binary" });
+        const wb = XLSX.read(bstr, { type: "binary", cellDates: true });
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
         const data = XLSX.utils.sheet_to_json(ws);
@@ -111,10 +130,10 @@ const AdminPage = () => {
         const mapped = data.map((row: any) => ({
           day: row.Hari || row.hari || "Senin",
           rombel: row.Rombel || row.rombel || "-",
-          start_time: row.Mulai || row.mulai || "07:00:00",
-          end_time: row.Selesai || row.selesai || "08:00:00",
+          start_time: cleanTime(row["Jam Mulai"] || row.Mulai || row.mulai),
+          end_time: cleanTime(row["Jam Selesai"] || row.Selesai || row.selesai),
           period: row.JP || row.jp || "-",
-          subject_name: row.Pelajaran || row.pelajaran || "-",
+          subject_name: row["Nama Mapel"] || row.Pelajaran || row.pelajaran || "-",
           description: row.Keterangan || row.keterangan || "-",
           mode: importMode,
         }));

@@ -203,50 +203,81 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
   // Update status based on current time
   useEffect(() => {
     const updateTimeStatus = () => {
+      // 1. Get current time in Asia/Jakarta specifically
       const now = new Date();
-      const idDays = ["Ahad", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-      const currentDay = idDays[now.getDay()];
-      const currentTimeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+      const jakartaDateStr = now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" });
+      const jakartaDate = new Date(jakartaDateStr);
+      
+      // 2. Day Mapping (Sunday -> Ahad, dsb)
+      const enDay = new Intl.DateTimeFormat("en-US", { weekday: 'long', timeZone: "Asia/Jakarta" }).format(now);
+      const dayMap: { [key: string]: string } = {
+        'Sunday': 'Ahad',
+        'Monday': 'Senin',
+        'Tuesday': 'Selasa',
+        'Wednesday': 'Rabu',
+        'Thursday': 'Kamis',
+        'Friday': 'Jumat',
+        'Saturday': 'Sabtu'
+      };
+      const currentDayID = dayMap[enDay] || 'Senin';
+
+      // 3. Time Normalization (HH:mm)
+      const hh = jakartaDate.getHours().toString().padStart(2, '0');
+      const mm = jakartaDate.getMinutes().toString().padStart(2, '0');
+      const currentTimeHM = `${hh}:${mm}`;
       
       // Filter by active mode and current day
       const modeTimetable = timetable.filter(entry => entry.mode === settings.active_mode);
-      const todayEntries = modeTimetable.filter(entry => entry.day === currentDay);
+      const todayEntries = modeTimetable.filter(entry => entry.day === currentDayID);
 
-      // Find active period
-      const active = todayEntries.find(entry => 
-        currentTimeStr >= entry.start_time && currentTimeStr < entry.end_time
-      ) || null;
+      // --- DEBUG MODE LOGS ---
+      if (now.getSeconds() % 30 === 0) { // Log every 30s to avoid spam
+        console.log('--- DEBUG SCHEDULE ---');
+        console.log('Hari terdeteksi:', currentDayID, `(${enDay})`);
+        console.log('Mode aktif:', settings.active_mode);
+        console.log('Waktu (WIB):', currentTimeHM);
+        console.log('Jumlah data ditemukan (Filter Mode+Hari):', todayEntries.length);
+      }
 
-      // Find next period (can be today or next day)
+      // 4. Find Active Period
+      // DB might store HH:mm:ss or HH:mm, so we normalize for comparison
+      const active = todayEntries.find(entry => {
+        const start = entry.start_time.substring(0, 5);
+        const end = entry.end_time.substring(0, 5);
+        return currentTimeHM >= start && currentTimeHM < end;
+      }) || null;
+
+      // 5. Find next period
       let next: TimetableEntry | null = null;
-      let nextDate = new Date();
+      let nextDate = new Date(jakartaDateStr);
 
-      // Look through next 7 days
       for (let i = 0; i < 8; i++) {
-        const checkDate = new Date();
-        checkDate.setDate(now.getDate() + i);
-        const checkDay = idDays[checkDate.getDay()];
+        const checkDate = new Date(jakartaDateStr);
+        checkDate.setDate(jakartaDate.getDate() + i);
+        
+        const checkEnDay = new Intl.DateTimeFormat("en-US", { weekday: 'long', timeZone: "Asia/Jakarta" }).format(checkDate);
+        const checkDayID = dayMap[checkEnDay];
         
         const dayEntries = modeTimetable
-          .filter(entry => entry.day === checkDay)
+          .filter(entry => entry.day === checkDayID)
           .sort((a, b) => a.start_time.localeCompare(b.start_time));
 
         for (const entry of dayEntries) {
+          const entryStartHM = entry.start_time.substring(0, 5);
           if (i === 0) {
-            // If today, must be in the future
-            if (entry.start_time > currentTimeStr) {
+            if (entryStartHM > currentTimeHM) {
               next = entry;
-              const [h, m, s] = entry.start_time.split(':').map(Number);
-              nextDate = checkDate;
-              nextDate.setHours(h, m, s || 0, 0);
+              const [h, m] = entryStartHM.split(':').map(Number);
+              nextDate = new Date(jakartaDateStr);
+              nextDate.setHours(h, m, 0, 0);
               break;
             }
           } else {
-            // First entry of the next available day
             next = entry;
-            const [h, m, s] = entry.start_time.split(':').map(Number);
-            nextDate = checkDate;
-            nextDate.setHours(h, m, s || 0, 0);
+            const [h, m] = entryStartHM.split(':').map(Number);
+            nextDate = new Date(jakartaDateStr);
+            nextDate.setDate(jakartaDate.getDate() + i);
+            nextDate.setHours(h, m, 0, 0);
             break;
           }
         }
@@ -255,13 +286,13 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
 
       let countdownStr = "00:00:00";
       if (next) {
-        const diffMs = nextDate.getTime() - now.getTime();
+        const diffMs = nextDate.getTime() - jakartaDate.getTime();
         if (diffMs > 0) {
           const totalSeconds = Math.floor(diffMs / 1000);
-          const h = Math.floor(totalSeconds / 3600);
-          const m = Math.floor((totalSeconds % 3600) / 60);
-          const s = totalSeconds % 60;
-          countdownStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+          const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+          const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+          const s = (totalSeconds % 60).toString().padStart(2, '0');
+          countdownStr = `${h}:${m}:${s}`;
         }
       }
 
