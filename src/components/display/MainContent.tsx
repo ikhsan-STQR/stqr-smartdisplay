@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { useDisplay, ContentSchedule } from "@/context/DisplayContext";
+import { useDisplay } from "@/context/DisplayContext";
+import { useVideoSchedule } from "@/hooks/useVideoSchedule";
 
 const MainContent = () => {
-  const { config, status, settings } = useDisplay();
+  const { status, settings } = useDisplay();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [activeSchedule, setActiveSchedule] = useState<ContentSchedule | null>(null);
+  const activeProgram = useVideoSchedule();
 
   // Status for current active period (KBM Transition)
   const isTransition = status.activePeriod?.subject_name === "-" || !status.activePeriod?.subject_name;
@@ -19,32 +20,10 @@ const MainContent = () => {
     return status.activePeriod?.description || "";
   };
 
+  // Slider animation for slider content (independent of source)
   useEffect(() => {
-    const checkSchedule = () => {
-      const now = new Date();
-      const currentTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
-      const currentDay = now.getDay();
-
-      const active = config.schedules.find(s => 
-        s.isActive && 
-        s.type === "main" && 
-        s.days.includes(currentDay) &&
-        currentTime >= s.startTime && 
-        currentTime < s.endTime
-      );
-      
-      setActiveSchedule(active || null);
-    };
-
-    checkSchedule();
-    const interval = setInterval(checkSchedule, 10000); // Check every 10s
-    return () => clearInterval(interval);
-  }, [config.schedules]);
-
-  // Slider animation for scheduled slider
-  useEffect(() => {
-    const isSlider = activeSchedule?.contentType === "slider";
-    const images = Array.isArray(activeSchedule?.content) ? activeSchedule.content : [];
+    const isSlider = activeProgram.contentType === "slider";
+    const images = Array.isArray(activeProgram.content) ? activeProgram.content : [];
     
     if (isSlider && images.length > 1) {
       const timer = setInterval(() => {
@@ -52,7 +31,7 @@ const MainContent = () => {
       }, 5000);
       return () => clearInterval(timer);
     }
-  }, [activeSchedule]);
+  }, [activeProgram]);
 
   // If in Transition Mode (Break/Apel/etc)
   if (status.activePeriod && isTransition) {
@@ -92,10 +71,8 @@ const MainContent = () => {
     );
   }
 
-  const currentType = activeSchedule ? activeSchedule.contentType : config.contentType;
-  const currentContent = activeSchedule 
-    ? (Array.isArray(activeSchedule.content) ? activeSchedule.content : [activeSchedule.content as string])
-    : (config.contentType === "video" ? [config.videoUrl] : config.sliderImages);
+  const currentType = activeProgram.contentType;
+  const currentContent = Array.isArray(activeProgram.content) ? activeProgram.content : [activeProgram.content];
 
   if (!currentContent || currentContent.length === 0 || !currentContent[0]) {
     return (
