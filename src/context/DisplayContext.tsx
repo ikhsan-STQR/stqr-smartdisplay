@@ -180,7 +180,6 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
     try {
       const configToSave = JSON.parse(JSON.stringify(config));
       const { error } = await (supabase as any).from("display_config").upsert({ 
-        id: configRecordId,
         config_key: "default", 
         config_data: configToSave,
         updated_at: new Date().toISOString()
@@ -193,7 +192,7 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setIsSaving(false);
     }
-  }, [config, configRecordId]);
+  }, [config]);
 
   const saveSettings = useCallback(async () => {
     setIsSaving(true);
