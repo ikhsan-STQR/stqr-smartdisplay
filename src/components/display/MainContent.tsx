@@ -105,12 +105,26 @@ const MainContent = () => {
     );
   }
 
+  const getEnhancedVideoUrl = (url: string) => {
+    if (!url) return url;
+    
+    // Robustly extract Video ID from any standard YouTube link (Watch, Embed, or Short)
+    const embedMatch = url.match(/(?:youtube\.com\/embed\/|youtu\.be\/|youtube\.com\/watch\?v=|youtube\.com\/live\/)([^&?/\s]+)/);
+    if (embedMatch) {
+      const videoId = embedMatch[1];
+      // Construct a clean embed URL with all professional digital signage parameters
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&rel=0&modestbranding=1&iv_load_policy=3`;
+    }
+    
+    return url;
+  };
+
   return (
     <div className="w-full h-full bg-black rounded-[calc(var(--radius)-0.3vw)] overflow-hidden relative shadow-inner">
       {currentType === "video" ? (
         <iframe
-          src={currentContent[0]}
-          className="absolute inset-0 w-full h-full"
+          src={getEnhancedVideoUrl(currentContent[0])}
+          className="absolute inset-0 w-full h-full border-0 pointer-events-none"
           allow="autoplay; encrypted-media"
           allowFullScreen
           title="Video Content"

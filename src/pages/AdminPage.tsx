@@ -539,11 +539,11 @@ const InputField = ({
 
 const formatYoutubeUrl = (url: string) => {
   if (!url) return "";
-  if (url.includes("youtube.com/embed/")) return url;
-  const watchMatch = url.match(/v=([^&]+)/);
-  if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${watchMatch[1]}`;
-  const shortMatch = url.match(/youtu\.be\/([^?]+)/);
-  if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${shortMatch[1]}`;
+  const embedMatch = url.match(/(?:youtube\.com\/embed\/|youtu\.be\/|youtube\.com\/watch\?v=)([^&?/\s]+)/);
+  if (embedMatch) {
+    const videoId = embedMatch[1];
+    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&rel=0&modestbranding=1`;
+  }
   return url;
 };
 
