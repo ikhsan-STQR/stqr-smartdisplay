@@ -35,6 +35,9 @@ const DisplaySidebar = ({ isMobile }: { isMobile?: boolean }) => {
   useEffect(() => {
     const posters = Array.isArray(currentPosters) ? currentPosters : [];
     if (posters.length > 1) {
+      // Clear index if it exceeds the new length
+      setCurrentPoster((prev) => (prev >= posters.length ? 0 : prev));
+      
       const intervalDuration = (config.announcementInterval || 5) * 1000;
       const timer = setInterval(() => {
         setCurrentPoster((prev) => (prev + 1) % posters.length);
@@ -63,14 +66,15 @@ const DisplaySidebar = ({ isMobile }: { isMobile?: boolean }) => {
             </div>
           ) : (
             <div className="absolute inset-0 w-full h-full">
-              {currentPosters.map((poster, i) => (
+              {(currentPosters as string[]).map((poster, i) => (
                 <img
                   key={i}
-                  src={poster as string}
+                  src={poster}
                   alt={`Pengumuman ${i + 1}`}
+                  loading="lazy"
                   className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${
                     isMobile ? 'object-contain' : 'object-cover'
-                  } ${i === currentPoster ? "opacity-100" : "opacity-0"}`}
+                  } ${i === currentPoster ? "opacity-100 z-10" : "opacity-0 z-0"}`}
                 />
               ))}
             </div>

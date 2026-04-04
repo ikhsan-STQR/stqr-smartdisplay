@@ -463,6 +463,26 @@ const AdminPage = () => {
                    )}
                 </div>
                 <ArrayField label="Right Sidebar Posters" values={config.announcementPosters} onChange={v => updateConfig({ announcementPosters: v })} />
+                
+                <div className="mt-4 p-4 bg-zinc-50 rounded-xl border border-dashed border-zinc-200">
+                  <label className="block text-sm font-bold text-zinc-700 mb-2 uppercase tracking-tight">
+                    Transisi Poster (Detik)
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="range"
+                      min="3"
+                      max="30"
+                      value={config.announcementInterval || 5}
+                      onChange={(e) => updateConfig({ announcementInterval: parseInt(e.target.value) })}
+                      className="flex-1 accent-primary"
+                    />
+                    <div className="w-12 h-12 flex items-center justify-center bg-white border border-zinc-200 rounded-lg font-black text-primary">
+                      {config.announcementInterval || 5}s
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-zinc-400 mt-2 italic">* Kecepatan pindah antar poster di sidebar kanan.</p>
+                </div>
               </div>
             </Section>
 
