@@ -59,7 +59,39 @@ export interface DisplayConfig {
   runningTextSpeed: number;
   announcementInterval: number;
   prayerLocation: string;
-  headerTitle: string;
+  headerTitle: string; // Legacy
+  header_subtitle: string;
+  organization_name: string;
+  organization_logo: string;
+  primary_color: string;
+  secondary_color: string;
+  text_color_main: string;
+  clock_bg_color: string;
+  clock_text_color: string;
+  running_text_bg: string;
+  running_text_color: string;
+  
+  // Granular Zone Colors
+  header_bg: string;
+  header_title_color: string;
+  header_subtitle_color: string;
+  top_clock_bg: string;
+  top_clock_text: string;
+  left_title_bg: string;
+  left_title_text: string;
+  left_content_text: string;
+  left_countdown_bg: string;
+  left_countdown_text: string;
+  right_title_bg: string;
+  right_title_text: string;
+  footer_bg: string;
+  footer_text_color: string;
+  prayer_box_bg: string;
+  prayer_box_text: string;
+  prayer_highlight_text: string;
+  left_wrapper_bg: string;
+  marquee_wrapper_bg: string;
+
   schedules: ContentSchedule[];
 }
 
@@ -104,6 +136,38 @@ const defaultConfig: DisplayConfig = {
   announcementInterval: 5,
   prayerLocation: "Pandeglang, Banten",
   headerTitle: "SMART DIGITAL INFORMATION SYSTEM",
+  header_subtitle: "SMART DIGITAL INFORMATION SYSTEM",
+  organization_name: "STQ Riyadhussholihiin",
+  organization_logo: "",
+  primary_color: "#8b7336",
+  secondary_color: "#A8E6CF",
+  text_color_main: "#1a3a3a",
+  clock_bg_color: "#8b7336",
+  clock_text_color: "#ffffff",
+  running_text_bg: "#A8E6CF",
+  running_text_color: "#133c47",
+
+  // Granular Defaults
+  header_bg: "transparent",
+  header_title_color: "#1a3a3a",
+  header_subtitle_color: "#9e8549",
+  top_clock_bg: "#8b7336",
+  top_clock_text: "#ffffff",
+  left_title_bg: "#1a3a3a",
+  left_title_text: "#ffffff",
+  left_content_text: "#1a3a3a",
+  left_countdown_bg: "#ffffff",
+  left_countdown_text: "#8b7336",
+  right_title_bg: "#A8E6CF",
+  right_title_text: "#133c47",
+  footer_bg: "transparent",
+  footer_text_color: "#ffffff",
+  prayer_box_bg: "#1a3a3a",
+  prayer_box_text: "#133c47",
+  prayer_highlight_text: "#facc15",
+  left_wrapper_bg: "transparent",
+  marquee_wrapper_bg: "#133c47",
+
   schedules: [],
 };
 
@@ -131,18 +195,63 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
     }, 10000);
 
     try {
-      // 1. Fetch Config
-      const { data: configData } = await (supabase as any)
+      // 1. Fetch Config - Use "*" to be more resilient to schema changes/cache
+      const { data: configData, error: configError } = await (supabase as any)
         .from("display_config")
-        .select("config_data")
+        .select("*")
         .eq("config_key", "default")
         .maybeSingle();
 
-      if (configData?.config_data) {
-        setConfig({
+      if (configError) {
+        console.error("Supabase Config Fetch Error:", configError);
+        // Fallback to default if table exists but column is missing in cache
+      }
+
+      if (configData) {
+        // Safe mapping - only update if data exists in the DB response
+        const newUpdates: Partial<DisplayConfig> = {};
+        
+        if (configData.config_data) {
+          Object.assign(newUpdates, configData.config_data);
+        }
+        
+        // Identity columns (Handle if columns were recently added/removed)
+        if (configData.organization_name !== undefined) newUpdates.organization_name = configData.organization_name;
+        if (configData.organization_logo !== undefined) newUpdates.organization_logo = configData.organization_logo;
+        if (configData.header_subtitle !== undefined) newUpdates.header_subtitle = configData.header_subtitle;
+        if (configData.primary_color !== undefined) newUpdates.primary_color = configData.primary_color;
+        if (configData.secondary_color !== undefined) newUpdates.secondary_color = configData.secondary_color;
+        if (configData.text_color_main !== undefined) newUpdates.text_color_main = configData.text_color_main;
+        if (configData.clock_bg_color !== undefined) newUpdates.clock_bg_color = configData.clock_bg_color;
+        if (configData.clock_text_color !== undefined) newUpdates.clock_text_color = configData.clock_text_color;
+        if (configData.running_text_bg !== undefined) newUpdates.running_text_bg = configData.running_text_bg;
+        if (configData.running_text_color !== undefined) newUpdates.running_text_color = configData.running_text_color;
+        
+        // Granular Mapping
+        if (configData.header_bg !== undefined) newUpdates.header_bg = configData.header_bg;
+        if (configData.header_title_color !== undefined) newUpdates.header_title_color = configData.header_title_color;
+        if (configData.header_subtitle_color !== undefined) newUpdates.header_subtitle_color = configData.header_subtitle_color;
+        if (configData.top_clock_bg !== undefined) newUpdates.top_clock_bg = configData.top_clock_bg;
+        if (configData.top_clock_text !== undefined) newUpdates.top_clock_text = configData.top_clock_text;
+        if (configData.left_title_bg !== undefined) newUpdates.left_title_bg = configData.left_title_bg;
+        if (configData.left_title_text !== undefined) newUpdates.left_title_text = configData.left_title_text;
+        if (configData.left_content_text !== undefined) newUpdates.left_content_text = configData.left_content_text;
+        if (configData.left_countdown_bg !== undefined) newUpdates.left_countdown_bg = configData.left_countdown_bg;
+        if (configData.left_countdown_text !== undefined) newUpdates.left_countdown_text = configData.left_countdown_text;
+        if (configData.right_title_bg !== undefined) newUpdates.right_title_bg = configData.right_title_bg;
+        if (configData.right_title_text !== undefined) newUpdates.right_title_text = configData.right_title_text;
+        if (configData.footer_bg !== undefined) newUpdates.footer_bg = configData.footer_bg;
+        if (configData.footer_text_color !== undefined) newUpdates.footer_text_color = configData.footer_text_color;
+        if (configData.prayer_box_bg !== undefined) newUpdates.prayer_box_bg = configData.prayer_box_bg;
+        if (configData.prayer_box_text !== undefined) newUpdates.prayer_box_text = configData.prayer_box_text;
+        if (configData.prayer_highlight_text !== undefined) newUpdates.prayer_highlight_text = configData.prayer_highlight_text;
+        if (configData.left_wrapper_bg !== undefined) newUpdates.left_wrapper_bg = configData.left_wrapper_bg;
+        if (configData.marquee_wrapper_bg !== undefined) newUpdates.marquee_wrapper_bg = configData.marquee_wrapper_bg;
+
+        setConfig(prev => ({
           ...defaultConfig,
-          ...(configData.config_data as unknown as Partial<DisplayConfig>),
-        });
+          ...newUpdates
+        }));
       }
 
       // 2. Fetch Display Settings (Global Mode & Notes)
@@ -333,6 +442,35 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
       const { error } = await (supabase as any).from("display_config").upsert({ 
         config_key: "default", 
         config_data: configToSave,
+        organization_name: config.organization_name,
+        organization_logo: config.organization_logo,
+        header_subtitle: config.header_subtitle,
+        primary_color: config.primary_color,
+        secondary_color: config.secondary_color,
+        text_color_main: config.text_color_main,
+        clock_bg_color: config.clock_bg_color,
+        clock_text_color: config.clock_text_color,
+        running_text_bg: config.running_text_bg,
+        running_text_color: config.running_text_color,
+        header_bg: config.header_bg,
+        header_title_color: config.header_title_color,
+        header_subtitle_color: config.header_subtitle_color,
+        top_clock_bg: config.top_clock_bg,
+        top_clock_text: config.top_clock_text,
+        left_title_bg: config.left_title_bg,
+        left_title_text: config.left_title_text,
+        left_content_text: config.left_content_text,
+        left_countdown_bg: config.left_countdown_bg,
+        left_countdown_text: config.left_countdown_text,
+        right_title_bg: config.right_title_bg,
+        right_title_text: config.right_title_text,
+        footer_bg: config.footer_bg,
+        footer_text_color: config.footer_text_color,
+        prayer_box_bg: config.prayer_box_bg,
+        prayer_box_text: config.prayer_box_text,
+        prayer_highlight_text: config.prayer_highlight_text,
+        left_wrapper_bg: config.left_wrapper_bg,
+        marquee_wrapper_bg: config.marquee_wrapper_bg,
         updated_at: new Date().toISOString()
       }, { onConflict: 'config_key' });
 

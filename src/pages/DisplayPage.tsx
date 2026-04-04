@@ -8,7 +8,7 @@ import DisplayFooter from "@/components/display/DisplayFooter";
 import DisplayPrayerTimes from "@/components/display/DisplayPrayerTimes";
 
 const DisplayPage = () => {
-  const { isLoading } = useDisplay();
+  const { config, isLoading } = useDisplay();
   const [isMobile, setIsMobile] = useState(false);
   const [scale, setScale] = useState(1);
 
@@ -53,7 +53,10 @@ const DisplayPage = () => {
 
       {/* Content Row: Sidebar Left (17.5% Mobile / 22% Desktop) | Main Content (58%) | Sidebar Right (24.5% Mobile / 20% Desktop) */}
       <div className={`shrink-0 flex gap-[0.5vw] px-[0.5vw] items-stretch justify-center ${isScaled ? 'h-auto' : 'flex-1 min-h-0'}`}>
-        <div className={`${isScaled ? 'w-[17.5%]' : 'w-[22%]'} bg-white rounded-xl shadow-md p-[0.5vw] flex flex-col relative overflow-hidden shrink-0`}>
+        <div 
+          className={`${isScaled ? 'w-[17.5%]' : 'w-[22%]'} rounded-xl shadow-md p-[0.5vw] flex flex-col relative overflow-hidden shrink-0 transition-colors duration-500`}
+          style={{ backgroundColor: config.left_wrapper_bg }}
+        >
           <DisplaySidebarLeft isMobile={isScaled} />
         </div>
         <div className={`flex-1 min-w-0 flex items-center justify-center overflow-hidden ${isScaled ? 'max-w-[58%] aspect-video' : ''}`}>

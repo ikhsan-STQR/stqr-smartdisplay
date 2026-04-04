@@ -208,8 +208,8 @@ const AdminPage = () => {
             />
           </div>
           <div>
-            <h1 className="text-white font-black text-lg tracking-tight font-poppins">
-              STQ RIYADHUSSHOLIHIIN <span className="text-yellow-400 font-medium ml-2">Display Admin</span>
+            <h1 className="text-white font-black text-lg tracking-tight font-poppins uppercase">
+              {config.organization_name || "STQ RIYADHUSSHOLIHIIN"} <span className="text-yellow-400 font-medium ml-2">Display Admin</span>
             </h1>
             <p className="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em]">Management System Control Panel</p>
           </div>
@@ -322,8 +322,162 @@ const AdminPage = () => {
           </Section>
         </div>
 
-        {/* Right Column: Other Displays */}
+        {/* Right Column: Identity & Content */}
         <div className="xl:col-span-8 space-y-8">
+          <Section icon="🏢" title="IDENTITY SETTINGS" description="Custom branding, logo, and theme colors.">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-zinc-100/50 p-6 rounded-[2rem] border border-zinc-200">
+              <div className="space-y-4">
+                <InputField label="Organization Name" value={config.organization_name} onChange={v => updateConfig({ organization_name: v })} />
+                <InputField label="Header Subtitle" value={config.header_subtitle} onChange={v => updateConfig({ header_subtitle: v })} />
+                
+                <hr className="border-zinc-200" />
+                
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-black uppercase text-[#1a3a3a] tracking-[0.2em] flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 bg-yellow-400 rounded-full animate-pulse" />
+                      Ultimate Color Palette
+                    </label>
+                    <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest bg-zinc-100 px-2 py-0.5 rounded-full">Granular Level</span>
+                  </div>
+
+                  {/* BRAND ZONE */}
+                  <div className="space-y-3 bg-zinc-50/50 p-4 rounded-2xl border border-zinc-100">
+                    <p className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.1em] mb-2 px-1">Brand Identity</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <ColorInputWithSwatch label="Primary Brand" value={config.primary_color} onChange={v => updateConfig({ primary_color: v })} />
+                      <ColorInputWithSwatch label="Secondary Brand" value={config.secondary_color} onChange={v => updateConfig({ secondary_color: v })} />
+                      <ColorInputWithSwatch label="Global Accent Text" value={config.text_color_main} onChange={v => updateConfig({ text_color_main: v })} />
+                    </div>
+                  </div>
+
+                  {/* HEADER ZONE */}
+                  <div className="space-y-3 bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm">
+                    <p className="text-[9px] font-black text-[#1a3a3a] uppercase tracking-[0.1em] mb-2 px-1">Header Zone</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <ColorInputWithSwatch label="Header BG" value={config.header_bg} onChange={v => updateConfig({ header_bg: v })} />
+                      <ColorInputWithSwatch label="Title Color" value={config.header_title_color} onChange={v => updateConfig({ header_title_color: v })} />
+                      <ColorInputWithSwatch label="Subtitle Color" value={config.header_subtitle_color} onChange={v => updateConfig({ header_subtitle_color: v })} />
+                      <ColorInputWithSwatch label="Top Clock BG" value={config.top_clock_bg} onChange={v => updateConfig({ top_clock_bg: v })} />
+                      <ColorInputWithSwatch label="Top Clock Text" value={config.top_clock_text} onChange={v => updateConfig({ top_clock_text: v })} />
+                    </div>
+                  </div>
+
+                  {/* LEFT SIDEBAR ZONE */}
+                  <div className="space-y-3 bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm">
+                    <p className="text-[9px] font-black text-[#1a3a3a] uppercase tracking-[0.1em] mb-2 px-1">Left Sidebar Zone</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <ColorInputWithSwatch label="Wrapper BG" value={config.left_wrapper_bg} onChange={v => updateConfig({ left_wrapper_bg: v })} />
+                      <ColorInputWithSwatch label="Title BG" value={config.left_title_bg} onChange={v => updateConfig({ left_title_bg: v })} />
+                      <ColorInputWithSwatch label="Title Text" value={config.left_title_text} onChange={v => updateConfig({ left_title_text: v })} />
+                      <ColorInputWithSwatch label="Content Text" value={config.left_content_text} onChange={v => updateConfig({ left_content_text: v })} />
+                      <ColorInputWithSwatch label="Countdown BG" value={config.left_countdown_bg} onChange={v => updateConfig({ left_countdown_bg: v })} />
+                      <ColorInputWithSwatch label="Countdown Text" value={config.left_countdown_text} onChange={v => updateConfig({ left_countdown_text: v })} />
+                    </div>
+                  </div>
+
+                  {/* RIGHT SIDEBAR ZONE */}
+                  <div className="space-y-3 bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm">
+                    <p className="text-[9px] font-black text-[#1a3a3a] uppercase tracking-[0.1em] mb-2 px-1">Right Sidebar Zone</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <ColorInputWithSwatch label="Sidebar Title BG" value={config.right_title_bg} onChange={v => updateConfig({ right_title_bg: v })} />
+                      <ColorInputWithSwatch label="Sidebar Title Text" value={config.right_title_text} onChange={v => updateConfig({ right_title_text: v })} />
+                    </div>
+                  </div>
+
+                  {/* MARQUEE ZONE */}
+                  <div className="space-y-3 bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm">
+                    <p className="text-[9px] font-black text-[#1a3a3a] uppercase tracking-[0.1em] mb-2 px-1">Marquee Zone</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <ColorInputWithSwatch label="Marquee BG" value={config.running_text_bg} onChange={v => updateConfig({ running_text_bg: v })} />
+                      <ColorInputWithSwatch label="Marquee Text" value={config.running_text_color} onChange={v => updateConfig({ running_text_color: v })} />
+                      <ColorInputWithSwatch label="Wrapper BG" value={config.marquee_wrapper_bg} onChange={v => updateConfig({ marquee_wrapper_bg: v })} />
+                    </div>
+                  </div>
+
+                  {/* FOOTER ZONE */}
+                  <div className="space-y-3 bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm">
+                    <p className="text-[9px] font-black text-[#1a3a3a] uppercase tracking-[0.1em] mb-2 px-1">Footer & Prayer Zone</p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <ColorInputWithSwatch label="Footer BG" value={config.footer_bg} onChange={v => updateConfig({ footer_bg: v })} />
+                      <ColorInputWithSwatch label="Footer Text Color" value={config.footer_text_color} onChange={v => updateConfig({ footer_text_color: v })} />
+                      <ColorInputWithSwatch label="Prayer Box BG" value={config.prayer_box_bg} onChange={v => updateConfig({ prayer_box_bg: v })} />
+                      <ColorInputWithSwatch label="Prayer Box Text" value={config.prayer_box_text} onChange={v => updateConfig({ prayer_box_text: v })} />
+                      <ColorInputWithSwatch label="Prayer Highlight" value={config.prayer_highlight_text} onChange={v => updateConfig({ prayer_highlight_text: v })} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-[10px] font-bold uppercase text-zinc-400 ml-1 block">Organization Logo</label>
+                <div className="flex flex-col items-center gap-4 bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm relative group min-h-[160px] justify-center">
+                  {config.organization_logo ? (
+                    <img src={config.organization_logo} className="h-24 w-auto object-contain" alt="Logo Preview" />
+                  ) : (
+                    <div className="text-zinc-300 text-center">
+                      <div className="text-3xl mb-2">🖼️</div>
+                      <p className="text-[10px] font-bold uppercase">No Logo Set</p>
+                    </div>
+                  )}
+                  
+                  <label className="cursor-pointer bg-primary text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase hover:opacity-90 transition-all shadow-md mt-2">
+                    {configSaving ? "UPLOADING..." : "Change Logo"}
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      accept="image/*" 
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        try {
+                          const fileExt = file.name.split('.').pop();
+                          const fileName = `logo_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                          
+                          const { data, error: uploadError } = await supabase.storage
+                            .from('posters')
+                            .upload(fileName, file, { upsert: true });
+
+                          if (uploadError) {
+                            console.error("Storage upload error:", uploadError);
+                            if (uploadError.message.includes("not found")) {
+                              throw new Error("Folder 'posters' tidak ditemukan di Supabase Storage. Silakan buat bucket bernama 'posters'.");
+                            }
+                            throw uploadError;
+                          }
+
+                          const { data: { publicUrl } } = supabase.storage.from('posters').getPublicUrl(fileName);
+                          updateConfig({ organization_logo: publicUrl });
+                          toast.success("Logo berhasil diperbarui!");
+                        } catch (err: any) {
+                          console.error("Critical Upload Error:", err);
+                          toast.error(err.message || "Gagal mengunggah logo.");
+                        }
+                      }} 
+                    />
+                  </label>
+                  {config.organization_logo && (
+                    <button 
+                      onClick={() => updateConfig({ organization_logo: "" })}
+                      className="text-red-400 text-[9px] font-bold hover:underline"
+                    >
+                      Remove Logo
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="mt-4">
+               <button
+                  onClick={handleSaveConfig}
+                  disabled={configSaving}
+                  className="w-full bg-[#1a3a3a] text-white py-3 rounded-2xl font-black text-xs hover:opacity-90 transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-3"
+                >
+                  {configSaving ? "⌛ SYNCING IDENTITY..." : "💾 SAVE IDENTITY & SYNC COLORS"}
+                </button>
+            </div>
+          </Section>
+
           <Section icon="🎬" title="Penjadwalan Konten Utama" description="Overlay konten otomatis (Video/Poster/Running Text) pada jam tertentu.">
             <div className="space-y-4">
               {config.schedules.map((s) => (
@@ -563,6 +717,53 @@ const InputField = ({
   </div>
 );
 
+const ColorInputWithSwatch = ({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) => (
+  <div className="space-y-1.5">
+    <label className="text-[10px] font-bold text-zinc-400 uppercase ml-1 block">{label}</label>
+    <div className="flex gap-2 items-center bg-zinc-50 p-1.5 rounded-xl border border-zinc-200/60 transition-all hover:bg-white group">
+      <div className="relative w-8 h-8 shrink-0">
+        <input 
+          type="color" 
+          value={value || "#000000"} 
+          onChange={e => onChange(e.target.value)}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+        />
+        <div 
+          className="w-full h-full rounded-lg border border-zinc-200 shadow-sm"
+          style={{ backgroundColor: value || "#000000" }}
+        />
+      </div>
+      <input 
+        type="text" 
+        value={value || "#000000"} 
+        onChange={e => onChange(e.target.value)}
+        className="flex-1 bg-transparent px-2 py-1 text-xs font-mono uppercase focus:outline-none transition-all font-bold text-zinc-600 tracking-wider"
+        placeholder="#000000"
+      />
+    </div>
+  </div>
+);
+
+const ColorPicker = ({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) => (
+  <div className="space-y-1.5">
+    <label className="text-[10px] font-bold text-zinc-400 uppercase ml-1">{label}</label>
+    <div className="flex gap-2">
+      <input 
+        type="color" 
+        value={value || "#000000"} 
+        onChange={e => onChange(e.target.value)}
+        className="w-10 h-10 rounded-lg cursor-pointer border-none bg-transparent"
+      />
+      <input 
+        type="text" 
+        value={value || "#000000"} 
+        onChange={e => onChange(e.target.value)}
+        className="flex-1 border border-zinc-200 rounded-xl px-3 py-2 text-xs font-mono uppercase focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all font-medium"
+      />
+    </div>
+  </div>
+);
+
 const formatYoutubeUrl = (url: string) => {
   if (!url) return "";
   const embedMatch = url.match(/(?:youtube\.com\/embed\/|youtu\.be\/|youtube\.com\/watch\?v=)([^&?/\s]+)/);
@@ -582,33 +783,33 @@ const ArrayField = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File terlalu besar! Maksimal 5MB.");
-      return;
-    }
-
     setUploading(index);
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
+      const fileName = `${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      const { data, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('posters')
-        .upload(filePath, file);
+        .upload(filePath, file, { upsert: true });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error("Poster Storage Error:", uploadError);
+        if (uploadError.message.includes("not found")) {
+          throw new Error("Folder 'posters' tidak ditemukan di Supabase Storage. Silakan buat bucket bernama 'posters'.");
+        }
+        throw uploadError;
+      }
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('posters')
-        .getPublicUrl(filePath);
+      const { data: { publicUrl } } = supabase.storage.from('posters').getPublicUrl(filePath);
 
       const updated = [...values];
       updated[index] = publicUrl;
       onChange(updated);
-      toast.success("Gambar berhasil diunggah!");
-    } catch (error: any) {
-      toast.error("Gagal mengunggah: " + error.message);
+      toast.success("Poster berhasil diunggah!");
+    } catch (err: any) {
+      console.error("Critical Poster Upload Error:", err);
+      toast.error(err.message || "Gagal mengunggah poster.");
     } finally {
       setUploading(null);
     }

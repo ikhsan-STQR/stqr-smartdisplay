@@ -50,9 +50,15 @@ const DisplaySidebar = ({ isMobile }: { isMobile?: boolean }) => {
 
   return (
     <div className="w-full h-full flex flex-col">
-      {/* INFO STQR Banner - Light Tosca Background */}
-      <div className={`bg-[#A8E6CF] ${isMobile ? 'py-[0.8vh]' : 'py-[1.2vh]'} px-4 text-center overflow-hidden shrink-0 shadow-sm border-b border-[#96d1bc]`}>
-        <span className={`text-[#133c47] font-montserrat font-black ${isMobile ? 'text-[1vw]' : 'text-[1.15vw]'} uppercase tracking-wider whitespace-nowrap inline-block w-full`}>
+      {/* INFO STQR Banner - Dynamic Background */}
+      <div 
+        className={`${isMobile ? 'py-[0.8vh]' : 'py-[1.2vh]'} px-4 text-center overflow-hidden shrink-0 shadow-sm border-b border-black/5 transition-colors duration-500`}
+        style={{ backgroundColor: config.right_title_bg || config.secondary_color || "#A8E6CF" }}
+      >
+        <span 
+          className={`font-montserrat font-black ${isMobile ? 'text-[1vw]' : 'text-[1.15vw]'} uppercase tracking-wider whitespace-nowrap inline-block w-full transition-colors duration-500`}
+          style={{ color: config.right_title_text || config.running_text_color || "#133c47" }}
+        >
           Info STQR
         </span>
       </div>

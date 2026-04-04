@@ -41,10 +41,16 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
   );
 
   return (
-    <div className={`flex-1 flex flex-col ${isMobile ? 'gap-[0.3vw]' : 'gap-[0.5vw]'} h-full overflow-hidden w-full`}>
+    <div className={`flex-1 flex flex-col ${isMobile ? 'gap-[0.3vw]' : 'gap-[0.5vw]'} h-full overflow-hidden w-full transition-colors duration-500`}>
       {/* Status Box - Simplified Single Line */}
-      <div className={`w-full bg-[#133c47] rounded-xl px-[2vw] ${isMobile ? 'py-[0.8vw] min-h-[6vh]' : 'py-[1.2vw] min-h-[8vh]'} shadow-lg border border-white/10 flex items-center justify-center shrink-0`}>
-        <h2 className={`text-yellow-400 font-montserrat font-black ${isMobile ? 'text-[1.2vw]' : 'text-[1.5vw]'} uppercase tracking-tight text-center leading-none whitespace-nowrap`}>
+      <div 
+        className={`w-full rounded-xl px-[2vw] ${isMobile ? 'py-[0.8vw] min-h-[6vh]' : 'py-[1.2vw] min-h-[8vh]'} shadow-lg border border-white/10 flex items-center justify-center shrink-0 transition-colors duration-500`}
+        style={{ backgroundColor: config.left_title_bg || config.text_color_main || "#133c47" }}
+      >
+        <h2 
+          className={`font-montserrat font-black ${isMobile ? 'text-[1.2vw]' : 'text-[1.5vw]'} uppercase tracking-tight text-center leading-none whitespace-nowrap transition-colors duration-500`}
+          style={{ color: config.left_title_text || "#EAB308" }}
+        >
           {status.activePeriod 
             ? (status.activePeriod.subject_name !== "-" ? status.activePeriod.subject_name : (status.activePeriod.description || status.activePeriod.period)) 
             : "TIDAK ADA KEGIATAN"}
@@ -61,13 +67,19 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
             
             return (
               <div className={`flex-1 flex flex-col items-center justify-center text-center ${isMobile ? 'p-4' : 'p-8'} bg-white/40 backdrop-blur-sm rounded-2xl border border-white/40 shadow-sm animate-in fade-in zoom-in duration-1000`}>
-                <div className={`${isMobile ? 'w-12 h-12 mb-3' : 'w-20 h-20 mb-6'} bg-[#1a3a3a]/5 rounded-full flex items-center justify-center`}>
+                <div 
+                  className={`${isMobile ? 'w-12 h-12 mb-3' : 'w-20 h-20 mb-6'} rounded-full flex items-center justify-center transition-colors duration-500`}
+                  style={{ backgroundColor: `${config.left_content_text || config.text_color_main || "#1a3a3a"}10` }} // 10% opacity
+                >
                   <span className={isMobile ? 'text-2xl' : 'text-4xl'}>👋</span>
                 </div>
-                <h2 className={`text-[#1a3a3a] font-montserrat font-black ${isMobile ? 'text-[1.6vw] mb-2' : 'text-[2vw] mb-4'} leading-tight uppercase tracking-tighter`}>
+                <h2 
+                  className={`font-montserrat font-black ${isMobile ? 'text-[1.6vw] mb-2' : 'text-[2vw] mb-4'} leading-tight uppercase tracking-tighter transition-colors duration-500`}
+                  style={{ color: config.left_content_text || config.text_color_main || "#1a3a3a" }}
+                >
                   {isWeekendOrThursday ? "Sampai Jumpa Hari Ahad" : "Sampai Jumpa Esok Hari"}
                 </h2>
-                <p className={`text-gray-500 font-jakarta font-bold ${isMobile ? 'text-[0.8vw]' : 'text-[1vw]'} uppercase tracking-[0.2em] opacity-80`}>
+                <p className={`text-gray-500 font-jakarta font-bold ${isMobile ? 'text-[0.8vw]' : 'text-[1vw]'} uppercase tracking-[0.2em] opacity-80 transition-colors duration-500`}>
                   Dengan Semangat Belajar Baru
                 </p>
                 
@@ -75,7 +87,13 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
                 {!isMobile && (
                   <div className="mt-8 opacity-10">
                      <div className="flex gap-2">
-                       {[1,2,3].map(i => <div key={i} className="w-2 h-2 rounded-full bg-[#1a3a3a]" />)}
+                       {[1,2,3].map(i => (
+                         <div 
+                           key={i} 
+                           className="w-2 h-2 rounded-full transition-colors duration-500" 
+                           style={{ backgroundColor: config.left_content_text || config.text_color_main || "#1a3a3a" }}
+                         />
+                       ))}
                      </div>
                   </div>
                 )}
@@ -99,11 +117,20 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
 
           if (instructions) {
             return (
-              <div className={`flex-1 bg-white/60 backdrop-blur-md border border-white/40 shadow-sm rounded-xl flex flex-col items-center justify-center text-center ${isMobile ? 'p-3' : 'p-6'} animate-in zoom-in fade-in duration-700`}>
-                <h2 className={`text-[#133c47] font-montserrat font-black ${isMobile ? 'text-[1.6vw] mb-2' : 'text-[2vw] mb-4'} uppercase tracking-tight border-b-4 border-primary/20 pb-2 px-4 shadow-sm text-center w-full`}>
+              <div className={`flex-1 bg-white/60 backdrop-blur-md border border-white/40 shadow-sm rounded-xl flex flex-col items-center justify-center text-center ${isMobile ? 'p-3' : 'p-6'} animate-in zoom-in fade-in duration-700 transition-colors duration-500`}>
+                <h2 
+                  className={`font-montserrat font-black ${isMobile ? 'text-[1.6vw] mb-2' : 'text-[2vw] mb-4'} uppercase tracking-tight border-b-4 pb-2 px-4 shadow-sm text-center w-full transition-colors duration-500`}
+                  style={{ 
+                    color: config.left_content_text || config.text_color_main || "#133c47",
+                    borderBottomColor: `${config.primary_color || "#8b7336"}40`
+                  }}
+                >
                   {active.subject_name !== "-" ? active.subject_name : (active.description || active.period)}
                 </h2>
-                <div className={`text-gray-700 font-jakarta font-black ${isMobile ? 'text-[1.2vw] leading-[1.5]' : 'text-[1.4vw] leading-[1.8]'} uppercase whitespace-pre-line text-center max-w-[95%] tracking-wide`}>
+                <div 
+                  className={`font-jakarta font-black ${isMobile ? 'text-[1.2vw] leading-[1.5]' : 'text-[1.4vw] leading-[1.8]'} uppercase whitespace-pre-line text-center max-w-[95%] tracking-wide transition-colors duration-500`}
+                  style={{ color: config.left_content_text || "rgb(55 65 81)" }}
+                >
                   {instructions}
                 </div>
               </div>
@@ -112,22 +139,35 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
 
           /* Normal Class Schedule List */
           return (
-            <div className="h-full flex flex-col">
+            <div className="h-full flex flex-col transition-colors duration-500">
               {activeItems.length > 0 ? (
                 <div
                   className={`w-full flex-1 flex flex-col ${isMobile ? 'gap-1' : 'gap-2'} transition-opacity duration-500 ease-in-out`}
                   key={currentPage}
                 >
                   {displayedItems.map((item, i) => (
-                    <div key={i} className={`flex justify-between items-center bg-white rounded-lg ${isMobile ? 'px-3 py-1' : 'px-4 py-2'} shadow-sm border border-gray-100 animate-in fade-in duration-500`}>
-                      <span className={`text-[#1e5666] font-montserrat font-black ${isMobile ? 'text-[1vw] w-[3.5vw]' : 'text-[1.2vw] w-[4vw]'} shrink-0`}>{item.kelas}</span>
-                      <span className={`text-gray-900 font-montserrat font-medium ${isMobile ? 'text-[0.9vw]' : 'text-[1.1vw]'} truncate flex-1 text-right`}>{item.pelajaran}</span>
+                    <div key={i} className={`flex justify-between items-center bg-white rounded-lg ${isMobile ? 'px-3 py-1' : 'px-4 py-2'} shadow-sm border border-gray-100 animate-in fade-in duration-500 transition-colors duration-500`}>
+                      <span 
+                        className={`font-montserrat font-black ${isMobile ? 'text-[1vw] w-[3.5vw]' : 'text-[1.2vw] w-[4vw]'} shrink-0 transition-colors duration-500`}
+                        style={{ color: config.primary_color || "#1e5666" }}
+                      >
+                        {item.kelas}
+                      </span>
+                      <span 
+                        className={`font-montserrat font-medium ${isMobile ? 'text-[0.9vw]' : 'text-[1.1vw]'} truncate flex-1 text-right transition-colors duration-500`}
+                        style={{ color: config.left_content_text || "rgb(17 24 39)" }}
+                      >
+                        {item.pelajaran}
+                      </span>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="flex-1 flex items-center justify-center text-center p-4">
-                  <p className="text-gray-500 font-montserrat font-medium text-[1.2vw] uppercase tracking-widest leading-relaxed text-center w-full">
+                  <p 
+                    className="font-montserrat font-medium text-[1.2vw] uppercase tracking-widest leading-relaxed text-center w-full transition-colors duration-500"
+                    style={{ color: config.left_content_text || "rgb(107 114 128)" }}
+                  >
                     TIDAK ADA KELAS<br />SAAT INI
                   </p>
                 </div>
@@ -139,7 +179,11 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
                   {Array.from({ length: Math.ceil(activeItems.length / ITEMS_PER_PAGE) }).map((_, i) => (
                     <div
                       key={i}
-                      className={`h-1 rounded-full transition-all duration-300 ${i === currentPage ? "w-4 bg-[#1e5666]" : "w-1 bg-gray-300"}`}
+                      className="h-1 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: i === currentPage ? "1rem" : "0.25rem",
+                        backgroundColor: i === currentPage ? (config.primary_color || "#1e5666") : "rgb(209 213 219)"
+                      }}
                     />
                   ))}
                 </div>

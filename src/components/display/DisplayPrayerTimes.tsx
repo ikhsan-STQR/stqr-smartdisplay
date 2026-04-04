@@ -104,14 +104,26 @@ const DisplayPrayerTimes = ({ isMobile }: { isMobile?: boolean }) => {
   ];
 
   return (
-    <div className={`w-full shrink-0 ${isMobile ? 'h-[95px]' : 'h-24 md:h-[110px]'} bg-[#1e5666] flex items-center justify-center px-[2vw] border-t border-white/10 overflow-hidden shadow-2xl relative z-10 gap-[3vw]`}>
+    <div 
+      className={`w-full shrink-0 ${isMobile ? 'h-[95px]' : 'h-24 md:h-[110px]'} flex items-center justify-center px-[2vw] border-t border-white/10 overflow-hidden shadow-2xl relative z-10 gap-[3vw] transition-colors duration-500`}
+      style={{ backgroundColor: config.footer_bg || "#1e5666" }}
+    >
       {/* Left Section: Header Block */}
       <div className="flex items-center h-full shrink-0">
-        <div className={`flex flex-col items-center justify-center bg-yellow-400 px-[1.2vw] py-[0.8vh] ${isMobile ? 'h-[85%] min-w-[9vw]' : 'h-[82%] min-w-[8.5vw]'} rounded-2xl border border-white/10 shadow-sm select-none whitespace-nowrap`}>
-          <span className={`text-[#133c47] font-montserrat font-bold ${isMobile ? 'text-[0.9vw]' : 'text-[0.8vw]'} uppercase tracking-[0.2em] opacity-90 mb-0`}>
+        <div 
+          className={`flex flex-col items-center justify-center px-[1.2vw] py-[0.8vh] ${isMobile ? 'h-[85%] min-w-[9vw]' : 'h-[82%] min-w-[8.5vw]'} rounded-2xl border border-white/10 shadow-sm select-none whitespace-nowrap transition-colors duration-500`}
+          style={{ backgroundColor: config.prayer_highlight_text || "#facc15" }}
+        >
+          <span 
+            className={`font-montserrat font-bold ${isMobile ? 'text-[0.9vw]' : 'text-[0.8vw]'} uppercase tracking-[0.2em] opacity-90 mb-0 transition-colors duration-500`}
+            style={{ color: config.prayer_box_bg || config.text_color_main || "#133c47" }}
+          >
             PRAYER
           </span>
-          <span className={`text-[#133c47] font-montserrat font-black ${isMobile ? 'text-[2.6vw]' : 'text-[2.4vw]'} uppercase tracking-tighter leading-[0.9]`}>
+          <span 
+            className={`font-montserrat font-black ${isMobile ? 'text-[2.6vw]' : 'text-[2.4vw]'} uppercase tracking-tighter leading-[0.9] transition-colors duration-500`}
+            style={{ color: config.prayer_box_bg || config.text_color_main || "#133c47" }}
+          >
             TIME
           </span>
         </div>
@@ -123,7 +135,10 @@ const DisplayPrayerTimes = ({ isMobile }: { isMobile?: boolean }) => {
           <span className={`text-white font-montserrat font-black ${isMobile ? 'text-[1.2vw]' : 'text-[1.15vw]'} uppercase tracking-[0.15em] opacity-90 mb-1 whitespace-nowrap`}>
             MENUJU WAKTU {nextPrayer.name}:
           </span>
-          <span className={`${isMobile ? 'text-[2.8vw]' : 'text-[2.6vw]'} font-black text-yellow-300 tracking-[0.05em] font-montserrat tabular-nums leading-[0.9]`}>
+          <span 
+            className={`${isMobile ? 'text-[2.8vw]' : 'text-[2.6vw]'} font-black tracking-[0.05em] font-montserrat tabular-nums leading-[0.9] transition-colors duration-500`}
+            style={{ color: config.prayer_highlight_text || "#facc15" }}
+          >
             {nextPrayer.diff}
           </span>
         </div>
@@ -134,10 +149,17 @@ const DisplayPrayerTimes = ({ isMobile }: { isMobile?: boolean }) => {
         {prayerItems.map((item) => (
           <div 
             key={item.label} 
-            className={`flex flex-col items-center justify-center bg-[#133c47] px-[1.1vw] py-[0.8vh] ${isMobile ? 'h-[88%] min-w-[9.5vw]' : 'h-[82%] min-w-[8.5vw]'} rounded-2xl border border-white/10 shadow-sm transition-all hover:bg-[#1a4a58]`}
+            className={`flex flex-col items-center justify-center px-[1.1vw] py-[0.8vh] ${isMobile ? 'h-[88%] min-w-[9.5vw]' : 'h-[82%] min-w-[8.5vw]'} rounded-2xl border border-white/10 shadow-sm transition-all duration-500`}
+            style={{ backgroundColor: config.prayer_box_bg || "#133c47" }}
           >
-            <span className={`text-yellow-400 font-montserrat font-bold ${isMobile ? 'text-[0.95vw]' : 'text-[0.8vw]'} tracking-wider uppercase mb-1`}>{item.label}</span>
-            <span className={`text-white font-montserrat font-black ${isMobile ? 'text-[2.2vw]' : 'text-[1.8vw]'} leading-none text-center w-full`}>{item.time}</span>
+            <span 
+              className={`font-montserrat font-bold ${isMobile ? 'text-[0.95vw]' : 'text-[0.8vw]'} tracking-wider uppercase mb-1 transition-colors duration-500`}
+              style={{ color: config.prayer_highlight_text || "#facc15" }}
+            >{item.label}</span>
+            <span 
+              className={`font-montserrat font-black ${isMobile ? 'text-[2.2vw]' : 'text-[1.8vw]'} leading-none text-center w-full transition-colors duration-500`}
+              style={{ color: config.prayer_box_text || "#ffffff" }}
+            >{item.time}</span>
           </div>
         ))}
       </div>
