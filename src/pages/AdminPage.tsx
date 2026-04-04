@@ -201,7 +201,11 @@ const AdminPage = () => {
       <header className="bg-[#1a3a3a] islamic-pattern px-6 py-4 flex items-center justify-between shadow-lg sticky top-0 z-[100]">
         <div className="flex items-center gap-4">
           <div className="bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/20">
-            <img src="https://static.vecteezy.com/system/resources/previews/025/115/254/non_2x/mosque-on-white-background-free-png.png" className="h-8 w-auto invert" />
+            <img 
+              src="https://static.vecteezy.com/system/resources/previews/025/115/254/non_2x/mosque-on-white-background-free-png.png" 
+              className="h-8 w-auto invert" 
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
           </div>
           <div>
             <h1 className="text-white font-black text-lg tracking-tight font-poppins">

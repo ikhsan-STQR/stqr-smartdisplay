@@ -190,13 +190,15 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
+    let mounted = true;
     loadData();
-    const prayerInterval = setInterval(fetchPrayerTimes, 3600000);
+    const prayerInterval = setInterval(fetchPrayerTimes, 3600000); // Update once an hour
     
+    // Real-time Subscriptions
     const configChannel = supabase
       .channel('display-config-sync')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'display_config', filter: 'config_key=eq.default' }, (payload) => {
-        if (payload.new && (payload.new as any).config_data) {
+        if (mounted && payload.new && (payload.new as any).config_data) {
           setConfig(prev => ({ ...prev, ...((payload.new as any).config_data as any) }));
         }
       }).subscribe();
@@ -204,18 +206,22 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
     const settingsChannel = supabase
       .channel('display-settings-sync')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'display_settings' }, (payload) => {
-        if (payload.new) setSettings(payload.new as DisplaySettings);
+        if (mounted && payload.new) setSettings(payload.new as DisplaySettings);
       }).subscribe();
 
     const timetableChannel = supabase
       .channel('timetable-sync')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'timetables' }, () => {
-        (supabase as any).from("timetables").select("*").then(({ data }: any) => {
-          if (data) setTimetable(data as TimetableEntry[]);
-        });
+        // Refresh full timetable on any major change
+        if (mounted) {
+          (supabase as any).from("timetables").select("*").then(({ data }: any) => {
+            if (mounted && data) setTimetable(data as unknown as TimetableEntry[]);
+          });
+        }
       }).subscribe();
 
     return () => {
+      mounted = false;
       supabase.removeChannel(configChannel);
       supabase.removeChannel(settingsChannel);
       supabase.removeChannel(timetableChannel);
