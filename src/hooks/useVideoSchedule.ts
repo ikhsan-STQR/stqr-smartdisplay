@@ -1,11 +1,19 @@
 import { useState, useEffect } from "react";
-import { useDisplay, ContentSchedule } from "@/context/DisplayContext";
+import { useDisplay } from "@/context/DisplayContext";
 
 export interface ProgramContent {
   contentType: "video" | "slider";
   content: string | string[];
   scheduleName: string | null;
 }
+
+// Built-in fixed TV Program Schedule
+const BUILT_IN_PROGRAMS = [
+  { name: "MUROTTAL AL-QUR'AN (Fajr)", start: "04:00", end: "06:00", id: "3S68n_V2F3o", days: [0,1,2,3,4,5,6] },
+  { name: "LIVE KBM / PROFILE STQR", start: "07:00", end: "15:00", id: "default", days: [1,2,3,4,5] }, // Mon-Fri
+  { name: "KAJIAN AKHIR PEKAN", start: "08:00", end: "10:00", id: "live_id_example", days: [0,6] }, // Sat-Sun
+  { name: "ADZKAR SORE & TILAWAH", start: "18:00", end: "20:00", id: "another_id", days: [0,1,2,3,4,5,6] },
+];
 
 export const useVideoSchedule = () => {
   const { config } = useDisplay();
@@ -23,8 +31,8 @@ export const useVideoSchedule = () => {
       const currentTime = `${hh}:${mm}`;
       const currentDay = now.getDay();
 
-      // Find an active schedule of type "main"
-      const active = config.schedules.find(s => 
+      // 1. PRIORITY: Check Admin Panel Schedules
+      const adminActive = config.schedules.find(s => 
         s.isActive && 
         s.type === "main" && 
         s.days.includes(currentDay) &&
@@ -32,24 +40,42 @@ export const useVideoSchedule = () => {
         currentTime < s.endTime
       );
 
-      if (active) {
+      if (adminActive) {
         setActiveProgram({
-          contentType: active.contentType || "video",
-          content: active.content,
-          scheduleName: active.name,
+          contentType: adminActive.contentType || "video",
+          content: adminActive.content,
+          scheduleName: adminActive.name,
         });
-      } else {
-        // Fallback to Default
-        setActiveProgram({
-          contentType: config.contentType,
-          content: config.contentType === "video" ? config.videoUrl : config.sliderImages,
-          scheduleName: "DEFAULT (24H)",
-        });
+        return;
       }
+
+      // 2. SECONDARY: Check Built-in "Live TV" Programs
+      const builtInActive = BUILT_IN_PROGRAMS.find(p => 
+        p.days.includes(currentDay) &&
+        currentTime >= p.start &&
+        currentTime < p.end
+      );
+
+      if (builtInActive) {
+        const contentId = builtInActive.id === "default" ? config.videoUrl : builtInActive.id;
+        setActiveProgram({
+          contentType: "video",
+          content: contentId,
+          scheduleName: builtInActive.name,
+        });
+        return;
+      }
+
+      // 3. FALLBACK: Global Default
+      setActiveProgram({
+        contentType: config.contentType,
+        content: config.contentType === "video" ? config.videoUrl : config.sliderImages,
+        scheduleName: "DEFAULT (MURROTAL 24H)",
+      });
     };
 
     updateProgram();
-    const interval = setInterval(updateProgram, 5000); // Check every 5 seconds
+    const interval = setInterval(updateProgram, 30000); // Check every 30 seconds
     return () => clearInterval(interval);
   }, [config.schedules, config.contentType, config.videoUrl, config.sliderImages]);
 
