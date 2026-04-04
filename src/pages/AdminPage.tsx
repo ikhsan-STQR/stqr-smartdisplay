@@ -31,7 +31,8 @@ const AdminPage = () => {
       await saveToCloud();
       toast.success("Konfigurasi Konten berhasil disimpan!");
     } catch (e: any) {
-      toast.error("Gagal menyimpan: " + e.message);
+      console.error("CRITICAL CONFIG SAVE ERROR:", e);
+      toast.error(`Gagal menyimpan: ${e?.message || "Unknown Error"}`);
     }
   };
 
@@ -40,7 +41,8 @@ const AdminPage = () => {
       await saveSettings();
       toast.success("Pengaturan Mode & Catatan berhasil disimpan!");
     } catch (e: any) {
-      toast.error("Gagal menyimpan: " + e.message);
+      console.error("CRITICAL SETTINGS SAVE ERROR:", e);
+      toast.error(`Gagal menyimpan: ${e?.message || "Unknown Error"}`);
     }
   };
 
