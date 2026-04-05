@@ -11,7 +11,7 @@ const AdminPage = () => {
     config, updateConfig, saveToCloud, isSaving: configSaving,
     settings, updateSettings, saveSettings, isSaving: settingsSaving 
   } = useDisplay();
-  const { user, isAdmin, isLoading: authLoading, signIn, signOut } = useAuth();
+  const { user, isAdmin, isLoading: authLoading, userRole, signIn, signOut } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -97,7 +97,7 @@ const AdminPage = () => {
     );
   }
 
-  if (!isAdmin) {
+  if (!isAdmin && userRole !== null) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 font-jakarta">
         <div className="bg-destructive/5 p-8 rounded-2xl border border-destructive/20 max-w-md w-full text-center space-y-4 shadow-2xl">

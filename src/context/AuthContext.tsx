@@ -54,26 +54,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const handleSession = async (session: Session | null) => {
       if (!mounted) return;
       
+      let nextRole: string | null = null;
+      let nextIsAdmin = false;
+
       try {
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          const role = await fetchUserRole(session.user.id);
-          if (mounted) {
-            setUserRole(role);
-            setIsAdmin(role === "admin");
-          }
-        } else {
-          if (mounted) {
-            setUserRole(null);
-            setIsAdmin(false);
-          }
+          nextRole = await fetchUserRole(session.user.id);
+          // If role fetch fails but user exists, default to 'user' role
+          if (!nextRole) nextRole = "user";
+          nextIsAdmin = nextRole === "admin";
         }
       } catch (err) {
         console.error("Auth state handling failed:", err);
+        nextRole = "user"; // Safe default
       } finally {
-        if (mounted) setIsLoading(false);
+        if (mounted) {
+          setUserRole(nextRole);
+          setIsAdmin(nextIsAdmin);
+          setIsLoading(false);
+          clearTimeout(globalTimeout);
+        }
       }
     };
 
