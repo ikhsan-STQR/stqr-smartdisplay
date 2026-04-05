@@ -115,7 +115,7 @@ const DisplayPrayerTimes = ({ isMobile }: { isMobile?: boolean }) => {
           style={{ backgroundColor: config.prayer_highlight_text || "#facc15" }}
         >
           <span 
-            className={`font-montserrat font-bold ${isMobile ? 'text-[0.9vw]' : 'text-[0.8vw]'} uppercase tracking-[0.2em] opacity-90 mb-0 transition-colors duration-500`}
+            className={`font-montserrat font-bold ${isMobile ? 'text-[1.35vw]' : 'text-[1.2vw]'} uppercase tracking-[0.2em] opacity-90 mb-0 transition-colors duration-500`}
             style={{ color: config.prayer_box_bg || config.text_color_main || "#133c47" }}
           >
             PRAYER
@@ -153,7 +153,7 @@ const DisplayPrayerTimes = ({ isMobile }: { isMobile?: boolean }) => {
             style={{ backgroundColor: config.prayer_box_bg || "#133c47" }}
           >
             <span 
-              className={`font-montserrat font-bold ${isMobile ? 'text-[0.95vw]' : 'text-[0.8vw]'} tracking-wider uppercase mb-1 transition-colors duration-500`}
+              className={`font-montserrat font-bold ${isMobile ? 'text-[1.4vw]' : 'text-[1.2vw]'} tracking-wider uppercase mb-1 transition-colors duration-500`}
               style={{ color: config.prayer_highlight_text || "#facc15" }}
             >{item.label}</span>
             <span 
