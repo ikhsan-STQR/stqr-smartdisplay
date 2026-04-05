@@ -67,7 +67,7 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
           style={{ color: config.left_title_text || "#EAB308" }}
         >
           {(() => {
-            if (!status.activePeriod) return "TIDAK ADA KEGIATAN";
+            if (!status.activePeriod) return "KBM HARI SELESAI";
             
             // Priority: Description (Column H) -> Period (Column F) -> Subject
             let p = status.activePeriod.description && status.activePeriod.description !== "-" 
