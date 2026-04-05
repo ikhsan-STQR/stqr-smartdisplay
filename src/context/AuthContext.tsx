@@ -7,6 +7,7 @@ interface AuthContextType {
   user: User | null;
   isAdmin: boolean;
   isLoading: boolean;
+  userRole: string | null;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<{ error: any }>;
 }
@@ -18,25 +19,79 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  const fetchUserRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching user role:", error);
+        return null;
+      }
+      return data?.role || null;
+    } catch (err) {
+      console.error("Fatal error fetching role:", err);
+      return null;
+    }
+  };
 
   useEffect(() => {
-    // Get initial session
+    let mounted = true;
+    
+    // Global Safety Timeout
+    const globalTimeout = setTimeout(() => {
+      if (mounted) {
+        console.warn("AuthContext: Global initialization timeout reached.");
+        setIsLoading(false);
+      }
+    }, 5000);
+
+    const handleSession = async (session: Session | null) => {
+      if (!mounted) return;
+      
+      try {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          const role = await fetchUserRole(session.user.id);
+          if (mounted) {
+            setUserRole(role);
+            setIsAdmin(role === "admin");
+          }
+        } else {
+          if (mounted) {
+            setUserRole(null);
+            setIsAdmin(false);
+          }
+        }
+      } catch (err) {
+        console.error("Auth state handling failed:", err);
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    };
+
+    // Initial check
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsAdmin(!!session?.user);
-      setIsLoading(false);
+      handleSession(session);
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsAdmin(!!session?.user);
-      setIsLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      handleSession(session);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+      clearTimeout(globalTimeout);
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -44,11 +99,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
+    setUserRole(null);
+    setIsAdmin(false);
     return await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, isAdmin, isLoading, signIn, signOut }}>
+    <AuthContext.Provider value={{ session, user, isAdmin, isLoading, userRole, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

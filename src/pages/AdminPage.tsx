@@ -59,7 +59,7 @@ const AdminPage = () => {
       <div className="min-h-screen bg-background flex items-center justify-center p-6 font-jakarta">
         <div className="bg-card p-8 rounded-xl shadow-xl border border-border max-w-sm w-full">
           <h2 className="text-2xl font-bold text-primary mb-2 text-center font-poppins">Admin Login</h2>
-          <p className="text-muted-foreground text-sm mb-6 text-center italic">STQ Riyadhussholihiin Display Management</p>
+          <p className="text-muted-foreground text-sm mb-6 text-center italic">Smart Display Management</p>
           
           <div className="space-y-4">
             <div className="space-y-1">
@@ -92,6 +92,27 @@ const AdminPage = () => {
               Masuk ke Dashboard
             </button>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 font-jakarta">
+        <div className="bg-destructive/5 p-8 rounded-2xl border border-destructive/20 max-w-md w-full text-center space-y-4 shadow-2xl">
+          <div className="text-5xl mb-4">🚫</div>
+          <h2 className="text-2xl font-black text-destructive font-poppins uppercase tracking-tight">Akses Ditolak</h2>
+          <p className="text-muted-foreground text-sm font-medium">
+            Akun <span className="text-foreground font-bold">{user.email}</span> tidak memiliki izin administrator.
+            Silahkan hubungi Superadmin untuk mendapatkan akses.
+          </p>
+          <button
+            onClick={() => signOut()}
+            className="w-full bg-destructive text-destructive-foreground py-3 rounded-xl font-bold text-sm hover:bg-destructive/90 transition shadow-lg"
+          >
+            Keluar & Gunakan Akun Lain
+          </button>
         </div>
       </div>
     );
@@ -249,7 +270,7 @@ const AdminPage = () => {
           </div>
           <div>
             <h1 className="text-white font-black text-lg tracking-tight font-poppins uppercase">
-              {config.organization_name || "STQ RIYADHUSSHOLIHIIN"} <span className="text-yellow-400 font-medium ml-2">Display Admin</span>
+              SMART <span className="text-yellow-400 font-medium ml-1">DISPLAY ADMIN</span>
             </h1>
             <p className="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em]">Management System Control Panel</p>
           </div>

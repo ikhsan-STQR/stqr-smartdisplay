@@ -188,11 +188,11 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
   const [prayerTimes, setPrayerTimes] = useState<any>(null);
 
   const loadData = async () => {
-    // Safety Timeout: Force stop loading after 10s
+    // Safety Timeout: Force stop loading after 5s
     const timeoutId = setTimeout(() => {
       console.warn("DisplayContext: Data loading timed out. Enabling dashboard with current state.");
       setIsLoading(false);
-    }, 10000);
+    }, 5000);
 
     try {
       // 1. Fetch Config - Use "*" to be more resilient to schema changes/cache
