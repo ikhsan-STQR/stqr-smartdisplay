@@ -102,22 +102,41 @@ const AdminPage = () => {
     if (!file) return;
 
     const cleanTime = (val: any) => {
-      if (!val) return "00:00:00";
+      if (val === undefined || val === null || val === "") return "00:00:00";
       
-      // If it's a JS Date (from XLSX)
+      // 1. Handle JS Date Objects (from XLSX cellDates: true)
       if (val instanceof Date) {
-        return val.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/\./g, ':') + ":00";
+        const hh = val.getHours().toString().padStart(2, '0');
+        const mm = val.getMinutes().toString().padStart(2, '0');
+        return `${hh}:${mm}:00`;
       }
 
+      // 2. Handle Numbers (Excel Serial Time or Decimal HH.mm)
+      if (typeof val === 'number') {
+        if (val < 1) {
+          // XLSX Serial Time (fraction of a day)
+          const totalSeconds = Math.round(val * 24 * 3600);
+          const hh = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+          const mm = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+          return `${hh}:${mm}:00`;
+        } else {
+          // Decimal format (e.g., 7.45 or 7.3)
+          let str = val.toFixed(2).replace('.', ':');
+          const [h, m] = str.split(':');
+          return `${h.padStart(2, '0')}:${m.padEnd(2, '0').substring(0, 2)}:00`;
+        }
+      }
+
+      // 3. Handle Strings
       let str = String(val).trim().replace(/\./g, ':');
-      // Handle HH:mm format to HH:mm:ss
       const parts = str.split(':');
-      if (parts.length === 2) {
+      if (parts.length >= 2) {
         const h = parts[0].padStart(2, '0');
         const m = parts[1].padStart(2, '0');
         return `${h}:${m}:00`;
       }
-      return str;
+
+      return "00:00:00";
     };
 
     const reader = new FileReader();
@@ -127,16 +146,37 @@ const AdminPage = () => {
         const wb = XLSX.read(bstr, { type: "binary", cellDates: true });
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
-        const data = XLSX.utils.sheet_to_json(ws);
 
-        const mapped = data.map((row: any) => ({
-          day: row.Hari || row.hari || "Senin",
-          rombel: row.Rombel || row.rombel || "-",
-          start_time: cleanTime(row["Jam Mulai"] || row.Mulai || row.mulai),
-          end_time: cleanTime(row["Jam Selesai"] || row.Selesai || row.selesai),
-          period: row.JP || row.jp || "-",
-          subject_name: row["Nama Mapel"] || row.Pelajaran || row.pelajaran || "-",
-          description: row.Keterangan || row.keterangan || "-",
+        // Fuzzy Matcher for Column Names
+        const findVal = (row: any, keys: string[]) => {
+          const rowKeys = Object.keys(row);
+          for (const k of keys) {
+            const normalizedK = k.toLowerCase().replace(/\s+/g, '');
+            const match = rowKeys.find(rk => rk.toLowerCase().replace(/\s+/g, '') === normalizedK);
+            if (match) return row[match];
+          }
+          return undefined;
+        };
+
+        const cleanString = (val: any) => {
+          return (val === undefined || val === null || val === "") ? "-" : String(val).trim();
+        };
+
+        const rawData: any[] = XLSX.utils.sheet_to_json(ws, { raw: false, defval: "" });
+
+        if (rawData.length === 0) {
+          toast.error("File Excel kosong atau tidak terbaca.");
+          return;
+        }
+
+        const mapped = rawData.map((row: any) => ({
+          day: cleanString(findVal(row, ["Hari", "Day"]) || "Senin"),
+          rombel: cleanString(findVal(row, ["Rombel", "Kelas", "Class"]) || "-"),
+          start_time: cleanTime(findVal(row, ["Jam Mulai", "Mulai", "Start Time", "Start"])),
+          end_time: cleanTime(findVal(row, ["Jam Selesai", "Selesai", "End Time", "End"])),
+          period: cleanString(findVal(row, ["JP Ke", "JP", "Period"]) || "-"),
+          subject_name: cleanString(findVal(row, ["Nama Mapel", "Pelajaran", "Subject", "Mapel"]) || "-"),
+          description: cleanString(findVal(row, ["Keterangan", "Description"]) || "-"),
           mode: importMode,
         }));
 

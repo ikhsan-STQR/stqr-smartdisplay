@@ -341,71 +341,69 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const updateTimeStatus = () => {
       const now = new Date();
-      const jakartaDateStr = now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" });
-      const jakartaDate = new Date(jakartaDateStr);
-      const dayNum = now.getDay();
-      
-      const enDay = new Intl.DateTimeFormat("en-US", { weekday: 'long', timeZone: "Asia/Jakarta" }).format(now);
-      const dayMap: { [key: string]: string } = {
-        'Sunday': 'Ahad', 'Monday': 'Senin', 'Tuesday': 'Selasa', 'Wednesday': 'Rabu',
-        'Thursday': 'Kamis', 'Friday': 'Jumat', 'Saturday': 'Sabtu'
-      };
-      const currentDayID = dayMap[enDay] || 'Senin';
-
-      const hh = jakartaDate.getHours().toString().padStart(2, '0');
-      const mm = jakartaDate.getMinutes().toString().padStart(2, '0');
+      const hh = now.getHours().toString().padStart(2, '0');
+      const mm = now.getMinutes().toString().padStart(2, '0');
       const currentTimeHM = `${hh}:${mm}`;
       
+      const daysOrder = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
       const modeTimetable = timetable.filter(entry => entry.mode === settings.active_mode);
-      const todaySorted = modeTimetable
-        .filter(entry => entry.day === currentDayID)
-        .sort((a, b) => a.start_time.localeCompare(b.start_time));
+      
+      // Collect all potential "Target Events" for today and tomorrow
+      let timeline: { date: Date, label: string, periodRecord?: TimetableEntry }[] = [];
 
-      const active = todaySorted.find(entry => {
-        const start = entry.start_time.substring(0, 5);
-        const end = entry.end_time.substring(0, 5);
-        return currentTimeHM >= start && currentTimeHM < end;
-      }) || null;
+      for (let i = 0; i < 2; i++) {
+        const d = new Date();
+        d.setDate(now.getDate() + i);
+        const dayName = daysOrder[d.getDay()];
+        
+        const dayClasses = modeTimetable
+          .filter(e => (e.day || "").toString().trim().toUpperCase() === dayName.toUpperCase())
+          .sort((a, b) => a.start_time.localeCompare(b.start_time));
 
-      let next: TimetableEntry | null = null;
-      let nextDate = new Date(jakartaDateStr);
-      let label = "-";
-
-      if (dayNum === 5 || dayNum === 6) {
-        label = "JAM MASUK SEKOLAH";
-        const daysToSun = (7 - dayNum) % 7;
-        nextDate.setDate(jakartaDate.getDate() + daysToSun);
-        nextDate.setHours(7, 30, 0, 0);
-      } else {
-        const futureToday = todaySorted.filter(e => e.start_time.substring(0, 5) > currentTimeHM);
-        if (futureToday.length > 0) {
-          next = futureToday[0];
-          const [h, m] = next.start_time.split(':').map(Number);
-          nextDate.setHours(h, m, 0, 0);
-          const isFirst = next.id === todaySorted[0].id;
-          const isLast = next.id === todaySorted[todaySorted.length-1].id;
-          const sub = (next.subject_name || "").toUpperCase();
-          const per = (next.period || "").toUpperCase();
-          if (isFirst) label = "JAM MASUK SEKOLAH";
-          else if (sub.includes("ISTIRAHAT")) label = "JAM ISTIRAHAT";
-          else if (isLast) label = "JAM PULANG SEKOLAH";
-          else if (per.includes("JP")) label = per;
-          else label = sub || "KEGIATAN BERIKUTNYA";
-        } else {
-          label = "SHALAT DZUHUR";
-          if (prayerTimes?.Dhuhr) {
-            const [h, m] = prayerTimes.Dhuhr.split(':').map(Number);
-            nextDate.setHours(h, m, 0, 0);
-            if (nextDate < jakartaDate) nextDate.setDate(jakartaDate.getDate() + 1);
+        // Add Classes
+        dayClasses.forEach((cls, idx) => {
+          const evtDate = new Date(d);
+          const [h, m] = cls.start_time.split(':').map(Number);
+          evtDate.setHours(h, m, 0, 0);
+          
+          // Priority: Period (e.g. 1-2) -> Description (Column H) -> Subject
+          let l = cls.period && cls.period !== "-" ? cls.period : (cls.description && cls.description !== "-" ? cls.description : (cls.subject_name || "KEGIATAN"));
+          
+          if (idx === 0) {
+            l = "JAM MASUK SEKOLAH";
           } else {
-            nextDate.setHours(12, 0, 0, 0);
-            if (nextDate < jakartaDate) nextDate.setDate(jakartaDate.getDate() + 1);
+            // Add "JP" prefix if it's a numeric period like "1-2"
+            if (/^\d/.test(l) && !l.toUpperCase().includes("JP")) {
+              l = `JP ${l}`;
+            }
           }
-        }
+
+          // Removed "MENUJU" prefix - will be added by the UI components
+          timeline.push({ date: evtDate, label: l.toUpperCase(), periodRecord: cls });
+        });
+
+        // REMOVED: Dhuhr from this timeline to avoid redundancy with Footer Prayer Countdown
       }
 
+      // Sort timeline and find first in future
+      timeline.sort((a, b) => a.date.getTime() - b.date.getTime());
+      const nextEvent = timeline.find(e => e.date.getTime() > now.getTime());
+
+      let targetDate = nextEvent?.date || new Date();
+      let targetLabel = nextEvent?.label || "MENUNGGU JADWAL";
+      let nextPeriod: TimetableEntry | null = nextEvent?.periodRecord || null;
+
+      // Final fallback - only if no classes at all (unlikely)
+      if (!nextEvent) {
+        targetDate = new Date();
+        targetDate.setHours(12, 0, 0, 0);
+        if (targetDate < now) targetDate.setDate(targetDate.getDate() + 1);
+        targetLabel = "MENCARI JADWAL";
+      }
+
+      // Calculate countdown string
       let countdownStr = "00:00:00";
-      const diffMs = nextDate.getTime() - jakartaDate.getTime();
+      const diffMs = targetDate.getTime() - now.getTime();
       if (diffMs > 0) {
         const totalSeconds = Math.floor(diffMs / 1000);
         const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
@@ -415,10 +413,19 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
       }
 
       setStatus({
-        activePeriod: active ? { ...active } : null,
-        nextPeriod: next ? { ...next } : null,
+        activePeriod: modeTimetable.find(entry => {
+          const start = (entry.start_time || "00:00:00").substring(0, 5);
+          const end = (entry.end_time || "00:00:00").substring(0, 5);
+          const currentDayName = daysOrder[now.getDay()];
+          const entryDay = (entry.day || "").toString().trim().toUpperCase();
+          
+          return entryDay === currentDayName.toUpperCase() && 
+                 currentTimeHM >= start && 
+                 currentTimeHM < end;
+        }) || null,
+        nextPeriod: nextPeriod,
         countdown: countdownStr,
-        targetLabel: label,
+        targetLabel: targetLabel,
       });
     };
 

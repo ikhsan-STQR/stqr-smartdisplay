@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useDisplay, ScheduleItem } from "@/context/DisplayContext";
 
 const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
-  const { config, status, settings } = useDisplay();
+  const { config, status, settings, timetable } = useDisplay();
   const [activeItems, setActiveItems] = useState<ScheduleItem[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const ITEMS_PER_PAGE = isMobile ? 6 : 7;
@@ -10,11 +10,26 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
   useEffect(() => {
     const updateActiveSchedule = () => {
       const now = new Date();
-      const currentTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
+      const hh = now.getHours().toString().padStart(2, '0');
+      const mm = now.getMinutes().toString().padStart(2, '0');
+      const currentTime = `${hh}:${mm}`;
+      const daysOrder = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const currentDayName = daysOrder[now.getDay()];
 
-      const filtered = config.jadwalPelajaran.filter(item =>
-        currentTime >= item.startTime && currentTime < item.endTime
-      );
+      // Filter from the new timetable system
+      const filtered = timetable
+        .filter(entry => 
+          entry.mode === settings.active_mode && 
+          (entry.day || "").toString().trim().toUpperCase() === currentDayName.toUpperCase() &&
+          currentTime >= entry.start_time.substring(0, 5) && 
+          currentTime < entry.end_time.substring(0, 5)
+        )
+        .map(entry => ({
+          kelas: entry.rombel || "-",
+          pelajaran: entry.subject_name || "-",
+          startTime: entry.start_time,
+          endTime: entry.end_time
+        }));
 
       setActiveItems(filtered);
     };
@@ -22,7 +37,7 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
     updateActiveSchedule();
     const interval = setInterval(updateActiveSchedule, 60000); // Check every minute
     return () => clearInterval(interval);
-  }, [config.jadwalPelajaran]);
+  }, [timetable, settings.active_mode]);
 
   useEffect(() => {
     if (activeItems.length > ITEMS_PER_PAGE) {
@@ -51,9 +66,27 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
           className={`font-montserrat font-black ${isMobile ? 'text-[1.2vw]' : 'text-[1.5vw]'} uppercase tracking-tight text-center leading-none whitespace-nowrap transition-colors duration-500`}
           style={{ color: config.left_title_text || "#EAB308" }}
         >
-          {status.activePeriod 
-            ? (status.activePeriod.subject_name !== "-" ? status.activePeriod.subject_name : (status.activePeriod.description || status.activePeriod.period)) 
-            : "TIDAK ADA KEGIATAN"}
+          {(() => {
+            if (!status.activePeriod) return "TIDAK ADA KEGIATAN";
+            
+            // Priority: Description (Column H) -> Period (Column F) -> Subject
+            let p = status.activePeriod.description && status.activePeriod.description !== "-" 
+              ? status.activePeriod.description 
+              : (status.activePeriod.period && status.activePeriod.period !== "-" ? status.activePeriod.period : "");
+            
+            if (p) {
+              // Strip extra details like "(60 Menit)" from the title
+              p = p.split('(')[0].trim();
+              
+              // If it's just numbers like "1-2", prefix with "JP"
+              const displayPeriod = /^\d/.test(p) && !p.toUpperCase().includes("JP") ? `JP ${p}` : p;
+              return displayPeriod.toUpperCase();
+            }
+            
+            return status.activePeriod.subject_name !== "-" 
+              ? status.activePeriod.subject_name.toUpperCase()
+              : "JADWAL PELAJARAN";
+          })()}
         </h2>
       </div>
 
@@ -63,6 +96,7 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
           const active = status.activePeriod;
           if (!active) {
             const today = new Date().getDay(); // 0: Ahad, 4: Kamis, 5: Jumat, 6: Sabtu
+            // Sunday is now a school day, so we adjust the weekend check
             const isWeekendOrThursday = today === 4 || today === 5 || today === 6;
             
             return (
