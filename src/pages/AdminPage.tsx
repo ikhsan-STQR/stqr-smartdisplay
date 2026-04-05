@@ -385,7 +385,8 @@ const AdminPage = () => {
 
         {/* Right Column: Identity & Content */}
         <div className="xl:col-span-8 space-y-8">
-          <Section icon="🏢" title="IDENTITY SETTINGS" description="Custom branding, logo, and theme colors.">
+          {user?.email === 'superadmin@smartdisplay.com' && (
+            <Section icon="🏢" title="IDENTITY SETTINGS" description="Custom branding, logo, and theme colors.">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-zinc-100/50 p-6 rounded-[2rem] border border-zinc-200">
               <div className="space-y-4">
                 <InputField label="Organization Name" value={config.organization_name} onChange={v => updateConfig({ organization_name: v })} />
@@ -538,6 +539,7 @@ const AdminPage = () => {
                 </button>
             </div>
           </Section>
+          )}
 
           <Section icon="🎬" title="Penjadwalan Konten Utama" description="Overlay konten otomatis (Video/Poster/Running Text) pada jam tertentu.">
             <div className="space-y-4">
