@@ -145,10 +145,12 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
             instructions = settings.note_apel_pagi;
           } else if (desc.includes("HAFALAN")) {
             instructions = settings.note_hafalan;
-          } else if (desc.includes("ISTIRAHAT") || name === "-") {
-            instructions = settings.note_istirahat;
           } else if (desc.includes("PULANG")) {
             instructions = settings.note_pulang;
+          } else if (desc.includes("ISTIRAHAT")) {
+            instructions = settings.note_istirahat;
+          } else if (name === "-") {
+            instructions = settings.note_istirahat;
           }
 
           if (instructions) {
