@@ -46,10 +46,28 @@ const MainContent = () => {
     return url;
   };
 
+  const isContentEmpty = !activeProgram.content || (Array.isArray(activeProgram.content) && activeProgram.content.length === 0);
+
   return (
     <div className="w-full h-full bg-black rounded-[calc(var(--radius)-0.3vw)] overflow-hidden relative shadow-inner" onClick={handleInteraction}>
-      {/* Background Content: Video or Slider */}
-      {activeProgram.contentType === "video" ? (
+      {isContentEmpty ? (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-zinc-900 to-black p-[4vw] text-center">
+          {config.organization_logo ? (
+            <img src={config.organization_logo} alt="Logo" className="w-[12vw] h-[12vw] object-contain mb-[2vw] drop-shadow-2xl" />
+          ) : (
+            <div className="w-[12vw] h-[12vw] bg-white/5 rounded-full flex items-center justify-center mb-[2vw] border border-white/10">
+               <span className="text-[5vw]">🏫</span>
+            </div>
+          )}
+          <h1 className="text-white font-montserrat font-black text-[3.5vw] uppercase tracking-tighter leading-tight max-w-[80%]">
+            {config.organization_name || "STQ Riyadhussholihiin"}
+          </h1>
+          <div className="w-[10vw] h-[0.5vh] bg-primary my-[1.5vw] rounded-full" />
+          <p className="text-white/40 font-jakarta font-bold text-[1.2vw] uppercase tracking-[0.3em]">
+            Digital Information System
+          </p>
+        </div>
+      ) : activeProgram.contentType === "video" ? (
         <div className="absolute inset-0">
           <iframe
             src={getEnhancedVideoUrl(activeProgram.content as string)}

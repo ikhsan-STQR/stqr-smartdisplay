@@ -27,7 +27,9 @@ const DisplayFooter = () => {
     return () => clearInterval(interval);
   }, [config.schedules]);
 
-  const textToDisplay = activeSchedule ? (activeSchedule.content as string) : config.runningText;
+  const textToDisplay = activeSchedule 
+    ? (activeSchedule.content as string) 
+    : (Array.isArray(config.runningText) ? config.runningText.join(" | ") : config.runningText);
 
   return (
     <footer 

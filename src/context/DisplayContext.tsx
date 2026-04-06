@@ -55,8 +55,7 @@ export interface DisplayConfig {
   sliderImages: string[];
   announcementPosters: string[];
   jadwalPelajaran: ScheduleItem[]; // Legacy
-  dalilHariIni: string;
-  runningText: string;
+  runningText: string[];
   runningTextSpeed: number;
   announcementInterval: number;
   prayerLocation: string;
@@ -132,8 +131,11 @@ const defaultConfig: DisplayConfig = {
     "https://images.unsplash.com/photo-1564769625905-50e93615e769?w=400&q=80",
   ],
   jadwalPelajaran: [],
-  dalilHariIni: '"Maukah aku tunjukkan sesuatu yang jika dilakukan akan membuat kalian saling mencintai? Sebarkan salam di antara kalian" (HR. Muslim)',
-  runningText: '"Maukah aku tunjukkan sesuatu yang jika dilakukan akan membuat kalian saling mencintai? Sebarkan salam di antara kalian" (HR. Muslim) | Pendaftaran Santri Baru TA 2026/2027 dibuka! | Kegiatan Pesantren Kilat Ramadhan 1447H',
+  runningText: [
+    '"Maukah aku tunjukkan sesuatu yang jika dilakukan akan membuat kalian saling mencintai? Sebarkan salam di antara kalian" (HR. Muslim)',
+    "Pendaftaran Santri Baru TA 2026/2027 dibuka!",
+    "Kegiatan Pesantren Kilat Ramadhan 1447H"
+  ],
   runningTextSpeed: 30,
   announcementInterval: 5,
   prayerLocation: "Pandeglang, Banten",
@@ -214,7 +216,14 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
         const newUpdates: Partial<DisplayConfig> = {};
         
         if (configData.config_data) {
-          Object.assign(newUpdates, configData.config_data);
+          const rawData = configData.config_data;
+          
+          // Migration: Convert runningText from string to array if necessary
+          if (rawData.runningText && typeof rawData.runningText === "string") {
+            rawData.runningText = rawData.runningText.split(" | ").map((s: string) => s.trim()).filter(Boolean);
+          }
+          
+          Object.assign(newUpdates, rawData);
         }
         
         // Identity columns (Handle if columns were recently added/removed)

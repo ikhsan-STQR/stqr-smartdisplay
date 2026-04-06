@@ -710,11 +710,14 @@ const AdminPage = () => {
               </div>
             </Section>
 
-            <Section icon="📢" title="Default Messaging" description="Teks berjalan dan dalil harian default.">
+            <Section icon="📢" title="Default Messaging" description="Konfigurasi teks berjalan and fallback visual.">
               <div className="space-y-5">
-                <InputField label="Header Organization Subtitle" value={config.headerTitle} onChange={v => updateConfig({ headerTitle: v })} />
-                <InputField label="Dalil Hari Ini" value={config.dalilHariIni} onChange={v => updateConfig({ dalilHariIni: v })} multiline />
-                <InputField label="Main Running Text" value={config.runningText} onChange={v => updateConfig({ runningText: v })} multiline />
+                <InputField label="Header Organization Subtitle" value={config.header_subtitle} onChange={v => updateConfig({ header_subtitle: v })} />
+                <TextArrayField 
+                  label="Dynamic Running Text" 
+                  values={config.runningText} 
+                  onChange={v => updateConfig({ runningText: v })} 
+                />
                 <div className="bg-zinc-100/50 p-4 rounded-xl border border-zinc-200">
                   <label className="text-[10px] font-bold text-zinc-400 uppercase block mb-3">Running Speed: {config.runningTextSpeed}s</label>
                   <input
@@ -836,6 +839,44 @@ const formatYoutubeUrl = (url: string) => {
     return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&loop=1&playlist=${videoId}&controls=0&rel=0&modestbranding=1&enablejsapi=1`;
   }
   return url;
+};
+
+const TextArrayField = ({
+  label, values, onChange,
+}: { label: string; values: string[]; onChange: (v: string[]) => void }) => {
+  return (
+    <div className="mb-3 space-y-2">
+      <label className="text-[10px] font-black text-zinc-400 block uppercase tracking-wider ml-1">{label}</label>
+      <div className="space-y-2">
+        {values.map((v, i) => (
+          <div key={i} className="flex gap-2 items-center bg-zinc-50 p-1.5 rounded-xl border border-zinc-200/60 group">
+            <textarea
+              value={v}
+              onChange={(e) => {
+                const updated = [...values];
+                updated[i] = e.target.value;
+                onChange(updated);
+              }}
+              placeholder="Masukkan teks di sini..."
+              className="flex-1 bg-transparent px-3 py-2 text-xs focus:ring-0 outline-none font-medium text-zinc-600 min-h-[60px] resize-none"
+            />
+            <button 
+              onClick={() => onChange(values.filter((_, j) => j !== i))} 
+              className="text-red-400 hover:bg-white p-2 rounded-lg transition-all border border-transparent hover:border-red-100 self-start mt-1"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={() => onChange([...values, ""])}
+          className="text-primary text-[10px] font-black hover:bg-primary/5 px-4 py-3 rounded-xl border border-primary/20 transition-all flex items-center gap-2 mt-2"
+        >
+          <span>+</span> TAMBAH TEKS BERJALAN
+        </button>
+      </div>
+    </div>
+  );
 };
 
 const ArrayField = ({
