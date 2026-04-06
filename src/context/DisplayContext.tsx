@@ -39,6 +39,7 @@ export interface DisplaySettings {
   note_apel_bersama: string;
   note_istirahat: string;
   note_pulang: string;
+  note_hafalan: string;
 }
 
 export interface TimeStatus {
@@ -114,7 +115,8 @@ const defaultSettings: DisplaySettings = {
   note_apel_pagi: 'Berbaris Di Depan Kelas Masing-Masing',
   note_apel_bersama: 'Seragam Lengkap, Berbaris Rapi',
   note_istirahat: 'Shalat Dhuha, Tetap Tertib, Jaga Kebersihan',
-  note_pulang: 'Shalat Dzuhur Berjamaah, Tetap Jaga Ketertiban'
+  note_pulang: 'Shalat Dzuhur Berjamaah, Tetap Jaga Ketertiban',
+  note_hafalan: 'Murojaah Bersama, Simak Dengan Khidmat'
 };
 
 const defaultConfig: DisplayConfig = {

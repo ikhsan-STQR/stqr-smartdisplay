@@ -370,6 +370,7 @@ const AdminPage = () => {
                   <NoteField label="Transition: Istirahat" value={settings.note_istirahat} onChange={v => updateSettings({ note_istirahat: v })} />
                   <NoteField label="Transition: Pulang" value={settings.note_pulang} onChange={v => updateSettings({ note_pulang: v })} />
                   <NoteField label="Transition: Apel Bersama" value={settings.note_apel_bersama} onChange={v => updateSettings({ note_apel_bersama: v })} />
+                  <NoteField label="Transition: Hafalan Doa & Hadits" value={settings.note_hafalan} onChange={v => updateSettings({ note_hafalan: v })} />
                 </div>
                 <button 
                   onClick={handleSaveSettings}
