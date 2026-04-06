@@ -24,11 +24,11 @@ const MainContent = () => {
 
     if (videoIdMatch) {
       const videoId = videoIdMatch[1];
-      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&rel=0&modestbranding=1&iv_load_policy=3&showinfo=0`;
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&loop=1&playlist=${videoId}&controls=0&rel=0&modestbranding=1&iv_load_policy=3&showinfo=0&enablejsapi=1`;
     }
 
-    if (url.includes('/embed/')) return `${url.split('?')[0]}?autoplay=1&mute=1&loop=1&controls=0`;
-    if (url.length === 11) return `https://www.youtube.com/embed/${url}?autoplay=1&mute=1&loop=1&playlist=${url}&controls=0`;
+    if (url.includes('/embed/')) return `${url.split('?')[0]}?autoplay=1&mute=0&loop=1&controls=0&enablejsapi=1`;
+    if (url.length === 11) return `https://www.youtube.com/embed/${url}?autoplay=1&mute=0&loop=1&playlist=${url}&controls=0&enablejsapi=1`;
 
     return url;
   };
@@ -40,7 +40,7 @@ const MainContent = () => {
         <iframe
           src={getEnhancedVideoUrl(activeProgram.content as string)}
           className="absolute inset-0 w-full h-full border-0 pointer-events-none"
-          allow="autoplay; encrypted-media"
+          allow="autoplay; encrypted-media; clipboard-write; gyroscope; picture-in-picture; web-share"
           allowFullScreen
           title="Video Content"
         />
