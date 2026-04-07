@@ -16,6 +16,7 @@ const MainContent = () => {
   const [hasInteracted, setHasInteracted] = useState(false);
   const [currentPlaylistIndex, setCurrentPlaylistIndex] = useState(0);
   const playerRef = useRef<any>(null);
+  const currentVideoIdRef = useRef<string>("");
 
   // Check if we've already interacted in this session
   useEffect(() => {
@@ -77,6 +78,10 @@ const MainContent = () => {
     };
 
     const initPlayer = (videoId: string) => {
+      // Prevent reloading the same video if it's already playing
+      if (currentVideoIdRef.current === videoId && playerRef.current) return;
+      currentVideoIdRef.current = videoId;
+
       // If player already exists, just load the new video
       if (playerRef.current && playerRef.current.loadVideoById) {
         playerRef.current.loadVideoById(videoId);
@@ -94,9 +99,7 @@ const MainContent = () => {
           modestbranding: 1,
           enablejsapi: 1,
           origin: window.location.origin,
-          mute: hasInteracted ? 0 : 1,
-          playlist: videoId, // Ensure looping works for single videos too
-          loop: 1
+          mute: hasInteracted ? 0 : 1
         },
         events: {
           onReady: (event: any) => {
