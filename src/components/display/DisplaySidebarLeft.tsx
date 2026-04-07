@@ -141,7 +141,7 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
 
           if (desc.includes("APEL BERSAMA")) {
             instructions = settings.note_apel_bersama;
-          } else if (desc.includes("APEL PAGI")) {
+          } else if (desc.includes("APEL PAGI") || desc.includes("APEL KELAS") || desc.includes("APEL")) {
             instructions = settings.note_apel_pagi;
           } else if (desc.includes("HAFALAN")) {
             instructions = settings.note_hafalan;
