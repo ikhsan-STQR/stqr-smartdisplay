@@ -63,12 +63,14 @@ const MainContent = () => {
 
     const onPlayerStateChange = (event: any) => {
       if (event.data === window.YT.PlayerState.ENDED) {
-        // Only advance playlist if NOT in a specific scheduled program override
+        // Determine if we are in default mode or schedule mode
         const isDefault = !activeProgram.scheduleName || activeProgram.scheduleName === "DEFAULT (MURROTAL 24H)";
-        if (isDefault && config.defaultVideoUrls.length > 1) {
-          setCurrentPlaylistIndex((prev) => (prev + 1) % config.defaultVideoUrls.length);
+        const playlist = Array.isArray(activeProgram.content) ? activeProgram.content : config.defaultVideoUrls;
+
+        if (isDefault && playlist.length > 1) {
+          setCurrentPlaylistIndex((prev) => (prev + 1) % playlist.length);
         } else {
-          // If schedule video ends, restart it
+          // If it's a single video (schedule or single default), loop it
           event.target.playVideo();
         }
       }
@@ -92,7 +94,9 @@ const MainContent = () => {
           modestbranding: 1,
           enablejsapi: 1,
           origin: window.location.origin,
-          mute: hasInteracted ? 0 : 1
+          mute: hasInteracted ? 0 : 1,
+          playlist: videoId, // Ensure looping works for single videos too
+          loop: 1
         },
         events: {
           onReady: (event: any) => {
@@ -114,14 +118,16 @@ const MainContent = () => {
     // Determine what to play
     let videoToPlay = "";
     const isSchedule = activeProgram.scheduleName && activeProgram.scheduleName !== "DEFAULT (MURROTAL 24H)";
-    const playlist = config.defaultVideoUrls || [];
     
     if (isSchedule) {
       const content = activeProgram.content;
       videoToPlay = getYouTubeId(Array.isArray(content) ? content[0] : content);
-    } else if (playlist.length > 0) {
-      const safeIndex = currentPlaylistIndex % playlist.length;
-      videoToPlay = getYouTubeId(playlist[safeIndex]);
+    } else {
+      const playlist = Array.isArray(activeProgram.content) ? activeProgram.content : config.defaultVideoUrls;
+      if (playlist && playlist.length > 0) {
+        const safeIndex = currentPlaylistIndex % playlist.length;
+        videoToPlay = getYouTubeId(playlist[safeIndex]);
+      }
     }
 
     if (!videoToPlay) return;
@@ -131,7 +137,7 @@ const MainContent = () => {
     } else {
       window.onYouTubeIframeAPIReady = () => initPlayer(videoToPlay);
     }
-  }, [activeProgram.contentType, activeProgram.content, currentPlaylistIndex, config.defaultVideoUrls, hasInteracted]);
+  }, [activeProgram.scheduleName, activeProgram.contentType, activeProgram.content, currentPlaylistIndex, config.defaultVideoUrls, hasInteracted]);
 
   const isContentEmpty = activeProgram.contentType === "video" 
     ? (config.defaultVideoUrls.length === 0 && !activeProgram.content)

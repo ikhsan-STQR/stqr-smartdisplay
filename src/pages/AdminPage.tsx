@@ -681,7 +681,14 @@ const AdminPage = () => {
                      </div>
                    </div>
                    {config.contentType === "video" ? (
-                    <InputField label="Default Video Link" value={config.videoUrl} onChange={v => updateConfig({ videoUrl: formatYoutubeUrl(v) })} />
+                    <TextArrayField 
+                      label="Default Video Playlist (Sequential Loop)" 
+                      values={config.defaultVideoUrls || [config.videoUrl]} 
+                      onChange={v => {
+                        const formatted = v.map(formatYoutubeUrl);
+                        updateConfig({ defaultVideoUrls: formatted });
+                      }} 
+                    />
                    ) : (
                     <ArrayField label="Slider Collection" values={config.sliderImages} onChange={v => updateConfig({ sliderImages: v })} />
                    )}
@@ -713,11 +720,6 @@ const AdminPage = () => {
             <Section icon="📢" title="Default Messaging" description="Konfigurasi teks berjalan and fallback visual.">
               <div className="space-y-5">
                 <InputField label="Header Organization Subtitle" value={config.header_subtitle} onChange={v => updateConfig({ header_subtitle: v })} />
-                <TextArrayField 
-                  label="Default Video Playlist (Sequential Loop)" 
-                  values={config.defaultVideoUrls || [config.videoUrl]} 
-                  onChange={v => updateConfig({ defaultVideoUrls: v })} 
-                />
                 <TextArrayField 
                   label="Dynamic Running Text" 
                   values={config.runningText} 

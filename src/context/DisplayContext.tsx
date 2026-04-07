@@ -51,7 +51,7 @@ export interface TimeStatus {
 
 export interface DisplayConfig {
   contentType: "video" | "slider";
-  videoUrl: string;
+  videoUrl: string; // Legacy - keep for backward compatibility during migration
   defaultVideoUrls: string[];
   sliderImages: string[];
   announcementPosters: string[];

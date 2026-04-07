@@ -19,7 +19,9 @@ export const useVideoSchedule = () => {
   const { config } = useDisplay();
   const [activeProgram, setActiveProgram] = useState<ProgramContent>({
     contentType: config.contentType,
-    content: config.contentType === "video" ? config.videoUrl : config.sliderImages,
+    content: config.contentType === "video" 
+      ? (config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls : [config.videoUrl]) 
+      : config.sliderImages,
     scheduleName: null,
   });
 
@@ -57,7 +59,9 @@ export const useVideoSchedule = () => {
       );
 
       if (builtInActive) {
-        const contentId = builtInActive.id === "default" ? config.videoUrl : builtInActive.id;
+        const contentId = builtInActive.id === "default" 
+          ? (config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls[0] : config.videoUrl) 
+          : builtInActive.id;
         setActiveProgram({
           contentType: "video",
           content: contentId,
@@ -69,7 +73,9 @@ export const useVideoSchedule = () => {
       // 3. FALLBACK: Global Default
       setActiveProgram({
         contentType: config.contentType,
-        content: config.contentType === "video" ? config.videoUrl : config.sliderImages,
+        content: config.contentType === "video" 
+          ? (config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls : [config.videoUrl]) 
+          : config.sliderImages,
         scheduleName: "DEFAULT (MURROTAL 24H)",
       });
     };
@@ -77,7 +83,7 @@ export const useVideoSchedule = () => {
     updateProgram();
     const interval = setInterval(updateProgram, 30000); // Check every 30 seconds
     return () => clearInterval(interval);
-  }, [config.schedules, config.contentType, config.videoUrl, config.sliderImages]);
+  }, [config.schedules, config.contentType, config.videoUrl, config.defaultVideoUrls, config.sliderImages]);
 
   return activeProgram;
 };
