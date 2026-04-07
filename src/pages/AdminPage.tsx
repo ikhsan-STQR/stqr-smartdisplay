@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useDisplay, ScheduleItem } from "@/context/DisplayContext";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -714,6 +714,11 @@ const AdminPage = () => {
               <div className="space-y-5">
                 <InputField label="Header Organization Subtitle" value={config.header_subtitle} onChange={v => updateConfig({ header_subtitle: v })} />
                 <TextArrayField 
+                  label="Default Video Playlist (Sequential Loop)" 
+                  values={config.defaultVideoUrls || [config.videoUrl]} 
+                  onChange={v => updateConfig({ defaultVideoUrls: v })} 
+                />
+                <TextArrayField 
                   label="Dynamic Running Text" 
                   values={config.runningText} 
                   onChange={v => updateConfig({ runningText: v })} 
@@ -848,7 +853,7 @@ const TextArrayField = ({
     <div className="mb-3 space-y-2">
       <label className="text-[10px] font-black text-zinc-400 block uppercase tracking-wider ml-1">{label}</label>
       <div className="space-y-2">
-        {values.map((v, i) => (
+        {(values || []).map((v, i) => (
           <div key={i} className="flex gap-2 items-center bg-zinc-50 p-1.5 rounded-xl border border-zinc-200/60 group">
             <textarea
               value={v}
@@ -857,8 +862,8 @@ const TextArrayField = ({
                 updated[i] = e.target.value;
                 onChange(updated);
               }}
-              placeholder="Masukkan teks di sini..."
-              className="flex-1 bg-transparent px-3 py-2 text-xs focus:ring-0 outline-none font-medium text-zinc-600 min-h-[60px] resize-none"
+              placeholder="Masukkan link YouTube atau teks di sini..."
+              className="flex-1 bg-transparent px-3 py-2 text-xs focus:ring-0 outline-none font-medium text-zinc-600 min-h-[40px] resize-none"
             />
             <button 
               onClick={() => onChange(values.filter((_, j) => j !== i))} 
@@ -869,11 +874,113 @@ const TextArrayField = ({
           </div>
         ))}
         <button
-          onClick={() => onChange([...values, ""])}
+          onClick={() => onChange([...(values || []), ""])}
           className="text-primary text-[10px] font-black hover:bg-primary/5 px-4 py-3 rounded-xl border border-primary/20 transition-all flex items-center gap-2 mt-2"
         >
-          <span>+</span> TAMBAH TEKS BERJALAN
+          <span>+</span> TAMBAH ITEM BARU
         </button>
+      </div>
+    </div>
+  );
+};
+
+const MediaGalleryModal = ({ 
+  isOpen, 
+  onClose, 
+  onSelect 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+  onSelect: (url: string) => void 
+}) => {
+  const [files, setFiles] = useState<{name: string, url: string}[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchFiles = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.storage.from('posters').list();
+      if (error) throw error;
+      
+      const fileWithUrls = data.map(f => ({
+        name: f.name,
+        url: supabase.storage.from('posters').getPublicUrl(f.name).data.publicUrl
+      }));
+      setFiles(fileWithUrls);
+    } catch (err) {
+      console.error("Error fetching gallery:", err);
+      toast.error("Gagal memuat galeri.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) fetchFiles();
+  }, [isOpen]);
+
+  const handleDelete = async (name: string) => {
+    if (!confirm("Hapus file ini secara permanen dari storage?")) return;
+    try {
+      const { error } = await supabase.storage.from('posters').remove([name]);
+      if (error) throw error;
+      toast.success("File berhasil dihapus.");
+      fetchFiles();
+    } catch (err) {
+      toast.error("Gagal menghapus file.");
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[80vh] overflow-hidden shadow-2xl relative flex flex-col animate-in zoom-in duration-300">
+        <div className="p-6 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50">
+          <div>
+            <h3 className="text-xl font-black text-zinc-800 uppercase tracking-tight">Media Library Gallery</h3>
+            <p className="text-xs text-zinc-400 font-bold uppercase tracking-widest mt-1">Kelola dan gunakan kembali aset di storage</p>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-zinc-200 rounded-full transition-all">✕</button>
+        </div>
+        
+        <div className="flex-1 overflow-y-auto p-6">
+          {loading ? (
+            <div className="flex items-center justify-center h-40">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+            </div>
+          ) : files.length === 0 ? (
+            <div className="text-center py-20 bg-zinc-50 rounded-2xl border-2 border-dashed border-zinc-100">
+              <p className="text-zinc-400 font-bold uppercase tracking-widest text-sm">Galeri Kosong</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {files.map((file, i) => (
+                <div key={i} className="group relative bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-100 shadow-sm hover:shadow-md transition-all">
+                  <img src={file.url} className="w-full aspect-square object-cover" alt={file.name} />
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-4 gap-2">
+                    <button 
+                      onClick={() => { onSelect(file.url); onClose(); }}
+                      className="w-full bg-white text-zinc-900 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-zinc-100 transition-all"
+                    >
+                      Gunakan Ulang
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(file.name)}
+                      className="w-full bg-red-500 text-white py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-600 transition-all"
+                    >
+                      Hapus Permanen
+                    </button>
+                  </div>
+                  <div className="p-2 bg-white/90 backdrop-blur-sm absolute bottom-0 left-0 right-0">
+                    <p className="text-[8px] font-black text-zinc-500 truncate uppercase">{file.name}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -883,6 +990,8 @@ const ArrayField = ({
   label, values, onChange,
 }: { label: string; values: string[]; onChange: (v: string[]) => void }) => {
   const [uploading, setUploading] = useState<number | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [targetIndex, setTargetIndex] = useState<number | null>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0];
@@ -937,6 +1046,12 @@ const ArrayField = ({
               className="flex-1 bg-transparent px-3 py-1 text-xs focus:ring-0 outline-none font-medium text-zinc-600"
             />
             <div className="flex gap-1 items-center">
+              <button 
+                onClick={() => { setTargetIndex(i); setIsGalleryOpen(true); }}
+                className="hover:bg-white p-1.5 rounded-lg transition-all border border-transparent hover:border-zinc-200 text-[9px] font-black text-blue-500 uppercase"
+              >
+                Galeri
+              </button>
               <label className="cursor-pointer hover:bg-white p-1.5 rounded-lg transition-all border border-transparent hover:border-zinc-200" title="Upload Media">
                 <span className="text-[9px] font-black text-primary uppercase">
                   {uploading === i ? "..." : "Upload"}
@@ -965,6 +1080,18 @@ const ArrayField = ({
           <span>+</span> TAMBAH RESOURCE BARU
         </button>
       </div>
+
+      <MediaGalleryModal 
+        isOpen={isGalleryOpen} 
+        onClose={() => setIsGalleryOpen(false)} 
+        onSelect={(url) => {
+          if (targetIndex !== null) {
+            const updated = [...values];
+            updated[targetIndex] = url;
+            onChange(updated);
+          }
+        }}
+      />
     </div>
   );
 };

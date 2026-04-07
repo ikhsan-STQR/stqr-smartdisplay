@@ -177,22 +177,22 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
 
           /* Normal Class Schedule List */
           return (
-            <div className="h-full flex flex-col transition-colors duration-500">
+            <div className="flex-1 min-h-0 flex flex-col transition-colors duration-500">
               {activeItems.length > 0 ? (
                 <div
-                  className={`w-full flex-1 flex flex-col ${isMobile ? 'gap-1' : 'gap-2'} transition-opacity duration-500 ease-in-out`}
+                  className={`w-full flex-1 flex flex-col ${isMobile ? 'gap-1' : 'gap-3'} min-h-0 overflow-y-auto transition-opacity duration-500 ease-in-out pr-1 scrollbar-hide`}
                   key={currentPage}
                 >
                   {displayedItems.map((item, i) => (
-                    <div key={i} className={`flex justify-between items-center bg-white rounded-lg ${isMobile ? 'px-3 py-1' : 'px-4 py-2'} shadow-sm border border-gray-100 animate-in fade-in duration-500 transition-colors duration-500`}>
+                    <div key={i} className={`flex justify-between items-center bg-white rounded-xl ${isMobile ? 'px-3 py-1' : 'px-[1.5vw] py-[1.2vh] 2xl:py-[1.5vh]'} shadow-sm border border-gray-100 animate-in fade-in duration-500 transition-colors duration-500`}>
                       <span
-                        className={`font-montserrat font-black ${isMobile ? 'text-[1vw] w-[3.5vw]' : 'text-[1.2vw] w-[4vw]'} shrink-0 transition-colors duration-500`}
+                        className={`font-montserrat font-black ${isMobile ? 'text-[1vw] w-[3.5vw]' : 'text-[1.2vw] 2xl:text-[1.4vw] w-fit min-w-[4vw]'} shrink-0 transition-colors duration-500`}
                         style={{ color: config.primary_color || "#1e5666" }}
                       >
                         {item.kelas}
                       </span>
                       <span
-                        className={`font-montserrat font-medium ${isMobile ? 'text-[0.9vw]' : 'text-[1.1vw]'} truncate flex-1 text-right transition-colors duration-500`}
+                        className={`font-montserrat font-bold ${isMobile ? 'text-[0.9vw]' : 'text-[1vw] 2xl:text-[1.2vw]'} truncate flex-1 text-right transition-colors duration-500`}
                         style={{ color: config.left_content_text || "rgb(17 24 39)" }}
                       >
                         {item.pelajaran}

@@ -1,12 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useDisplay } from "@/context/DisplayContext";
 import { useVideoSchedule } from "@/hooks/useVideoSchedule";
+
+declare global {
+  interface Window {
+    onYouTubeIframeAPIReady: () => void;
+    YT: any;
+  }
+}
 
 const MainContent = () => {
   const { config, status, settings } = useDisplay();
   const activeProgram = useVideoSchedule();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [currentPlaylistIndex, setCurrentPlaylistIndex] = useState(0);
+  const playerRef = useRef<any>(null);
 
   // Check if we've already interacted in this session
   useEffect(() => {
@@ -17,6 +26,10 @@ const MainContent = () => {
   const handleInteraction = () => {
     setHasInteracted(true);
     sessionStorage.setItem('display-interacted', 'true');
+    if (playerRef.current && playerRef.current.playVideo) {
+      playerRef.current.playVideo();
+      playerRef.current.unMute();
+    }
   };
 
   // Slider animation for slider content (independent of source)
@@ -29,24 +42,100 @@ const MainContent = () => {
     }
   }, [activeProgram.contentType, activeProgram.content, config.announcementInterval]);
 
-  const getEnhancedVideoUrl = (url: string) => {
-    if (!url) return "";
+  // Handle YouTube Playlist & Automatic Skipping
+  useEffect(() => {
+    if (activeProgram.contentType !== "video") return;
 
-    const origin = window.location.origin;
-    const videoIdMatch = url.match(/(?:youtube\.com\/(?:embed\/|v\/|watch\?v=|live\/)|youtu\.be\/)([^&?/\s]+)/);
-
-    if (videoIdMatch) {
-      const videoId = videoIdMatch[1];
-      return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&loop=1&playlist=${videoId}&controls=0&rel=0&modestbranding=1&iv_load_policy=3&showinfo=0&enablejsapi=1&origin=${origin}`;
+    // Load YouTube API script if not loaded
+    if (!window.YT) {
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
     }
 
-    if (url.includes('/embed/')) return `${url.split('?')[0]}?autoplay=1&mute=0&loop=1&controls=0&enablejsapi=1&origin=${origin}`;
-    if (url.length === 11) return `https://www.youtube.com/embed/${url}?autoplay=1&mute=0&loop=1&playlist=${url}&controls=0&enablejsapi=1&origin=${origin}`;
+    const onPlayerReady = (event: any) => {
+      if (hasInteracted) {
+        event.target.playVideo();
+        event.target.unMute();
+      }
+    };
 
-    return url;
-  };
+    const onPlayerStateChange = (event: any) => {
+      if (event.data === window.YT.PlayerState.ENDED) {
+        // Only advance playlist if NOT in a specific scheduled program override
+        const isDefault = !activeProgram.scheduleName || activeProgram.scheduleName === "DEFAULT (MURROTAL 24H)";
+        if (isDefault && config.defaultVideoUrls.length > 1) {
+          setCurrentPlaylistIndex((prev) => (prev + 1) % config.defaultVideoUrls.length);
+        } else {
+          // If schedule video ends, restart it
+          event.target.playVideo();
+        }
+      }
+    };
 
-  const isContentEmpty = !activeProgram.content || (Array.isArray(activeProgram.content) && activeProgram.content.length === 0);
+    const initPlayer = (videoId: string) => {
+      // If player already exists, just load the new video
+      if (playerRef.current && playerRef.current.loadVideoById) {
+        playerRef.current.loadVideoById(videoId);
+        return;
+      }
+
+      playerRef.current = new window.YT.Player('youtube-player', {
+        height: '100%',
+        width: '100%',
+        videoId: videoId,
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          rel: 0,
+          modestbranding: 1,
+          enablejsapi: 1,
+          origin: window.location.origin,
+          mute: hasInteracted ? 0 : 1
+        },
+        events: {
+          onReady: (event: any) => {
+            onPlayerReady(event);
+            if (hasInteracted) event.target.unMute();
+          },
+          onStateChange: onPlayerStateChange,
+        },
+      });
+    };
+
+    // Helper to extract Video ID
+    const getYouTubeId = (url: any) => {
+      if (!url || typeof url !== 'string') return "";
+      const match = url.match(/(?:youtube\.com\/(?:embed\/|v\/|watch\?v=|live\/)|youtu\.be\/)([^&?/\s]+)/);
+      return match ? match[1] : (url.length === 11 ? url : "");
+    };
+
+    // Determine what to play
+    let videoToPlay = "";
+    const isSchedule = activeProgram.scheduleName && activeProgram.scheduleName !== "DEFAULT (MURROTAL 24H)";
+    const playlist = config.defaultVideoUrls || [];
+    
+    if (isSchedule) {
+      const content = activeProgram.content;
+      videoToPlay = getYouTubeId(Array.isArray(content) ? content[0] : content);
+    } else if (playlist.length > 0) {
+      const safeIndex = currentPlaylistIndex % playlist.length;
+      videoToPlay = getYouTubeId(playlist[safeIndex]);
+    }
+
+    if (!videoToPlay) return;
+
+    if (window.YT && window.YT.Player) {
+      initPlayer(videoToPlay);
+    } else {
+      window.onYouTubeIframeAPIReady = () => initPlayer(videoToPlay);
+    }
+  }, [activeProgram.contentType, activeProgram.content, currentPlaylistIndex, config.defaultVideoUrls, hasInteracted]);
+
+  const isContentEmpty = activeProgram.contentType === "video" 
+    ? (config.defaultVideoUrls.length === 0 && !activeProgram.content)
+    : (!activeProgram.content || (Array.isArray(activeProgram.content) && activeProgram.content.length === 0));
 
   return (
     <div className="w-full h-full bg-black rounded-[calc(var(--radius)-0.3vw)] overflow-hidden relative shadow-inner" onClick={handleInteraction}>
@@ -69,13 +158,7 @@ const MainContent = () => {
         </div>
       ) : activeProgram.contentType === "video" ? (
         <div className="absolute inset-0">
-          <iframe
-            src={getEnhancedVideoUrl(activeProgram.content as string)}
-            className="absolute inset-0 w-full h-full border-0"
-            allow="autoplay; encrypted-media; clipboard-write; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            title="Video Content"
-          />
+          <div id="youtube-player" className="w-full h-full pointer-events-none" />
           
           {/* Subtle Activation Overlay - only if haven't interacted yet */}
           {!hasInteracted && (

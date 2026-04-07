@@ -52,6 +52,7 @@ export interface TimeStatus {
 export interface DisplayConfig {
   contentType: "video" | "slider";
   videoUrl: string;
+  defaultVideoUrls: string[];
   sliderImages: string[];
   announcementPosters: string[];
   jadwalPelajaran: ScheduleItem[]; // Legacy
@@ -121,6 +122,7 @@ const defaultSettings: DisplaySettings = {
 const defaultConfig: DisplayConfig = {
   contentType: "slider",
   videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+  defaultVideoUrls: ["https://www.youtube.com/embed/dQw4w9WgXcQ"],
   sliderImages: [
     "https://images.unsplash.com/photo-1585036156171-384164a8c21e?w=800&q=80",
     "https://images.unsplash.com/photo-1564769625905-50e93615e769?w=800&q=80",
@@ -221,6 +223,13 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
           // Migration: Convert runningText from string to array if necessary
           if (rawData.runningText && typeof rawData.runningText === "string") {
             rawData.runningText = rawData.runningText.split(" | ").map((s: string) => s.trim()).filter(Boolean);
+          }
+
+          // Migration: Initialize defaultVideoUrls from videoUrl if missing
+          if (!rawData.defaultVideoUrls && rawData.videoUrl) {
+            rawData.defaultVideoUrls = [rawData.videoUrl];
+          } else if (!Array.isArray(rawData.defaultVideoUrls)) {
+            rawData.defaultVideoUrls = [defaultConfig.videoUrl];
           }
           
           Object.assign(newUpdates, rawData);
