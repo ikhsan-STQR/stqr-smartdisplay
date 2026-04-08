@@ -27,6 +27,19 @@ const DisplayFooter = () => {
     return () => clearInterval(interval);
   }, [config.schedules]);
 
+  const renderText = (text: string) => {
+    if (!text) return null;
+    // Split by Arabic character ranges
+    const parts = text.split(/([\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+)/g);
+    return parts.map((part, i) => {
+      const isArabic = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(part);
+      if (isArabic) {
+        return <span key={i} className="font-arabic-large">{part}</span>;
+      }
+      return <span key={i}>{part}</span>;
+    });
+  };
+
   const textToDisplay = activeSchedule 
     ? (activeSchedule.content as string) 
     : (Array.isArray(config.runningText) ? config.runningText.join(" | ") : config.runningText);
@@ -56,22 +69,22 @@ const DisplayFooter = () => {
           </p>
         </div>
       </div>
-
+ 
       {/* Col 2: Running Text Bar (flex-1) - Expanding to the right with Dynamic secondary background */}
       <div 
         className="flex-1 h-full rounded-[1vw] overflow-hidden flex items-center shadow-inner relative transition-colors duration-500"
         style={{ backgroundColor: config.running_text_bg || config.secondary_color || "#A8E6CF" }}
       >
         <div
-          className="flex animate-marquee-seamless whitespace-nowrap font-montserrat font-medium text-[1.5vw] transition-colors duration-500"
+          className="flex animate-marquee-seamless whitespace-nowrap font-montserrat font-medium text-[1.5vw] transition-colors duration-500 items-baseline"
           style={{
             color: config.running_text_color || "#133c47",
             animationDuration: `${config.runningTextSpeed || 30}s`,
             animationPlayState: textToDisplay ? "running" : "paused"
           }}
         >
-          <span className="px-[4vw]">{textToDisplay || `${config.organization_name} - Digital Information Display`}</span>
-          <span className="px-[4vw]">{textToDisplay || `${config.organization_name} - Digital Information Display`}</span>
+          <span className="px-[4vw]">{renderText(textToDisplay) || `${config.organization_name} - Digital Information Display`}</span>
+          <span className="px-[4vw]">{renderText(textToDisplay) || `${config.organization_name} - Digital Information Display`}</span>
         </div>
       </div>
     </footer>

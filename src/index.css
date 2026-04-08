@@ -50,6 +50,14 @@
   .font-montserrat {
     font-family: 'Montserrat', sans-serif;
   }
+  .font-arabic-large {
+    font-family: 'Calibri', 'Amiri', serif;
+    font-size: 1.8em;
+    line-height: 0.8;
+    vertical-align: middle;
+    display: inline-block;
+    padding: 0 0.2em;
+  }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
