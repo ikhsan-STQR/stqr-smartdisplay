@@ -20,10 +20,28 @@ const VideoPlayer = memo(({
   onEnded: () => void;
 }) => {
   const playerRef = useRef<any>(null);
-  const playerElementId = `yt-player-${videoId}`;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const playerElementId = "yt-player-main"; // Use stable ID
+
+  // Handle video loading/changing
+  useEffect(() => {
+    if (playerRef.current && typeof playerRef.current.loadVideoById === 'function') {
+      playerRef.current.loadVideoById(videoId);
+    }
+  }, [videoId]);
+
+  // Handle mute/unmute
+  useEffect(() => {
+    if (playerRef.current && typeof playerRef.current.mute === 'function') {
+      if (hasInteracted) {
+        playerRef.current.unMute();
+      } else {
+        playerRef.current.mute();
+      }
+    }
+  }, [hasInteracted]);
 
   useEffect(() => {
-    let internalPlayer: any = null;
     let isMounted = true;
 
     const initPlayer = () => {
@@ -31,48 +49,64 @@ const VideoPlayer = memo(({
         return;
       }
 
-      // Destroy previous player if any exists
-      if (internalPlayer) {
-        try { internalPlayer.destroy(); } catch (e) {}
-      }
+      const currentOrigin = window.location.origin;
 
-      const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://stqr-smartdisplay.vercel.app';
-
-      internalPlayer = new window.YT.Player(playerElementId, {
+      playerRef.current = new window.YT.Player(playerElementId, {
         height: '100%',
         width: '100%',
         videoId: videoId,
+        host: 'https://www.youtube-nocookie.com',
         playerVars: {
-          origin: currentOrigin,
           enablejsapi: 1,
           autoplay: 1,
           controls: 0,
           rel: 0,
           modestbranding: 1,
           mute: hasInteracted ? 0 : 1,
+          origin: currentOrigin,
+          widget_referrer: currentOrigin,
         },
         events: {
           onReady: (event: any) => {
             if (isMounted) {
-              if (hasInteracted) event.target.unMute();
+              if (hasInteracted) {
+                event.target.unMute();
+              } else {
+                event.target.mute();
+              }
               event.target.playVideo();
             }
           },
           onStateChange: (event: any) => {
-            if (isMounted && event.data === window.YT.PlayerState.ENDED) {
+            if (!isMounted) return;
+            if (event.data === window.YT.PlayerState.ENDED) {
               onEnded();
+            } else if (event.data === window.YT.PlayerState.PAUSED) {
+              // Auto-resume if paused (e.g. by API glitch)
               event.target.playVideo();
             }
           },
+          onError: (event: any) => {
+            console.error("YouTube Player Error:", event.data);
+            setTimeout(() => {
+              if (isMounted) onEnded();
+            }, 3000);
+          }
         },
       });
-      playerRef.current = internalPlayer;
     };
 
     if (window.YT && window.YT.Player) {
-      initPlayer();
+      const timer = setTimeout(initPlayer, 200);
+      return () => {
+        isMounted = false;
+        clearTimeout(timer);
+        if (playerRef.current) {
+          try { playerRef.current.destroy(); } catch (e) {}
+          playerRef.current = null;
+        }
+      };
     } else {
-      // Load script if not present
       if (!document.querySelector('script[src*="iframe_api"]')) {
         const tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
@@ -86,32 +120,26 @@ const VideoPlayer = memo(({
         initPlayer();
       };
 
-      // Fallback interval
       const interval = setInterval(() => {
         if (window.YT && window.YT.Player) {
           initPlayer();
           clearInterval(interval);
         }
       }, 1000);
+      
       return () => {
         isMounted = false;
         clearInterval(interval);
-        if (internalPlayer) {
-          try { internalPlayer.destroy(); } catch (e) {}
+        if (playerRef.current) {
+          try { playerRef.current.destroy(); } catch (e) {}
+          playerRef.current = null;
         }
       };
     }
-
-    return () => {
-      isMounted = false;
-      if (internalPlayer) {
-        try { internalPlayer.destroy(); } catch (e) {}
-      }
-    };
-  }, [videoId, hasInteracted, onEnded, playerElementId]);
+  }, [onEnded]); // Only initialize once
 
   return (
-    <div className="w-full h-full bg-black flex items-center justify-center overflow-hidden">
+    <div ref={containerRef} className="w-full h-full bg-black flex items-center justify-center overflow-hidden">
       <div id={playerElementId} className="w-full h-full pointer-events-none" />
     </div>
   );
@@ -143,11 +171,25 @@ const MainContent = () => {
     }
   }, [activeProgram.contentType, activeProgram.content, config.announcementInterval]);
 
+  // Reset playlist index when content changes to ensure we start from the beginning
+  useEffect(() => {
+    setCurrentPlaylistIndex(0);
+  }, [activeProgram.content, activeProgram.contentType]);
+
   const handleVideoEnded = useCallback(() => {
-    const playlist = Array.isArray(activeProgram.content) ? activeProgram.content : config.defaultVideoUrls;
+    const activeContent = activeProgram.content;
+    const playlist = Array.isArray(activeContent) 
+      ? activeContent 
+      : (activeContent ? [activeContent as string] : config.defaultVideoUrls || []);
 
     if (playlist.length > 1) {
       setCurrentPlaylistIndex((prev) => (prev + 1) % playlist.length);
+    } else {
+      // For single video, force a re-play if possible, or trigger a refresh of videoToPlay
+      setCurrentPlaylistIndex(0);
+      // Small state toggle to force VideoPlayer remount if it's the same video
+      // But since we use videoToPlay as key, if it's same video, it won't remount.
+      // The VideoPlayer onStateChange now handles re-playing if the ID hasn't changed.
     }
   }, [activeProgram.content, config.defaultVideoUrls]);
 
@@ -198,7 +240,6 @@ const MainContent = () => {
       ) : activeProgram.contentType === "video" ? (
         <div className="absolute inset-0">
           <VideoPlayer 
-            key={videoToPlay}
             videoId={videoToPlay} 
             hasInteracted={hasInteracted} 
             onEnded={handleVideoEnded} 
