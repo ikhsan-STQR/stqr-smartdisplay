@@ -843,7 +843,8 @@ const formatYoutubeUrl = (url: string) => {
   const embedMatch = url.match(/(?:youtube\.com\/embed\/|youtu\.be\/|youtube\.com\/watch\?v=)([^&?/\s]+)/);
   if (embedMatch) {
     const videoId = embedMatch[1];
-    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&loop=1&playlist=${videoId}&controls=0&rel=0&modestbranding=1&enablejsapi=1&origin=${window.location.origin}`;
+    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://stqr-smartdisplay.vercel.app';
+    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&loop=1&playlist=${videoId}&controls=0&rel=0&modestbranding=1&enablejsapi=1&origin=${currentOrigin}`;
   }
   return url;
 };

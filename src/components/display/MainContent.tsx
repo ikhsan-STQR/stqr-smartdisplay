@@ -36,17 +36,19 @@ const VideoPlayer = memo(({
         try { internalPlayer.destroy(); } catch (e) {}
       }
 
+      const currentOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://stqr-smartdisplay.vercel.app';
+
       internalPlayer = new window.YT.Player(playerElementId, {
         height: '100%',
         width: '100%',
         videoId: videoId,
         playerVars: {
+          origin: currentOrigin,
+          enablejsapi: 1,
           autoplay: 1,
           controls: 0,
           rel: 0,
           modestbranding: 1,
-          enablejsapi: 1,
-          origin: window.location.origin.replace(/\/$/, ''),
           mute: hasInteracted ? 0 : 1,
         },
         events: {
