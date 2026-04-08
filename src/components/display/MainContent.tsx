@@ -31,10 +31,14 @@ const VideoPlayer = memo(forwardRef(({
   const playerElementId = "yt-player-main";
 
   const forceUnmute = useCallback((player: any) => {
-    if (player) {
-      if (typeof player.unMute === 'function') player.unMute();
-      if (typeof player.setVolume === 'function') player.setVolume(100);
-      if (typeof player.playVideo === 'function') player.playVideo();
+    if (player && typeof player.playVideo === 'function') {
+      try {
+        if (typeof player.unMute === 'function') player.unMute();
+        if (typeof player.setVolume === 'function') player.setVolume(100);
+        player.playVideo();
+      } catch (e) {
+        console.warn("YouTube forceUnmute partial failure:", e);
+      }
     }
   }, []);
 
@@ -70,7 +74,7 @@ const VideoPlayer = memo(forwardRef(({
           controls: 0,
           rel: 0,
           modestbranding: 1,
-          mute: hasInteracted ? 0 : 1,
+          mute: 1, // ALWAYS START MUTED TO ALLOW AUTOPLAY
           origin: window.location.origin,
         },
         events: {
@@ -86,7 +90,7 @@ const VideoPlayer = memo(forwardRef(({
             } else if (event.data === window.YT.PlayerState.PLAYING) {
               if (hasInteracted) forceUnmute(p);
             } else if (event.data === window.YT.PlayerState.PAUSED && isMounted) {
-              p.playVideo();
+              if (p && typeof p.playVideo === 'function') p.playVideo();
             }
           },
           onError: (event: any) => {
@@ -151,14 +155,13 @@ const MainContent = () => {
   const [defaultPlaylistIndex, setDefaultPlaylistIndex] = useState(0);
   const [scheduledPlaylistIndex, setScheduledPlaylistIndex] = useState(0);
 
-  useEffect(() => {
-    const interacted = sessionStorage.getItem('display-interacted');
-    if (interacted) setHasInteracted(true);
-  }, []);
-
   const handleInteraction = () => {
+    // Synchronously unmute the player BEFORE updating state
+    // This satisfying Chrome's "User Gesture" requirement for existing media
+    if (videoPlayerRef.current) {
+      videoPlayerRef.current.forcePlayWithSound();
+    }
     setHasInteracted(true);
-    sessionStorage.setItem('display-interacted', 'true');
   };
 
   useEffect(() => {
@@ -238,10 +241,7 @@ const MainContent = () => {
     : (!activeProgram.content || (Array.isArray(activeProgram.content) && activeProgram.content.length === 0));
 
   return (
-    <div className="w-full h-full bg-black rounded-[calc(var(--radius)-0.3vw)] overflow-hidden relative shadow-inner" onClick={() => {
-      handleInteraction();
-      videoPlayerRef.current?.forcePlayWithSound();
-    }}>
+    <div className="w-full h-full bg-black rounded-[calc(var(--radius)-0.3vw)] overflow-hidden relative shadow-inner" onClick={handleInteraction}>
       {isContentEmpty ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-zinc-900 to-black p-[4vw] text-center">
           {config.organization_logo ? (
@@ -273,7 +273,6 @@ const MainContent = () => {
             <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center cursor-pointer z-50 transition-all active:scale-95" onClick={(e) => {
               e.stopPropagation(); // Prevent double trigger if bubble
               handleInteraction();
-              videoPlayerRef.current?.forcePlayWithSound();
             }}>
               <div className="bg-white/10 border border-white/20 backdrop-blur-md px-8 py-4 rounded-2xl text-center space-y-2">
                 <div className="text-[2.5vw] animate-bounce">👆</div>

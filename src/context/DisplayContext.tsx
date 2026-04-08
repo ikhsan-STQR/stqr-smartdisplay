@@ -47,6 +47,7 @@ export interface TimeStatus {
   nextPeriod: TimetableEntry | null;
   countdown: string;
   targetLabel: string;
+  isNextEventToday: boolean;
 }
 
 export interface DisplayConfig {
@@ -190,6 +191,7 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
     nextPeriod: null,
     countdown: "00:00:00",
     targetLabel: "MENUNGGU JADWAL",
+    isNextEventToday: false,
   });
   const [prayerTimes, setPrayerTimes] = useState<any>(null);
 
@@ -413,6 +415,13 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
       let targetLabel = nextEvent?.label || "MENUNGGU JADWAL";
       let nextPeriod: TimetableEntry | null = nextEvent?.periodRecord || null;
 
+      // Check if next event is on the same calendar day
+      const isNextEventToday = nextEvent ? (
+        nextEvent.date.getDate() === now.getDate() && 
+        nextEvent.date.getMonth() === now.getMonth() && 
+        nextEvent.date.getFullYear() === now.getFullYear()
+      ) : false;
+
       // Final fallback - only if no classes at all (unlikely)
       if (!nextEvent) {
         targetDate = new Date();
@@ -446,6 +455,7 @@ export const DisplayProvider = ({ children }: { children: ReactNode }) => {
         nextPeriod: nextPeriod,
         countdown: countdownStr,
         targetLabel: targetLabel,
+        isNextEventToday: isNextEventToday,
       });
     };
 

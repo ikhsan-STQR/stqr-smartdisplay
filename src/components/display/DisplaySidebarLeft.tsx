@@ -67,7 +67,7 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
           style={{ color: config.left_title_text || "#EAB308" }}
         >
           {(() => {
-            if (!status.activePeriod) return "KBM HARI INI SELESAI";
+            if (!status.activePeriod) return "TIDAK ADA KEGIATAN";
 
             // Priority: Description (Column H) -> Period (Column F) -> Subject
             let p = status.activePeriod.description && status.activePeriod.description !== "-"
@@ -95,9 +95,24 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
         {(() => {
           const active = status.activePeriod;
           if (!active) {
-            const today = new Date().getDay(); // 0: Ahad, 4: Kamis, 5: Jumat, 6: Sabtu
-            // Sunday is now a school day, so we adjust the weekend check
-            const isWeekendOrThursday = today === 4 || today === 5 || today === 6;
+            const now = new Date();
+            const today = now.getDay(); // 0: Ahad, 4: Kamis
+            const hh = now.getHours().toString().padStart(2, '0');
+            const mm = now.getMinutes().toString().padStart(2, '0');
+            const currentHM = `${hh}:${mm}`;
+            const daysOrder = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const dayName = daysOrder[today].toUpperCase();
+
+            // Find the last class end time for the current day to determine if "School is over"
+            const todayClasses = timetable
+              .filter(e => e.mode === settings.active_mode && (e.day || "").toString().trim().toUpperCase() === dayName)
+              .sort((a, b) => b.end_time.localeCompare(a.end_time));
+            
+            const lastClassEndTime = todayClasses[0]?.end_time?.substring(0, 5) || "14:00";
+            const isAfterSchool = currentHM >= lastClassEndTime;
+            
+            // Only show "Hari Ahad" greeting on Thursday AFTER school has ended
+            const showSundayGreeting = today === 4 && isAfterSchool;
 
             return (
               <div className={`flex-1 flex flex-col items-center justify-center text-center ${isMobile ? 'p-4' : 'p-8'} bg-white/40 backdrop-blur-sm rounded-2xl border border-white/40 shadow-sm animate-in fade-in zoom-in duration-1000`}>
@@ -111,7 +126,7 @@ const DisplaySidebarLeft = ({ isMobile }: { isMobile?: boolean }) => {
                   className={`font-montserrat font-black ${isMobile ? 'text-[1.6vw] mb-2' : 'text-[2vw] mb-4'} leading-tight uppercase tracking-tighter transition-colors duration-500`}
                   style={{ color: config.left_content_text || config.text_color_main || "#1a3a3a" }}
                 >
-                  {isWeekendOrThursday ? "Sampai Jumpa Hari Ahad" : "Sampai Jumpa Esok Hari"}
+                  {showSundayGreeting ? "Sampai Jumpa Hari Ahad" : "Sampai Jumpa Esok Hari"}
                 </h2>
                 <p className={`text-gray-500 font-jakarta font-bold ${isMobile ? 'text-[0.8vw]' : 'text-[1vw]'} uppercase tracking-[0.2em] opacity-80 transition-colors duration-500`}>
                   Dengan Semangat Belajar Baru
