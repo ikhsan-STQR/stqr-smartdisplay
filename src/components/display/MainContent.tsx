@@ -160,20 +160,13 @@ const MainContent = () => {
   };
 
   let videoToPlay = "";
-  const isSchedule = activeProgram.scheduleName && activeProgram.scheduleName !== "DEFAULT (MURROTAL 24H)";
-  
-  if (isSchedule) {
-    const content = activeProgram.content;
-    const playlist = Array.isArray(content) ? content : (content ? [content] : []);
-    if (playlist.length > 0) {
-      videoToPlay = getYouTubeId(playlist[0]);
-    }
-  } else {
-    const playlist = Array.isArray(activeProgram.content) ? activeProgram.content : config.defaultVideoUrls;
-    if (playlist && playlist.length > 0) {
-      const safeIndex = currentPlaylistIndex % playlist.length;
-      videoToPlay = getYouTubeId(playlist[safeIndex]);
-    }
+  const configPlaylist = config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls : [config.videoUrl];
+  const activeContent = activeProgram.content;
+  const currentPlaylist = Array.isArray(activeContent) ? activeContent : (activeContent ? [activeContent] : configPlaylist);
+
+  if (currentPlaylist.length > 0) {
+    const safeIndex = currentPlaylistIndex % currentPlaylist.length;
+    videoToPlay = getYouTubeId(currentPlaylist[safeIndex]);
   }
 
   // Proper empty state detection
