@@ -186,7 +186,7 @@ const MainContent = () => {
     } else {
       const playlist = config.defaultVideoUrls && config.defaultVideoUrls.length > 0 
         ? config.defaultVideoUrls 
-        : [config.videoUrl];
+        : [];
       
       if (playlist.length > 1) {
         setDefaultPlaylistIndex(prev => (prev + 1) % playlist.length);
@@ -200,7 +200,13 @@ const MainContent = () => {
   // Determine current video source
   const isScheduled = !!activeProgram.content && activeProgram.contentType === "video";
   const activeContent = activeProgram.content;
-  const configPlaylist = config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls : [config.videoUrl];
+  const configPlaylist = config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls : [];
+
+  // Reset indices when content changes
+  useEffect(() => {
+    setDefaultPlaylistIndex(0);
+    setScheduledPlaylistIndex(0);
+  }, [activeProgram.content, config.defaultVideoUrls]);
   
   const currentPlaylist = isScheduled 
     ? (Array.isArray(activeContent) ? activeContent : [activeContent])
@@ -210,6 +216,13 @@ const MainContent = () => {
   const rawUrl = currentPlaylist[currentIndex % currentPlaylist.length] || "";
   const videoToPlay = extractYouTubeId(rawUrl);
   const videoPlayerRef = useRef<any>(null);
+
+  // DEBUG: Track exact data being fed to player
+  useEffect(() => {
+    console.log('Current Playlist Array:', currentPlaylist);
+    console.log('Playing Video Index:', currentIndex);
+    console.log('Video ID to Play:', videoToPlay);
+  }, [currentPlaylist, currentIndex, videoToPlay]);
 
   // Auto-skip invalid or empty entries in the playlist
   useEffect(() => {

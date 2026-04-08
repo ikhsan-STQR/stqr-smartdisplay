@@ -9,10 +9,10 @@ export interface ProgramContent {
 
 // Built-in fixed TV Program Schedule
 const BUILT_IN_PROGRAMS = [
-  { name: "MUROTTAL AL-QUR'AN (Fajr)", start: "04:00", end: "06:00", id: "3S68n_V2F3o", days: [0,1,2,3,4,5,6] },
+  { name: "MUROTTAL AL-QUR'AN (Fajr)", start: "04:00", end: "06:00", id: "default", days: [0,1,2,3,4,5,6] },
   { name: "LIVE KBM / PROFILE STQR", start: "07:00", end: "15:00", id: "default", days: [1,2,3,4,5] }, // Mon-Fri
-  { name: "KAJIAN AKHIR PEKAN", start: "08:00", end: "10:00", id: "live_id_example", days: [0,6] }, // Sat-Sun
-  { name: "ADZKAR SORE & TILAWAH", start: "18:00", end: "20:00", id: "another_id", days: [0,1,2,3,4,5,6] },
+  { name: "KAJIAN AKHIR PEKAN", start: "08:00", end: "10:00", id: "default", days: [0,6] }, // Sat-Sun
+  { name: "ADZKAR SORE & TILAWAH", start: "18:00", end: "20:00", id: "default", days: [0,1,2,3,4,5,6] },
 ];
 
 export const useVideoSchedule = () => {
@@ -20,7 +20,7 @@ export const useVideoSchedule = () => {
   const [activeProgram, setActiveProgram] = useState<ProgramContent>({
     contentType: config.contentType,
     content: config.contentType === "video" 
-      ? (config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls : [config.videoUrl]) 
+      ? (config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls : []) 
       : config.sliderImages,
     scheduleName: null,
   });
@@ -60,7 +60,7 @@ export const useVideoSchedule = () => {
 
       if (builtInActive) {
         const content = builtInActive.id === "default" 
-          ? (config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls : [config.videoUrl]) 
+          ? (config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls : []) 
           : builtInActive.id;
         setActiveProgram({
           contentType: "video",
@@ -74,9 +74,9 @@ export const useVideoSchedule = () => {
       setActiveProgram({
         contentType: config.contentType,
         content: config.contentType === "video" 
-          ? (config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls : [config.videoUrl]) 
+          ? (config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls : []) 
           : config.sliderImages,
-        scheduleName: "DEFAULT (MURROTAL 24H)",
+        scheduleName: "DEFAULT PLAYLIST",
       });
     };
 
