@@ -78,44 +78,76 @@ const MainContent = () => {
     };
 
     const initPlayer = (videoId: string) => {
-      // Prevent reloading the same video if it's already playing
-      if (currentVideoIdRef.current === videoId && playerRef.current) return;
-      currentVideoIdRef.current = videoId;
-
-      // If player already exists, just load the new video
-      if (playerRef.current && playerRef.current.loadVideoById) {
-        playerRef.current.loadVideoById(videoId);
+      // Prevent reloading if same video is already playing AND player is functional
+      if (
+        currentVideoIdRef.current === videoId && 
+        playerRef.current && 
+        typeof playerRef.current.loadVideoById === "function"
+      ) {
         return;
       }
 
-      playerRef.current = new window.YT.Player('youtube-player', {
-        height: '100%',
-        width: '100%',
-        videoId: videoId,
-        playerVars: {
-          autoplay: 1,
-          controls: 0,
-          rel: 0,
-          modestbranding: 1,
-          enablejsapi: 1,
-          origin: window.location.origin,
-          mute: hasInteracted ? 0 : 1
-        },
-        events: {
-          onReady: (event: any) => {
-            onPlayerReady(event);
-            if (hasInteracted) event.target.unMute();
+      currentVideoIdRef.current = videoId;
+
+      // If player already exists and is functional, just load the new video
+      if (playerRef.current && typeof playerRef.current.loadVideoById === "function") {
+        try {
+          playerRef.current.loadVideoById(videoId);
+          return;
+        } catch (e) {
+          console.warn("MainContent: loadVideoById failed, re-initializing player", e);
+        }
+      }
+
+      // Initialize new player
+      try {
+        playerRef.current = new window.YT.Player('youtube-player', {
+          height: '100%',
+          width: '100%',
+          videoId: videoId,
+          playerVars: {
+            autoplay: 1,
+            controls: 0,
+            rel: 0,
+            modestbranding: 1,
+            enablejsapi: 1,
+            origin: window.location.origin,
+            mute: hasInteracted ? 0 : 1
           },
-          onStateChange: onPlayerStateChange,
-        },
-      });
+          events: {
+            onReady: (event: any) => {
+              onPlayerReady(event);
+              if (hasInteracted) event.target.unMute();
+            },
+            onStateChange: onPlayerStateChange,
+            onError: (e: any) => {
+              console.error("MainContent: YouTube Player Error", e);
+              // Clear current ID to allow retry on next check
+              currentVideoIdRef.current = "";
+            }
+          },
+        });
+      } catch (e) {
+        console.error("MainContent: Player creation failed", e);
+        currentVideoIdRef.current = "";
+      }
     };
 
-    // Helper to extract Video ID
+    // Helper to extract Video ID - Now more aggressive for malformed inputs
     const getYouTubeId = (url: any) => {
       if (!url || typeof url !== 'string') return "";
+      
+      // 1. Standard YouTube/Embed Match
       const match = url.match(/(?:youtube\.com\/(?:embed\/|v\/|watch\?v=|live\/)|youtu\.be\/)([^&?/\s]+)/);
-      return match ? match[1] : (url.length === 11 ? url : "");
+      if (match) return match[1];
+
+      // 2. Extra effort: Match ID if it's inside a "playlist=" parameter (common in mangled URLs)
+      const playlistMatch = url.match(/[?&]playlist=([^&?/\s]+)/);
+      if (playlistMatch) return playlistMatch[1];
+      
+      // 3. Last fallback: Check if it's just a raw 11-char ID
+      const trimmed = url.trim();
+      return trimmed.length === 11 ? trimmed : "";
     };
 
     // Determine what to play
@@ -133,7 +165,10 @@ const MainContent = () => {
       }
     }
 
-    if (!videoToPlay) return;
+    if (!videoToPlay) {
+      console.warn("MainContent: Could not determine video ID for", activeProgram.content);
+      return;
+    }
 
     if (window.YT && window.YT.Player) {
       initPlayer(videoToPlay);
