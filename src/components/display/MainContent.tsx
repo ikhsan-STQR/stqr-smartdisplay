@@ -27,8 +27,13 @@ const VideoPlayer = memo(forwardRef(({
   hasInteracted: boolean;
   onEnded: () => void;
 }, ref) => {
+  const interactionRef = useRef(hasInteracted);
   const playerRef = useRef<any>(null);
   const playerElementId = "yt-player-main";
+
+  useEffect(() => {
+    interactionRef.current = hasInteracted;
+  }, [hasInteracted]);
 
   const forceUnmute = useCallback((player: any) => {
     if (player && typeof player.playVideo === 'function') {
@@ -79,7 +84,7 @@ const VideoPlayer = memo(forwardRef(({
         },
         events: {
           onReady: (event: any) => {
-            if (isMounted && hasInteracted) forceUnmute(event.target);
+            if (isMounted && interactionRef.current) forceUnmute(event.target);
           },
           onStateChange: (event: any) => {
             if (!isMounted) return;
@@ -88,7 +93,8 @@ const VideoPlayer = memo(forwardRef(({
             if (event.data === window.YT.PlayerState.ENDED) {
               onEnded();
             } else if (event.data === window.YT.PlayerState.PLAYING) {
-              if (hasInteracted) forceUnmute(p);
+              // AGGRESSIVE UNMUTE: Force unmute every time a video starts playing if session is unlocked
+              if (interactionRef.current) forceUnmute(p);
             } else if (event.data === window.YT.PlayerState.PAUSED && isMounted) {
               if (p && typeof p.playVideo === 'function') p.playVideo();
             }
