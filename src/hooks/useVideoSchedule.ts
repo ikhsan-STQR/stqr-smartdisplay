@@ -59,12 +59,12 @@ export const useVideoSchedule = () => {
       );
 
       if (builtInActive) {
-        const contentId = builtInActive.id === "default" 
-          ? (config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls[0] : config.videoUrl) 
+        const content = builtInActive.id === "default" 
+          ? (config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls : [config.videoUrl]) 
           : builtInActive.id;
         setActiveProgram({
           contentType: "video",
-          content: contentId,
+          content: content,
           scheduleName: builtInActive.name,
         });
         return;

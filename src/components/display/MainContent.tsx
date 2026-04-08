@@ -59,6 +59,7 @@ const VideoPlayer = memo(({
           onStateChange: (event: any) => {
             if (isMounted && event.data === window.YT.PlayerState.ENDED) {
               onEnded();
+              event.target.playVideo();
             }
           },
         },
@@ -141,13 +142,12 @@ const MainContent = () => {
   }, [activeProgram.contentType, activeProgram.content, config.announcementInterval]);
 
   const handleVideoEnded = useCallback(() => {
-    const isDefault = !activeProgram.scheduleName || activeProgram.scheduleName === "DEFAULT (MURROTAL 24H)";
     const playlist = Array.isArray(activeProgram.content) ? activeProgram.content : config.defaultVideoUrls;
 
-    if (isDefault && playlist.length > 1) {
+    if (playlist.length > 1) {
       setCurrentPlaylistIndex((prev) => (prev + 1) % playlist.length);
     }
-  }, [activeProgram.scheduleName, activeProgram.content, config.defaultVideoUrls]);
+  }, [activeProgram.content, config.defaultVideoUrls]);
 
   const getYouTubeId = (url: any) => {
     if (!url || typeof url !== 'string') return "";
