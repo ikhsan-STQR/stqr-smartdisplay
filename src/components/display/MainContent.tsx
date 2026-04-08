@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo, useCallback } from "react";
+import { useState, useEffect, useRef, memo, useCallback, forwardRef, useImperativeHandle } from "react";
 import { useDisplay } from "@/context/DisplayContext";
 import { useVideoSchedule } from "@/hooks/useVideoSchedule";
 
@@ -9,8 +9,16 @@ declare global {
   }
 }
 
-// Dedicated VideoPlayer component to isolate from clock re-renders
-const VideoPlayer = memo(({ 
+const extractYouTubeId = (url: any) => {
+  if (!url || typeof url !== 'string') return "";
+  const match = url.match(/(?:youtube\.com\/(?:embed\/|v\/|watch\?v=|live\/|shorts\/)|youtu\.be\/)([^&?/\s]{11})/);
+  if (match) return match[1];
+  const trimmed = url.trim();
+  return trimmed.length === 11 ? trimmed : "";
+};
+
+// Dedicated VideoPlayer component - Stable version with key-based remounting
+const VideoPlayer = memo(forwardRef(({ 
   videoId, 
   hasInteracted, 
   onEnded 
@@ -18,44 +26,44 @@ const VideoPlayer = memo(({
   videoId: string; 
   hasInteracted: boolean;
   onEnded: () => void;
-}) => {
+}, ref) => {
   const playerRef = useRef<any>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const playerElementId = "yt-player-main"; // Use stable ID
+  const playerElementId = "yt-player-main";
 
-  // Handle video loading/changing
-  useEffect(() => {
-    if (playerRef.current && typeof playerRef.current.loadVideoById === 'function') {
-      playerRef.current.loadVideoById(videoId);
+  const forceUnmute = useCallback((player: any) => {
+    if (player) {
+      if (typeof player.unMute === 'function') player.unMute();
+      if (typeof player.setVolume === 'function') player.setVolume(100);
+      if (typeof player.playVideo === 'function') player.playVideo();
     }
-  }, [videoId]);
+  }, []);
 
-  // Handle mute/unmute
-  useEffect(() => {
-    if (playerRef.current && typeof playerRef.current.mute === 'function') {
-      if (hasInteracted) {
-        playerRef.current.unMute();
-      } else {
-        playerRef.current.mute();
+  // Expose synchronous method for user gesture context
+  useImperativeHandle(ref, () => ({
+    forcePlayWithSound: () => {
+      if (playerRef.current) {
+        forceUnmute(playerRef.current);
       }
     }
-  }, [hasInteracted]);
+  }));
 
   useEffect(() => {
     let isMounted = true;
+    let checkInterval: any;
 
     const initPlayer = () => {
-      if (!isMounted || !window.YT || !window.YT.Player || !document.getElementById(playerElementId)) {
+      if (!isMounted || !window.YT || !window.YT.Player || !document.getElementById(playerElementId)) return;
+
+      if (!videoId) {
+        onEnded();
         return;
       }
-
-      const currentOrigin = window.location.origin;
 
       playerRef.current = new window.YT.Player(playerElementId, {
         height: '100%',
         width: '100%',
         videoId: videoId,
-        host: 'https://www.youtube-nocookie.com',
+        host: 'https://www.youtube.com',
         playerVars: {
           enablejsapi: 1,
           autoplay: 1,
@@ -63,49 +71,37 @@ const VideoPlayer = memo(({
           rel: 0,
           modestbranding: 1,
           mute: hasInteracted ? 0 : 1,
-          origin: currentOrigin,
-          widget_referrer: currentOrigin,
+          origin: window.location.origin,
         },
         events: {
           onReady: (event: any) => {
-            if (isMounted) {
-              if (hasInteracted) {
-                event.target.unMute();
-              } else {
-                event.target.mute();
-              }
-              event.target.playVideo();
-            }
+            if (isMounted && hasInteracted) forceUnmute(event.target);
           },
           onStateChange: (event: any) => {
             if (!isMounted) return;
+            const p = event.target;
+            
             if (event.data === window.YT.PlayerState.ENDED) {
               onEnded();
-            } else if (event.data === window.YT.PlayerState.PAUSED) {
-              // Auto-resume if paused (e.g. by API glitch)
-              event.target.playVideo();
+            } else if (event.data === window.YT.PlayerState.PLAYING) {
+              if (hasInteracted) forceUnmute(p);
+            } else if (event.data === window.YT.PlayerState.PAUSED && isMounted) {
+              p.playVideo();
             }
           },
           onError: (event: any) => {
-            console.error("YouTube Player Error:", event.data);
-            setTimeout(() => {
-              if (isMounted) onEnded();
-            }, 3000);
+            const errorId = event.data;
+            console.error(`YouTube Error [${errorId}] for video: ${videoId}. Skipping immediately...`);
+            
+            // Error 150/101 = Restricted/Deceased. Skip IMMEDIATELY.
+            if (isMounted) onEnded();
           }
         },
       });
     };
 
     if (window.YT && window.YT.Player) {
-      const timer = setTimeout(initPlayer, 200);
-      return () => {
-        isMounted = false;
-        clearTimeout(timer);
-        if (playerRef.current) {
-          try { playerRef.current.destroy(); } catch (e) {}
-          playerRef.current = null;
-        }
-      };
+      initPlayer();
     } else {
       if (!document.querySelector('script[src*="iframe_api"]')) {
         const tag = document.createElement('script');
@@ -114,43 +110,46 @@ const VideoPlayer = memo(({
         firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
       }
 
-      const prevCallback = window.onYouTubeIframeAPIReady;
+      const prev = window.onYouTubeIframeAPIReady;
       window.onYouTubeIframeAPIReady = () => {
-        if (prevCallback) prevCallback();
+        if (prev) prev();
         initPlayer();
       };
 
-      const interval = setInterval(() => {
+      checkInterval = setInterval(() => {
         if (window.YT && window.YT.Player) {
           initPlayer();
-          clearInterval(interval);
+          clearInterval(checkInterval);
         }
       }, 1000);
-      
-      return () => {
-        isMounted = false;
-        clearInterval(interval);
-        if (playerRef.current) {
-          try { playerRef.current.destroy(); } catch (e) {}
-          playerRef.current = null;
-        }
-      };
     }
-  }, [onEnded]); // Only initialize once
+
+    return () => {
+      isMounted = false;
+      if (checkInterval) clearInterval(checkInterval);
+      if (playerRef.current) {
+        try { playerRef.current.destroy(); } catch (e) {}
+        playerRef.current = null;
+      }
+    };
+  }, [videoId, onEnded]); // Initialize on every videoId change (Stable Lifecycle)
 
   return (
-    <div ref={containerRef} className="w-full h-full bg-black flex items-center justify-center overflow-hidden">
+    <div className="w-full h-full bg-black flex items-center justify-center overflow-hidden">
       <div id={playerElementId} className="w-full h-full pointer-events-none" />
     </div>
   );
-});
+}));
 
 const MainContent = () => {
   const { config } = useDisplay();
   const activeProgram = useVideoSchedule();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const [currentPlaylistIndex, setCurrentPlaylistIndex] = useState(0);
+  
+  // Separate indices for robust playlist management
+  const [defaultPlaylistIndex, setDefaultPlaylistIndex] = useState(0);
+  const [scheduledPlaylistIndex, setScheduledPlaylistIndex] = useState(0);
 
   useEffect(() => {
     const interacted = sessionStorage.getItem('display-interacted');
@@ -171,47 +170,54 @@ const MainContent = () => {
     }
   }, [activeProgram.contentType, activeProgram.content, config.announcementInterval]);
 
-  // Reset playlist index when content changes to ensure we start from the beginning
+  // Reset scheduled index when a new program starts
   useEffect(() => {
-    setCurrentPlaylistIndex(0);
-  }, [activeProgram.content, activeProgram.contentType]);
+    setScheduledPlaylistIndex(0);
+  }, [activeProgram.content]);
 
   const handleVideoEnded = useCallback(() => {
-    const activeContent = activeProgram.content;
-    const playlist = Array.isArray(activeContent) 
-      ? activeContent 
-      : (activeContent ? [activeContent as string] : config.defaultVideoUrls || []);
-
-    if (playlist.length > 1) {
-      setCurrentPlaylistIndex((prev) => (prev + 1) % playlist.length);
+    const isScheduled = !!activeProgram.content && activeProgram.contentType === "video";
+    
+    if (isScheduled) {
+      const playlist = Array.isArray(activeProgram.content) ? activeProgram.content : [activeProgram.content as string];
+      if (playlist.length > 1) {
+        setScheduledPlaylistIndex(prev => (prev + 1) % playlist.length);
+      }
     } else {
-      // For single video, force a re-play if possible, or trigger a refresh of videoToPlay
-      setCurrentPlaylistIndex(0);
-      // Small state toggle to force VideoPlayer remount if it's the same video
-      // But since we use videoToPlay as key, if it's same video, it won't remount.
-      // The VideoPlayer onStateChange now handles re-playing if the ID hasn't changed.
+      const playlist = config.defaultVideoUrls && config.defaultVideoUrls.length > 0 
+        ? config.defaultVideoUrls 
+        : [config.videoUrl];
+      
+      if (playlist.length > 1) {
+        setDefaultPlaylistIndex(prev => (prev + 1) % playlist.length);
+      } else {
+        // Force state refresh for single video loop
+        setDefaultPlaylistIndex(0);
+      }
     }
-  }, [activeProgram.content, config.defaultVideoUrls]);
+  }, [activeProgram.content, activeProgram.contentType, config.defaultVideoUrls, config.videoUrl]);
 
-  const getYouTubeId = (url: any) => {
-    if (!url || typeof url !== 'string') return "";
-    const match = url.match(/(?:youtube\.com\/(?:embed\/|v\/|watch\?v=|live\/)|youtu\.be\/)([^&?/\s]+)/);
-    if (match) return match[1];
-    const playlistMatch = url.match(/[?&]playlist=([^&?/\s]+)/);
-    if (playlistMatch) return playlistMatch[1];
-    const trimmed = url.trim();
-    return trimmed.length === 11 ? trimmed : "";
-  };
-
-  let videoToPlay = "";
-  const configPlaylist = config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls : [config.videoUrl];
+  // Determine current video source
+  const isScheduled = !!activeProgram.content && activeProgram.contentType === "video";
   const activeContent = activeProgram.content;
-  const currentPlaylist = Array.isArray(activeContent) ? activeContent : (activeContent ? [activeContent] : configPlaylist);
+  const configPlaylist = config.defaultVideoUrls && config.defaultVideoUrls.length > 0 ? config.defaultVideoUrls : [config.videoUrl];
+  
+  const currentPlaylist = isScheduled 
+    ? (Array.isArray(activeContent) ? activeContent : [activeContent])
+    : configPlaylist;
 
-  if (currentPlaylist.length > 0) {
-    const safeIndex = currentPlaylistIndex % currentPlaylist.length;
-    videoToPlay = getYouTubeId(currentPlaylist[safeIndex]);
-  }
+  const currentIndex = isScheduled ? scheduledPlaylistIndex : defaultPlaylistIndex;
+  const rawUrl = currentPlaylist[currentIndex % currentPlaylist.length] || "";
+  const videoToPlay = extractYouTubeId(rawUrl);
+  const videoPlayerRef = useRef<any>(null);
+
+  // Auto-skip invalid or empty entries in the playlist
+  useEffect(() => {
+    if (currentPlaylist.length > 0 && !videoToPlay) {
+      console.warn(`Invalid YouTube URL detected: "${rawUrl}". Skipping to next...`);
+      handleVideoEnded();
+    }
+  }, [videoToPlay, currentPlaylist.length, handleVideoEnded, rawUrl]);
 
   // Proper empty state detection
   const isContentEmpty = activeProgram.contentType === "video" 
@@ -219,7 +225,10 @@ const MainContent = () => {
     : (!activeProgram.content || (Array.isArray(activeProgram.content) && activeProgram.content.length === 0));
 
   return (
-    <div className="w-full h-full bg-black rounded-[calc(var(--radius)-0.3vw)] overflow-hidden relative shadow-inner" onClick={handleInteraction}>
+    <div className="w-full h-full bg-black rounded-[calc(var(--radius)-0.3vw)] overflow-hidden relative shadow-inner" onClick={() => {
+      handleInteraction();
+      videoPlayerRef.current?.forcePlayWithSound();
+    }}>
       {isContentEmpty ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-zinc-900 to-black p-[4vw] text-center">
           {config.organization_logo ? (
@@ -240,13 +249,19 @@ const MainContent = () => {
       ) : activeProgram.contentType === "video" ? (
         <div className="absolute inset-0">
           <VideoPlayer 
+            key={videoToPlay}
+            ref={videoPlayerRef}
             videoId={videoToPlay} 
             hasInteracted={hasInteracted} 
             onEnded={handleVideoEnded} 
           />
           
           {!hasInteracted && (
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center cursor-pointer z-50 transition-all active:scale-95" onClick={handleInteraction}>
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center cursor-pointer z-50 transition-all active:scale-95" onClick={(e) => {
+              e.stopPropagation(); // Prevent double trigger if bubble
+              handleInteraction();
+              videoPlayerRef.current?.forcePlayWithSound();
+            }}>
               <div className="bg-white/10 border border-white/20 backdrop-blur-md px-8 py-4 rounded-2xl text-center space-y-2">
                 <div className="text-[2.5vw] animate-bounce">👆</div>
                 <h3 className="text-white font-montserrat font-black text-[1.2vw] uppercase tracking-widest">Klik Untuk Aktifkan Video</h3>
