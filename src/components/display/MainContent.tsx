@@ -46,7 +46,7 @@ const VideoPlayer = memo(({
           rel: 0,
           modestbranding: 1,
           enablejsapi: 1,
-          origin: window.location.origin,
+          origin: window.location.origin.replace(/\/$/, ''),
           mute: hasInteracted ? 0 : 1,
         },
         events: {

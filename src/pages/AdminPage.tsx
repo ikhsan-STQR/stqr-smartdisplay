@@ -843,7 +843,7 @@ const formatYoutubeUrl = (url: string) => {
   const embedMatch = url.match(/(?:youtube\.com\/embed\/|youtu\.be\/|youtube\.com\/watch\?v=)([^&?/\s]+)/);
   if (embedMatch) {
     const videoId = embedMatch[1];
-    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&loop=1&playlist=${videoId}&controls=0&rel=0&modestbranding=1&enablejsapi=1`;
+    return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&loop=1&playlist=${videoId}&controls=0&rel=0&modestbranding=1&enablejsapi=1&origin=${window.location.origin}`;
   }
   return url;
 };
@@ -855,26 +855,44 @@ const TextArrayField = ({
     <div className="mb-3 space-y-2">
       <label className="text-[10px] font-black text-zinc-400 block uppercase tracking-wider ml-1">{label}</label>
       <div className="space-y-2">
-        {(values || []).map((v, i) => (
-          <div key={i} className="flex gap-2 items-center bg-zinc-50 p-1.5 rounded-xl border border-zinc-200/60 group">
-            <textarea
-              value={v}
-              onChange={(e) => {
-                const updated = [...values];
-                updated[i] = e.target.value;
-                onChange(updated);
-              }}
-              placeholder="Masukkan link YouTube atau teks di sini..."
-              className="flex-1 bg-transparent px-3 py-2 text-xs focus:ring-0 outline-none font-medium text-zinc-600 min-h-[40px] resize-none"
-            />
-            <button 
-              onClick={() => onChange(values.filter((_, j) => j !== i))} 
-              className="text-red-400 hover:bg-white p-2 rounded-lg transition-all border border-transparent hover:border-red-100 self-start mt-1"
-            >
-              ✕
-            </button>
-          </div>
-        ))}
+        {(values || []).map((v, i) => {
+          const ytMatch = v.match(/(?:youtube\.com\/(?:embed\/|v\/|watch\?v=|live\/)|youtu\.be\/)([^&?/\s]+)/) || v.match(/[?&]playlist=([^&?/\s]+)/);
+          const videoId = ytMatch ? ytMatch[1] : null;
+
+          return (
+            <div key={i} className="flex gap-3 items-center bg-white p-2 rounded-2xl border border-zinc-200 shadow-sm group hover:border-primary/20 transition-all">
+              {/* YouTube Thumbnail Preview */}
+              <div className="w-16 h-10 rounded-lg bg-zinc-50 border border-zinc-100 flex-shrink-0 overflow-hidden flex items-center justify-center relative shadow-inner bg-black">
+                {videoId ? (
+                  <img 
+                    src={`https://img.youtube.com/vi/${videoId}/default.jpg`}
+                    alt="YT Preview" 
+                    className="w-full h-full object-cover opacity-80"
+                  />
+                ) : (
+                  <div className="text-sm opacity-20">🎬</div>
+                )}
+              </div>
+
+              <textarea
+                value={v}
+                onChange={(e) => {
+                  const updated = [...values];
+                  updated[i] = e.target.value;
+                  onChange(updated);
+                }}
+                placeholder="Masukkan link YouTube atau teks di sini..."
+                className="flex-1 bg-transparent px-1 py-1 text-xs focus:ring-0 outline-none font-medium text-zinc-600 min-h-[40px] resize-none"
+              />
+              <button 
+                onClick={() => onChange(values.filter((_, j) => j !== i))} 
+                className="text-red-400 hover:bg-white p-2 rounded-lg transition-all border border-transparent hover:border-red-100 self-start mt-1"
+              >
+                ✕
+              </button>
+            </div>
+          );
+        })}
         <button
           onClick={() => onChange([...(values || []), ""])}
           className="text-primary text-[10px] font-black hover:bg-primary/5 px-4 py-3 rounded-xl border border-primary/20 transition-all flex items-center gap-2 mt-2"
@@ -1036,7 +1054,24 @@ const ArrayField = ({
       <label className="text-[10px] font-black text-zinc-400 block uppercase tracking-wider ml-1">{label}</label>
       <div className="space-y-2">
         {values.map((v, i) => (
-          <div key={i} className="flex gap-2 items-center bg-zinc-50 p-1.5 rounded-xl border border-zinc-200/60 group">
+          <div key={i} className="flex gap-3 items-center bg-white p-2 rounded-2xl border border-zinc-200 shadow-sm group hover:border-primary/20 transition-all">
+            {/* Thumbnail Preview */}
+            <div className="w-12 h-12 rounded-xl bg-zinc-50 border border-zinc-100 flex-shrink-0 overflow-hidden flex items-center justify-center relative shadow-inner">
+              {v && !v.startsWith("data:video") && !v.includes("youtube.com") && !v.includes("youtu.be") ? (
+                <img 
+                  src={v} 
+                  alt="Preview" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "";
+                    (e.target as HTMLImageElement).parentElement!.innerHTML = '<span class="text-[10px] font-bold text-zinc-300">FAIL</span>';
+                  }}
+                />
+              ) : (
+                <div className="text-xl opacity-20">{v.includes("youtube.com") ? "🎬" : "🖼️"}</div>
+              )}
+            </div>
+
             <input
               value={v.startsWith("data:image") ? "[Image Data]" : v}
               onChange={(e) => {
@@ -1045,7 +1080,7 @@ const ArrayField = ({
                 onChange(updated);
               }}
               placeholder="https://resource-url.com/..."
-              className="flex-1 bg-transparent px-3 py-1 text-xs focus:ring-0 outline-none font-medium text-zinc-600"
+              className="flex-1 bg-transparent px-1 py-1 text-xs focus:ring-0 outline-none font-medium text-zinc-600 truncate"
             />
             <div className="flex gap-1 items-center">
               <button 
